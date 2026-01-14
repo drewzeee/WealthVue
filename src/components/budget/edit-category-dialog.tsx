@@ -1,10 +1,9 @@
 "use client"
 
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Plus } from "lucide-react"
+import { Category } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +13,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -27,14 +25,20 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { createCategorySchema, CreateCategorySchema } from "@/lib/validations/budget"
+import { updateCategorySchema, UpdateCategorySchema } from "@/lib/validations/budget"
+import { useEffect } from "react"
 
-export function AddCategoryDialog() {
-  const [open, setOpen] = useState(false)
+interface EditCategoryDialogProps {
+  category: Category | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function EditCategoryDialog({ category, open, onOpenChange }: EditCategoryDialogProps) {
   const queryClient = useQueryClient()
 
-  const form = useForm<CreateCategorySchema>({
-    resolver: zodResolver(createCategorySchema),
+  const form = useForm<UpdateCategorySchema>({
+    resolver: zodResolver(updateCategorySchema),
     defaultValues: {
       name: "",
       monthlyBudget: 0,
@@ -43,44 +47,53 @@ export function AddCategoryDialog() {
     },
   })
 
+  // Reset form when category changes
+  useEffect(() => {
+    if (category) {
+      form.reset({
+        name: category.name,
+        monthlyBudget: Number(category.monthlyBudget),
+        color: category.color,
+        carryOver: category.carryOver,
+      })
+    }
+  }, [category, form])
+
   const mutation = useMutation({
-    mutationFn: async (values: CreateCategorySchema) => {
-      const response = await fetch("/api/budgets/categories", {
-        method: "POST",
+    mutationFn: async (values: UpdateCategorySchema) => {
+      if (!category) return
+
+      const response = await fetch(`/api/budgets/categories/${category.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create category")
+        throw new Error("Failed to update category")
       }
 
       return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] })
-      setOpen(false)
-      form.reset()
+      onOpenChange(false)
     },
   })
 
-  function onSubmit(values: CreateCategorySchema) {
+  function onSubmit(values: UpdateCategorySchema) {
     mutation.mutate(values)
   }
 
+  if (!category) return null
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Category
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Category</DialogTitle>
+          <DialogTitle>Edit Category</DialogTitle>
           <DialogDescription>
-            Add a new category to organize your transactions.
+            Update category details and budget allocation.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -149,7 +162,7 @@ export function AddCategoryDialog() {
             />
             <DialogFooter>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Creating..." : "Create Category"}
+                {mutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>

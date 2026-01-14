@@ -11,6 +11,7 @@ export const createCategorySchema = z.object({
     .regex(/^#([0-9A-F]{3}){1,2}$/i, "Invalid hex color code")
     .default("#3B82F6"),
   icon: z.string().optional(),
+  monthlyBudget: z.coerce.number().min(0, "Budget must be positive").default(0),
   carryOver: z.boolean().default(false),
 })
 

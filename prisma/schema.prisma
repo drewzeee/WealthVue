@@ -208,6 +208,7 @@ model Category {
   icon  String? // Icon name/emoji
 
   // Budget settings
+  monthlyBudget Decimal @default(0) @db.Decimal(15, 2)
   carryOver Boolean @default(false)
 
   // Relations

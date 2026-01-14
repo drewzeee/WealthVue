@@ -124,7 +124,7 @@
 
 ### 2.3 Budget & Categorization
 - ✅ Create budget category management UI
-- 🔲 Build budget allocation form
+- ✅ Build budget allocation form
 - ✅ Implement categorization rule builder
 - ✅ Create rule engine for auto-categorization
 - 🔲 Build budget dashboard

@@ -1,6 +1,7 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useState } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Category } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
 
@@ -20,14 +21,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { AddCategoryDialog } from "./add-category-dialog"
+import { EditCategoryDialog } from "./edit-category-dialog"
+import { formatCurrency } from "@/lib/utils"
 
 export function CategoryList() {
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const queryClient = useQueryClient()
+
   const { data, isLoading, error } = useQuery<{ success: boolean; data: Category[] }>({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await fetch("/api/budgets/categories")
       if (!res.ok) throw new Error("Failed to fetch categories")
       return res.json()
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/budgets/categories/${id}`, {
+        method: "DELETE",
+      })
+      if (!res.ok) throw new Error("Failed to delete category")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] })
     },
   })
 
@@ -49,6 +68,7 @@ export function CategoryList() {
             <TableRow>
               <TableHead>Color</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Monthly Budget</TableHead>
               <TableHead>Carry Over</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -56,7 +76,7 @@ export function CategoryList() {
           <TableBody>
             {categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   No categories found. Create one to get started.
                 </TableCell>
               </TableRow>
@@ -70,6 +90,11 @@ export function CategoryList() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell>
+                    {category.monthlyBudget 
+                      ? formatCurrency(Number(category.monthlyBudget)) 
+                      : formatCurrency(0)}
+                  </TableCell>
                   <TableCell>{category.carryOver ? "Yes" : "No"}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -79,8 +104,19 @@ export function CategoryList() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setEditingCategory(category)}>
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this category?")) {
+                              deleteMutation.mutate(category.id)
+                            }
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -90,6 +126,12 @@ export function CategoryList() {
           </TableBody>
         </Table>
       </div>
+
+      <EditCategoryDialog 
+        category={editingCategory} 
+        open={!!editingCategory} 
+        onOpenChange={(open) => !open && setEditingCategory(null)} 
+      />
     </div>
   )
 }
