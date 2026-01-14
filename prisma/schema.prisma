@@ -30,6 +30,7 @@ model User {
 
   // Relations
   accounts            Account[]
+  plaidItems          PlaidItem[]
   categories          Category[]
   categorizationRules CategorizationRule[]
   investmentAccounts  InvestmentAccount[]
@@ -80,6 +81,33 @@ enum InvitationStatus {
 // BANKING & TRANSACTIONS
 // ============================================================================
 
+model PlaidItem {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Plaid details
+  itemId         String   @unique
+  accessToken    String // Encrypted
+  institutionId  String?
+  institutionName String?
+  
+  // Sync cursor
+  cursor         String?
+
+  // Status
+  status         String   @default("active") // active, error
+
+  // Relations
+  accounts       Account[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@map("plaid_items")
+}
+
 model Account {
   id              String  @id @default(cuid())
   userId          String
@@ -92,8 +120,8 @@ model Account {
 
   // Plaid integration
   plaidAccountId   String?  @unique
-  plaidAccessToken String? // Encrypted
   plaidItemId      String?
+  plaidItem        PlaidItem? @relation(fields: [plaidItemId], references: [id], onDelete: Cascade)
 
   // Balance tracking
   currentBalance   Decimal  @db.Decimal(15, 2)
