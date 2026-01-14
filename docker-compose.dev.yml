@@ -1,0 +1,26 @@
+version: '3.9'
+
+# Development-specific overrides
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  postgres:
+    environment:
+      POSTGRES_USER: wealthvue
+      POSTGRES_PASSWORD: wealthvue_dev_password
+      POSTGRES_DB: wealthvue
+    # Expose logs for debugging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    # Disable persistence for faster development
+    command: redis-server
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
