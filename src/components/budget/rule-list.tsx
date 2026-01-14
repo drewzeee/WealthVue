@@ -1,6 +1,7 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useState } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { CategorizationRule } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
 
@@ -19,7 +20,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { AddRuleDialog } from "./add-rule-dialog"
+import { Badge } from "@/components/ui/badge"
+import { RuleDialog } from "./add-rule-dialog"
 
 type RuleWithCategory = CategorizationRule & {
   category: { name: string; color: string }
@@ -35,6 +37,23 @@ export function RuleList() {
     },
   })
 
+  const queryClient = useQueryClient()
+  const [editingRule, setEditingRule] = useState<RuleWithCategory | undefined>(undefined)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/budgets/rules/${id}`, {
+        method: "DELETE",
+      })
+      if (!res.ok) throw new Error("Failed to delete rule")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rules"] })
+    },
+  })
+
   if (isLoading) return <div>Loading rules...</div>
   if (error) return <div>Error loading rules</div>
 
@@ -44,7 +63,7 @@ export function RuleList() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Categorization Rules</h3>
-        <AddRuleDialog />
+        <RuleDialog />
       </div>
 
       <div className="rounded-md border">
@@ -78,11 +97,21 @@ export function RuleList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                        {(rule.conditions as any[]).map((cond, idx) => (
-                            <span key={idx} className="text-sm">
-                                {cond.field} {cond.operator} "{cond.value}"
+                      <span className="text-xs font-semibold text-muted-foreground mb-1">
+                        MATCH {(rule as any).logic || "AND"}
+                      </span>
+                      {(rule.conditions as any[]).map((cond, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs font-normal">
+                            {cond.field} {cond.operator} &quot;{cond.value}&quot;
+                          </Badge>
+                          {idx < (rule.conditions as any[]).length - 1 && (
+                            <span className="text-[10px] text-muted-foreground">
+                              {(rule as any).logic || "AND"}
                             </span>
-                        ))}
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -93,8 +122,20 @@ export function RuleList() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setEditingRule(rule)
+                          setIsEditDialogOpen(true)
+                        }}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this rule?")) {
+                              deleteMutation.mutate(rule.id)
+                            }
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -104,6 +145,12 @@ export function RuleList() {
           </TableBody>
         </Table>
       </div>
+
+      <RuleDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        ruleToEdit={editingRule}
+      />
     </div>
   )
 }

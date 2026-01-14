@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useState, useEffect, useMemo } from "react"
+import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Plus } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 import { Category } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
@@ -36,9 +36,22 @@ import {
 } from "@/components/ui/select"
 import { createRuleSchema, CreateRuleSchema } from "@/lib/validations/budget"
 
-export function AddRuleDialog() {
-  const [open, setOpen] = useState(false)
+export function RuleDialog({
+  ruleToEdit,
+  open,
+  onOpenChange
+}: {
+  ruleToEdit?: any, // Using any for simplicity with complex Prisma types, can be strict Typed if we export RuleWithCategory
+  open?: boolean,
+  onOpenChange?: (open: boolean) => void
+}) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = open !== undefined
+  const showModal = isControlled ? open : internalOpen
+  const setShowModal = isControlled ? onOpenChange! : setInternalOpen
+
   const queryClient = useQueryClient()
+  const isEditing = !!ruleToEdit
 
   // Fetch categories for selection
   const { data: categoriesData } = useQuery<{ data: Category[] }>({
@@ -47,34 +60,59 @@ export function AddRuleDialog() {
   })
   const categories = categoriesData?.data || []
 
-  const form = useForm<CreateRuleSchema>({
+  // useMemo to prevent infinite loop in useEffect
+  const defaultValues: CreateRuleSchema = useMemo(() => ({
+    categoryId: ruleToEdit?.categoryId || "",
+    priority: ruleToEdit?.priority || 1,
+    isActive: ruleToEdit?.isActive ?? true,
+    logic: ruleToEdit?.logic || "AND",
+    conditions: ruleToEdit?.conditions ? (ruleToEdit.conditions as any[]) : [{ field: "description", operator: "contains", value: "" }],
+  }), [ruleToEdit])
+
+  const form = useForm({
     resolver: zodResolver(createRuleSchema),
-    defaultValues: {
-      priority: 1,
-      isActive: true,
-      conditions: [{ field: "description", operator: "contains", value: "" }],
-    },
+    defaultValues,
   })
+
+  // Ensure field array is initialized cleanly
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "conditions",
+  })
+
+  // Reset form when ruleToEdit changes or dialog opens
+  useEffect(() => {
+    if (showModal) {
+      form.reset(defaultValues)
+    }
+  }, [showModal, defaultValues, form])
 
   const mutation = useMutation({
     mutationFn: async (values: CreateRuleSchema) => {
       // Ensure priority is number
       const payload = { ...values, priority: Number(values.priority) }
-      const response = await fetch("/api/budgets/rules", {
-        method: "POST",
+
+      const url = isEditing
+        ? `/api/budgets/rules/${ruleToEdit.id}`
+        : "/api/budgets/rules"
+
+      const method = isEditing ? "PATCH" : "POST"
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create rule")
+        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} rule`)
       }
 
       return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rules"] })
-      setOpen(false)
+      setShowModal(false)
       form.reset()
     },
   })
@@ -84,16 +122,18 @@ export function AddRuleDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Rule
-        </Button>
-      </DialogTrigger>
+    <Dialog open={showModal} onOpenChange={setShowModal}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Rule
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create Categorization Rule</DialogTitle>
+          <DialogTitle>{isEditing ? "Edit" : "Create"} Categorization Rule</DialogTitle>
           <DialogDescription>
             Automatically categorize transactions based on conditions.
           </DialogDescription>
@@ -107,7 +147,7 @@ export function AddRuleDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assign to Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select category" />
@@ -141,71 +181,119 @@ export function AddRuleDialog() {
               />
             </div>
 
-            <div className="space-y-2 border rounded-md p-4 bg-slate-50 dark:bg-slate-900">
-              <h4 className="text-sm font-medium">Condition (Match All)</h4>
-              {/* Only supporting single condition creation for MVP simplicity in UI */}
-              <div className="grid grid-cols-3 gap-2">
-                <FormField
-                  control={form.control}
-                  name="conditions.0.field"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Field" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="description">Description</SelectItem>
-                          <SelectItem value="merchant">Merchant</SelectItem>
-                          <SelectItem value="amount">Amount</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="conditions.0.operator"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Operator" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="contains">Contains</SelectItem>
-                          <SelectItem value="equals">Equals</SelectItem>
-                          <SelectItem value="gt">Greater Than</SelectItem>
-                          <SelectItem value="lt">Less Than</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="conditions.0.value"
-                  render={({ field }) => (
-                    <FormItem>
+            <div className="space-y-4 border rounded-md p-4 bg-slate-50 dark:bg-slate-900">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-medium">Conditions</h4>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => append({ field: "description", operator: "contains", value: "" })}
+                >
+                  <Plus className="h-3 w-3 mr-1" /> Add Condition
+                </Button>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="logic"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Match Logic</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <Input placeholder="Value" {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Logic" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="AND">Match All (AND)</SelectItem>
+                        <SelectItem value="OR">Match Any (OR)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-2">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex gap-2 items-start group">
+                    <div className="grid grid-cols-3 gap-2 flex-1">
+                      <FormField
+                        control={form.control}
+                        name={`conditions.${index}.field`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Field" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="description">Description</SelectItem>
+                                <SelectItem value="merchant">Merchant</SelectItem>
+                                <SelectItem value="amount">Amount</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`conditions.${index}.operator`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Operator" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="contains">Contains</SelectItem>
+                                <SelectItem value="equals">Equals</SelectItem>
+                                <SelectItem value="gt">Greater Than</SelectItem>
+                                <SelectItem value="lt">Less Than</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`conditions.${index}.value`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input placeholder="Value" {...field} value={field.value?.toString() ?? ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
             <DialogFooter>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Creating..." : "Create Rule"}
+                {mutation.isPending ? "Saving..." : (isEditing ? "Update Rule" : "Create Rule")}
               </Button>
             </DialogFooter>
           </form>

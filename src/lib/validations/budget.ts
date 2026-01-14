@@ -37,6 +37,7 @@ export const createRuleSchema = z.object({
   categoryId: z.string().cuid("Invalid category ID"),
   priority: z.number().int().min(1).default(1),
   conditions: z.array(conditionSchema).min(1, "At least one condition is required"),
+  logic: z.enum(["AND", "OR"]).default("AND"),
   isActive: z.boolean().default(true),
 })
 

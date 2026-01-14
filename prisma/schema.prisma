@@ -257,6 +257,7 @@ model CategorizationRule {
   // Rule definition
   priority   Int  // Lower number = higher priority
   conditions Json // Array of conditions: { field, operator, value }
+  logic      String @default("AND") // "AND" or "OR"
 
   // Status
   isActive Boolean @default(true)

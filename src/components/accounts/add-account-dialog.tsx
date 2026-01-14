@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+
 import { PlaidLinkButton } from "@/components/plaid/PlaidLinkButton"
+import { createAccount } from "@/app/actions/accounts"
 import { ArrowLeft, Landmark, CreditCard, TrendingUp, Home, ArrowLeftRight } from "lucide-react"
 
 export function AddAccountDialog({ children }: { children?: React.ReactNode }) {
@@ -35,11 +37,27 @@ export function AddAccountDialog({ children }: { children?: React.ReactNode }) {
         if (!open) reset()
     }
 
+
     const handleManualSubmit = async () => {
-        // TODO: Implement API calls for each type
-        console.log("Submitting", manualType, formData)
-        setOpen(false)
-        reset()
+        if (!manualType || !formData.name || !formData.balance) {
+            alert("Please fill in all required fields")
+            return
+        }
+
+        try {
+            await createAccount({
+                type: manualType as any,
+                name: formData.name,
+                balance: parseFloat(formData.balance),
+                subtype: formData.type,
+                interestRate: formData.interestRate ? parseFloat(formData.interestRate) : undefined
+            })
+            setOpen(false)
+            reset()
+        } catch (error) {
+            console.error(error)
+            alert("Failed to create account")
+        }
     }
 
     return (

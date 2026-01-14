@@ -1,5 +1,5 @@
 import { Transaction, CategorizationRule } from "@prisma/client"
-import { Condition, conditionSchema } from "@/lib/validations/budget"
+import { conditionSchema } from "@/lib/validations/budget"
 import { ruleRepository } from "@/lib/db/repositories/rules"
 
 export class CategorizationEngine {
@@ -16,12 +16,19 @@ export class CategorizationEngine {
 
     for (const rule of userRules) {
       if (!rule.isActive) continue
-      
+
       // Parse conditions safely
       const conditions = rule.conditions as any[] // Prisma Json type
       if (!Array.isArray(conditions)) continue
 
-      const isMatch = conditions.every((cond) => this.evaluateCondition(transaction, cond))
+      const logic = (rule as any).logic || "AND" // Handle existing rules or default
+      let isMatch = false
+
+      if (logic === "OR") {
+        isMatch = conditions.some((cond) => this.evaluateCondition(transaction, cond))
+      } else {
+        isMatch = conditions.every((cond) => this.evaluateCondition(transaction, cond))
+      }
 
       if (isMatch) {
         return rule.categoryId
@@ -40,7 +47,7 @@ export class CategorizationEngine {
     const { field, operator, value } = result.data
 
     let fieldValue: string | number | null | undefined
-    
+
     if (field === "amount") {
       fieldValue = Number(transaction.amount)
     } else {

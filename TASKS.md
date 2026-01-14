@@ -197,7 +197,9 @@
 
 ## Odds and Ends
 - 🔲 Improve CSV transaction import
-- [x] Identify account creation workflow
+- 🔲 Add duplicate account detection
+- 🔲 Add automatic transfer detection for credit cards, loans, account transfers, etc
+- ✅ Identify account creation workflow
 
 
 
