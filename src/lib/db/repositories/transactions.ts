@@ -27,21 +27,21 @@ export class TransactionRepository {
       account: { userId },
       ...(startDate || endDate
         ? {
-            date: {
-              ...(startDate ? { gte: startDate } : {}),
-              ...(endDate ? { lte: endDate } : {}),
-            },
-          }
+          date: {
+            ...(startDate ? { gte: startDate } : {}),
+            ...(endDate ? { lte: endDate } : {}),
+          },
+        }
         : {}),
       ...(accountId ? { accountId } : {}),
       ...(categoryId ? { categoryId } : {}),
       ...(search
         ? {
-            OR: [
-              { description: { contains: search, mode: "insensitive" } },
-              { merchant: { contains: search, mode: "insensitive" } },
-            ],
-          }
+          OR: [
+            { description: { contains: search, mode: "insensitive" } },
+            { merchant: { contains: search, mode: "insensitive" } },
+          ],
+        }
         : {}),
     }
 
@@ -93,6 +93,35 @@ export class TransactionRepository {
     if (!transaction) throw new Error("Transaction not found or unauthorized")
 
     return prisma.transaction.delete({ where: { id } })
+  }
+
+  async deleteMany(ids: string[], userId: string) {
+    // 1. Verify all transactions belong to user
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        id: { in: ids },
+        account: { userId },
+      },
+      select: { id: true },
+    })
+
+    const foundIds = transactions.map((t) => t.id)
+
+    // Check if any requested IDs were not found (or don't belong to user)
+    // We strictly only delete what we found. 
+    // If checking for mismatch is important, we could throw an error, 
+    // but silently ignoring invalid IDs is safer for "bulk delete" idempotency usually.
+    // However, for user feedback, let's just proceed with valid ones.
+
+    if (foundIds.length === 0) {
+      return { count: 0 }
+    }
+
+    return prisma.transaction.deleteMany({
+      where: {
+        id: { in: foundIds },
+      },
+    })
   }
 }
 

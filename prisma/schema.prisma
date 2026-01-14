@@ -443,7 +443,7 @@ model NetWorthSnapshot {
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Snapshot data
-  date     DateTime @unique
+  date     DateTime
   netWorth Decimal  @db.Decimal(15, 2)
 
   // Breakdown (optional, for detailed charts)
@@ -455,6 +455,6 @@ model NetWorthSnapshot {
 
   createdAt DateTime @default(now())
 
-  @@index([userId, date])
+  @@unique([userId, date])
   @@map("net_worth_snapshots")
 }

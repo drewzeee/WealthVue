@@ -130,30 +130,76 @@
 - 🔲 Build budget dashboard
 - 🔲 Implement carry-over logic
 
-*See TASKS.md for complete Phase 2-5 breakdown*
-
 ---
 
 ## Phase 3: Investment Tracking & Market Data
 
-**Status:** Not Started
-*See TASKS.md for full details*
+**Goal:** Build investment portfolio management with real-time price updates.
+**Duration:** 3-4 weeks
+**Status:** 🔲 Not Started
+
+- 🔲 Investment account and asset CRUD
+- 🔲 Support for all asset classes (stocks, crypto, real estate, etc.)
+- 🔲 Manual investment entry form
+- 🔲 CSV investment import
+- 🔲 Yahoo Finance API integration for stock prices
+- 🔲 CoinGecko API integration for crypto prices
+- 🔲 Background job for price updates (15-minute intervals)
+- 🔲 Investment portfolio dashboard
+- 🔲 Allocation donut chart by asset class
+- 🔲 Portfolio value over time chart
+- 🔲 Gains/losses calculation and display
+- 🔲 Individual investment detail pages
+- 🔲 Real-time portfolio valuation
 
 ---
 
 ## Phase 4: Dashboard, Net Worth & Family Accounts
 
-**Status:** Not Started
-*See TASKS.md for full details*
+**Goal:** Complete the dashboard, net worth tracking, asset/liability management, and family linking.
+**Duration:** 2-3 weeks
+**Status:** 🔲 Not Started
+
+- 🔲 Complete dashboard implementation (net worth, metrics, charts)
+- 🔲 Net worth calculation engine (aggregates all assets/liabilities)
+- 🔲 Time selector for net worth history (24h, 1w, 1m, 3m, 6m, 1y, all)
+- 🔲 Asset and liability CRUD (loans, real estate, credit cards, etc.)
+- 🔲 Liability tracking with payment schedules
+- 🔲 Family account linking (invitation system)
+- 🔲 Combined household view for linked accounts
+- 🔲 Toggle between individual and household views
+- 🔲 Monthly budget carry-over logic (scheduled job)
+- 🔲 Responsive design for mobile/tablet
+- 🔲 Final UI polish and consistency pass
 
 ---
 
 ## Phase 5: Polish, Testing & Deployment
 
-**Status:** Not Started
-*See TASKS.md for full details*
+**Goal:** Production-ready application with documentation and deployment assets.
+**Duration:** 1-2 weeks
+**Status:** 🔲 Not Started
+
+- 🔲 Comprehensive error handling and user-friendly error messages
+- 🔲 Loading states and optimistic UI updates
+- 🔲 Rate limiting on API endpoints
+- 🔲 API input validation with Zod schemas
+- 🔲 Integration tests for critical workflows
+- 🔲 Docker Compose production configuration
+- 🔲 Nginx reverse proxy setup with SSL
+- 🔲 Environment variable documentation (.env.example)
+- 🔲 README with setup and deployment instructions
+- 🔲 Database backup and restore scripts
+- 🔲 Health check endpoints
+- 🔲 Logging and monitoring setup
 
 ---
+
+## Odds and Ends
+- 🔲 Improve CSV transaction import
+- [x] Identify account creation workflow
+
+
 
 ## Quick Commands
 

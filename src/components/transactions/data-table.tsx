@@ -7,6 +7,8 @@ import {
   useReactTable,
   SortingState,
   getSortedRowModel,
+  OnChangeFn,
+  RowSelectionState,
 } from "@tanstack/react-table"
 
 import {
@@ -26,6 +28,8 @@ interface DataTableProps<TData, TValue> {
   pageCount: number
   pageIndex: number
   onPageChange: (page: number) => void
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +38,8 @@ export function DataTable<TData, TValue>({
   pageCount,
   pageIndex,
   onPageChange,
+  rowSelection,
+  onRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -49,8 +55,11 @@ export function DataTable<TData, TValue>({
         pageSize: 50,
       },
       sorting,
+      rowSelection,
     },
+    enableRowSelection: true,
     onSortingChange: setSorting,
+    onRowSelectionChange: onRowSelectionChange,
     getSortedRowModel: getSortedRowModel(),
   })
 
@@ -67,9 +76,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
@@ -116,7 +125,7 @@ export function DataTable<TData, TValue>({
           Previous
         </Button>
         <div className="text-sm text-muted-foreground">
-            Page {pageIndex} of {pageCount}
+          Page {pageIndex} of {pageCount}
         </div>
         <Button
           variant="outline"
