@@ -97,24 +97,24 @@
 
 **Goal:** Implement Plaid integration, transaction management, budget creation, and categorization engine.
 **Duration:** 3-4 weeks
-**Status:** Not Started
+**Status:** 🔄 In Progress
 
 ### 2.1 Plaid Integration Setup
-- 🔲 Create Plaid developer account and get API keys
-- 🔲 Install Plaid client library
-- 🔲 Create Plaid configuration module
-- 🔲 Implement Plaid Link Token generation (POST /api/plaid/link/token)
-- 🔲 Implement public token exchange (POST /api/plaid/link/exchange)
-- 🔲 Store encrypted Plaid access tokens in database
-- 🔲 Create Account model in Prisma schema
-- 🔲 Build Plaid Link UI component
+- ✅ Create Plaid developer account and get API keys
+- ✅ Install Plaid client library
+- ✅ Create Plaid configuration module
+- ✅ Implement Plaid Link Token generation (POST /api/plaid/create-link-token)
+- ✅ Implement public token exchange (POST /api/plaid/exchange-public-token)
+- ✅ Store encrypted Plaid access tokens in database
+- ✅ Create Account model in Prisma schema
+- ✅ Build Plaid Link UI component
 - 🔲 Create account connection page
-- 🔲 Test Plaid Link flow with sandbox banks
+- ✅ Test Plaid Link flow with sandbox banks
 
 ### 2.2 Transaction Management
-- 🔲 Implement initial transaction fetch from Plaid
-- 🔲 Create transaction storage logic
-- 🔲 Build Plaid webhook endpoint (POST /api/webhooks/plaid)
+- ✅ Implement initial transaction fetch from Plaid
+- ✅ Create transaction storage logic
+- ✅ Build Plaid webhook endpoint (POST /api/webhooks/plaid)
 - 🔲 Create transaction list page (/transactions)
 - 🔲 Build transaction table component with sorting
 - 🔲 Add transaction filters (date range, category, account)
