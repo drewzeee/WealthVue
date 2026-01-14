@@ -115,12 +115,12 @@
 - ✅ Implement initial transaction fetch from Plaid
 - ✅ Create transaction storage logic
 - ✅ Build Plaid webhook endpoint (POST /api/webhooks/plaid)
-- 🔲 Create transaction list page (/transactions)
-- 🔲 Build transaction table component with sorting
-- 🔲 Add transaction filters (date range, category, account)
-- 🔲 Build search functionality
-- 🔲 Create manual transaction entry form
-- 🔲 Implement CSV import
+- ✅ Create transaction list page (/transactions)
+- ✅ Build transaction table component with sorting
+- ✅ Add transaction filters (date range, category, account)
+- ✅ Build search functionality
+- ✅ Create manual transaction entry form
+- ✅ Implement CSV import
 
 ### 2.3 Budget & Categorization
 - 🔲 Create budget category management UI
