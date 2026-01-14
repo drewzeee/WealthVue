@@ -123,10 +123,10 @@
 - ✅ Implement CSV import
 
 ### 2.3 Budget & Categorization
-- 🔲 Create budget category management UI
+- ✅ Create budget category management UI
 - 🔲 Build budget allocation form
-- 🔲 Implement categorization rule builder
-- 🔲 Create rule engine for auto-categorization
+- ✅ Implement categorization rule builder
+- ✅ Create rule engine for auto-categorization
 - 🔲 Build budget dashboard
 - 🔲 Implement carry-over logic
 
