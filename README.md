@@ -21,7 +21,7 @@ A comprehensive personal financial dashboard that unifies budget management, inv
 
 ## Project Status
 
-🚧 **Phase 1: Foundation & Core Infrastructure** - In Progress
+🚧 **Phase 4: Dashboard, Net Worth & Family Accounts** - In Progress
 
 See [TASKS.md](./TASKS.md) for detailed task breakdown and progress.
 
@@ -149,7 +149,7 @@ Private project - All rights reserved
 
 ---
 
-**Current Phase**: Foundation & Core Infrastructure (Phase 1)
-**Next Phase**: Budget & Transaction Management (Phase 2)
+**Current Phase**: Dashboard, Net Worth & Family Accounts (Phase 4)
+**Next Phase**: Polish, Testing & Deployment (Phase 5)
 
 See [TASKS.md](./TASKS.md) for detailed progress tracking.

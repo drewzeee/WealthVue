@@ -136,7 +136,7 @@
 
 **Goal:** Build investment portfolio management with real-time price updates.
 **Duration:** 3-4 weeks
-**Status:** 🔄 In Progress
+**Status:** ✅ Completed
 
 - ✅ Investment account and asset CRUD
 - ✅ Support for all asset classes (stocks, crypto, real estate, etc.)
@@ -158,7 +158,7 @@
 
 **Goal:** Complete the dashboard, net worth tracking, asset/liability management, and family linking.
 **Duration:** 2-3 weeks
-**Status:** 🔲 Not Started
+**Status:** 🔄 In Progress
 
 - 🔲 Complete dashboard implementation (net worth, metrics, charts)
 - 🔲 Net worth calculation engine (aggregates all assets/liabilities)
