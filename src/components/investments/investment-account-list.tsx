@@ -24,6 +24,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { AddInvestmentAccountDialog } from "./add-investment-account-dialog"
+import { ImportInvestmentsDialog } from "./import-investments-dialog"
 import { ACCOUNT_TYPE_CONFIG } from "@/types/investment"
 
 interface InvestmentAccountWithSummary {
@@ -112,7 +113,10 @@ export function InvestmentAccountList() {
                         {accounts.length} account{accounts.length !== 1 ? "s" : ""}
                     </p>
                 </div>
-                <AddInvestmentAccountDialog />
+                <div className="flex gap-2">
+                    <ImportInvestmentsDialog accounts={accounts.map(a => ({ id: a.id, name: a.name }))} />
+                    <AddInvestmentAccountDialog />
+                </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

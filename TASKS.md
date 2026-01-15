@@ -141,7 +141,7 @@
 - ✅ Investment account and asset CRUD
 - ✅ Support for all asset classes (stocks, crypto, real estate, etc.)
 - ✅ Manual investment entry form
-- 🔲 CSV investment import
+- ✅ CSV investment import
 - ✅ Yahoo Finance API integration for stock prices
 - ✅ CoinGecko API integration for crypto prices
 - ✅ Background job for price updates (15-minute intervals)
