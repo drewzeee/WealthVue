@@ -133,3 +133,80 @@ export async function createAccount(data: {
         return { success: false, error: "Failed to create account" }
     }
 }
+
+export async function updateAccount(data: {
+    id: string
+    type: "BANK" | "CREDIT" | "INVESTMENT" | "ASSET" | "LIABILITY"
+    name: string
+    balance: number
+    subtype?: string
+    interestRate?: number
+}) {
+    const session = await getServerSession(authOptions)
+    if (!session) throw new Error("Unauthorized")
+    const userId = session.user.id
+
+    try {
+        switch (data.type) {
+            case "BANK":
+                await prisma.account.update({
+                    where: { id: data.id, userId },
+                    data: {
+                        name: data.name,
+                        type: data.subtype as any || "CHECKING",
+                        currentBalance: data.balance,
+                        availableBalance: data.balance,
+                    }
+                })
+                break
+
+            case "CREDIT":
+                await prisma.account.update({
+                    where: { id: data.id, userId },
+                    data: {
+                        name: data.name,
+                        type: "CREDIT_CARD",
+                        currentBalance: data.balance,
+                    }
+                })
+                break
+
+            case "INVESTMENT":
+                await prisma.investmentAccount.update({
+                    where: { id: data.id, userId },
+                    data: {
+                        name: data.name,
+                    }
+                })
+                break
+
+            case "ASSET":
+                await prisma.asset.update({
+                    where: { id: data.id, userId },
+                    data: {
+                        name: data.name,
+                        currentValue: data.balance,
+                    }
+                })
+                break
+
+            case "LIABILITY":
+                await prisma.liability.update({
+                    where: { id: data.id, userId },
+                    data: {
+                        name: data.name,
+                        currentBalance: data.balance,
+                        interestRate: data.interestRate,
+                    }
+                })
+                break
+        }
+
+        revalidatePath("/settings")
+        revalidatePath("/dashboard")
+        return { success: true }
+    } catch (error) {
+        console.error("Update failed", error)
+        return { success: false, error: "Failed to update account" }
+    }
+}

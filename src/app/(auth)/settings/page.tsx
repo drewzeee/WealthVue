@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/db/client"
-import { AddAccountDialog } from "@/components/accounts/add-account-dialog"
+import { AccountDialog } from "@/components/accounts/add-account-dialog"
 import { AccountList } from "@/components/settings/account-list"
 import { Separator } from "@/components/ui/separator"
 
@@ -60,7 +60,7 @@ export default async function SettingsPage() {
                             Connect banks, add manual accounts, or track assets.
                         </p>
                     </div>
-                    <AddAccountDialog />
+                    <AccountDialog />
                 </div>
 
                 <AccountList

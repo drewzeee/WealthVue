@@ -127,8 +127,8 @@
 - ✅ Build budget allocation form
 - ✅ Implement categorization rule builder
 - ✅ Create rule engine for auto-categorization
-- 🔲 Build budget dashboard
-- 🔲 Implement carry-over logic
+- ✅ Build budget dashboard
+- ✅ Implement carry-over logic
 
 ---
 
@@ -196,7 +196,13 @@
 ---
 
 ## Odds and Ends
-- 🔲 Improve CSV transaction import
+- ✅ Plaid link modal non-responsive
+- ✅ Improve CSV transaction import
+- ✅ Implement branding
+- ✅ Implement budget dashboard overview (summary cards, spending chart, category list)
+- ✅ Implement theme system (Light/Dark/Pink with OKLch colors)
+- ✅ Implement manual account creation
+- 🔲 Implement category editing on transaction list
 - 🔲 Add duplicate account detection
 - 🔲 Add automatic transfer detection for credit cards, loans, account transfers, etc
 - ✅ Identify account creation workflow
@@ -233,4 +239,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-15

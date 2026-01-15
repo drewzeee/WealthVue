@@ -9,9 +9,11 @@ interface PlaidLinkButtonProps {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
   className?: string;
   children?: React.ReactNode;
+  onPlaidOpen?: () => void;
+  onPlaidExit?: () => void;
 }
 
-export function PlaidLinkButton({ variant = 'default', className, children }: PlaidLinkButtonProps) {
+export function PlaidLinkButton({ variant = 'default', className, children, onPlaidOpen, onPlaidExit }: PlaidLinkButtonProps) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -44,13 +46,14 @@ export function PlaidLinkButton({ variant = 'default', className, children }: Pl
           },
           body: JSON.stringify({ publicToken }),
         });
-        
+
         // Refresh the page or invalidate queries to show new accounts
         router.refresh();
       } catch (error) {
         console.error('Error exchanging public token:', error);
       } finally {
         setLoading(false);
+        if (onPlaidExit) onPlaidExit();
       }
     },
     [router]
@@ -59,6 +62,10 @@ export function PlaidLinkButton({ variant = 'default', className, children }: Pl
   const config: PlaidLinkOptions = {
     token,
     onSuccess,
+    onExit: (error, metadata) => {
+      if (onPlaidExit) onPlaidExit();
+      if (error) console.error('Plaid exit with error:', error);
+    },
   };
 
   const { open, ready } = usePlaidLink(config);
@@ -67,7 +74,10 @@ export function PlaidLinkButton({ variant = 'default', className, children }: Pl
     <Button
       variant={variant}
       className={className}
-      onClick={() => open()}
+      onClick={() => {
+        open();
+        if (onPlaidOpen) onPlaidOpen();
+      }}
       disabled={!ready || loading}
     >
       {loading ? 'Linking...' : children || 'Connect Bank Account'}

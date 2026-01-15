@@ -14,6 +14,7 @@ import { Account, Asset, Liability, InvestmentAccount, PlaidItem } from "@prisma
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { deleteAccount } from "@/app/actions/accounts"
+import { AccountDialog } from "@/components/accounts/add-account-dialog"
 
 type SimpleAccount = Omit<Account, "currentBalance" | "availableBalance" | "creditLimit"> & {
     currentBalance: number;
@@ -38,6 +39,13 @@ interface AccountListProps {
 export function AccountList({ accounts, assets, liabilities, investmentAccounts }: AccountListProps) {
     const router = useRouter()
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [editingAccount, setEditingAccount] = useState<any>(null)
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+    const handleEdit = (account: any) => {
+        setEditingAccount(account)
+        setIsEditDialogOpen(true)
+    }
 
     const handleDelete = async (type: string, id: string) => {
         if (!confirm("Are you sure you want to delete this account? This action cannot be undone.")) return
@@ -79,7 +87,7 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
                             subtype={account.subtype}
                             isPlaid={!!account.plaidItem}
                             onDelete={() => handleDelete("account", account.id)}
-                            onEdit={() => console.log("Edit", account.id)}
+                            onEdit={() => handleEdit({ ...account, balance: account.currentBalance })}
                             deletingId={deletingId}
                         />
                     ))}
@@ -96,7 +104,7 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
                             balance={0} // TODO: Calculate total value
                             type={account.type}
                             onDelete={() => handleDelete("investment", account.id)}
-                            onEdit={() => console.log("Edit", account.id)}
+                            onEdit={() => handleEdit({ ...account, balance: 0 })} // Balance TODO
                             deletingId={deletingId}
                         />
                     ))}
@@ -113,7 +121,7 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
                             balance={asset.currentValue}
                             type={asset.type}
                             onDelete={() => handleDelete("asset", asset.id)}
-                            onEdit={() => console.log("Edit", asset.id)}
+                            onEdit={() => handleEdit({ ...asset, balance: asset.currentValue })}
                             deletingId={deletingId}
                         />
                     ))}
@@ -130,12 +138,19 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
                             balance={liability.currentBalance}
                             type={liability.type}
                             onDelete={() => handleDelete("liability", liability.id)}
-                            onEdit={() => console.log("Edit", liability.id)}
+                            onEdit={() => handleEdit({ ...liability, balance: liability.currentBalance })}
                             deletingId={deletingId}
                         />
                     ))}
                 </Section>
             )}
+
+            <AccountDialog
+                open={isEditDialogOpen}
+                onOpenChange={setIsEditDialogOpen}
+                mode="edit"
+                initialData={editingAccount}
+            />
         </div>
     )
 }

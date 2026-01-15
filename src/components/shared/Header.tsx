@@ -15,6 +15,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { UserMenu } from './UserMenu'
+import { ThemeSwitcher } from '@/core/theme/ThemeSwitcher'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -63,6 +64,7 @@ export function Header() {
 
         {/* Right Side: User Menu & Mobile Toggle */}
         <div className="flex items-center space-x-4">
+          <ThemeSwitcher />
           <UserMenu />
 
           {/* Mobile Menu Toggle */}

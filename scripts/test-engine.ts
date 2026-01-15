@@ -1,5 +1,5 @@
 import { categorizationEngine } from "../src/lib/services/categorization.engine"
-import { CategorizationRule } from "@prisma/client"
+
 import { Decimal } from "@prisma/client/runtime/library"
 
 // Mock Transaction

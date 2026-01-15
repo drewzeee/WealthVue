@@ -4,48 +4,122 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --background: 0.985 0.01 240;
+    --foreground: 0.145 0.02 240;
+    --card: 1 0 0;
+    --card-foreground: 0.145 0.02 240;
+    --popover: 1 0 0;
+    --popover-foreground: 0.145 0.02 240;
+    --primary: 0.45 0.24 270;
+    --primary-foreground: 0.985 0 0;
+    --secondary: 0.95 0.05 270;
+    --secondary-foreground: 0.45 0.24 270;
+    --muted: 0.96 0.02 240;
+    --muted-foreground: 0.55 0.04 240;
+    --accent: 0.96 0.02 240;
+    --accent-foreground: 0.45 0.24 270;
+    --destructive: 0.6 0.2 20;
+    --destructive-foreground: 0.98 0 0;
+    --border: 0.92 0.02 240;
+    --input: 0.92 0.02 240;
+    --ring: 0.45 0.24 270;
+
+    --radius: 1rem;
+
+    /* Finance Colors */
+    --finance-income: 0.75 0.20 145;
+    /* Neon Green */
+    --finance-expense: 0.65 0.25 25;
+    /* Bright Red */
+    --finance-remaining: 0.60 0.20 260;
+    /* Vivid Blue */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 0.12 0.01 260;
+    --foreground: 0.98 0 0;
+    --card: 0.25 0.01 260;
+    /* Alpha handled in utility or component */
+    --card-foreground: 0.98 0 0;
+    --popover: 0.25 0.01 260;
+    --popover-foreground: 0.98 0 0;
+    --primary: 0.88 0.22 135;
+    --primary-foreground: 0.12 0.01 260;
+    --secondary: 0.18 0.02 260;
+    --secondary-foreground: 0.90 0.02 260;
+    --muted: 0.18 0.02 260;
+    --muted-foreground: 0.70 0.02 260;
+    --accent: 0.25 0.05 260;
+    --accent-foreground: 0.88 0.22 135;
+    --destructive: 0.45 0.15 25;
+    --destructive-foreground: 0.98 0 0;
+    --border: 1 0 0;
+    /* Opacity handled by tailwind opacity modifier on usage, or hardcode here? 
+       Tailwind config uses / <alpha-value> so we define base color. 
+       If we want transparent border by default, we need to handle it carefully.
+       BRANDING.md says 0.1 opacity. For now, I'll put pure white and let transparency apply or use a specific variable if needed.
+       Actually, to stick to the plan of `oklch(var(--border) / <alpha>)`, 
+       if I set --border to `1 0 0`, then `border-border` will be opaque white unless I add `/10`.
+       However, shadcn usually relies on opaque base colors. 
+       Let's stick to the base color of the border. 
+       Wait, BRANDING.md says `oklch(1 0 0 / 0.1)`. 
+       If I put `1 0 0` here, `border-border` is white. 
+       I should probably update the value to be the visible color closest to it or allow alpha in the variable.
+       But tailwind config forces `oklch(var(--border) / <alpha-value>)`.
+       If I put `1 0 0 / 0.1` in the variable, the result is `oklch(1 0 0 / 0.1 / <alpha>)` which is invalid.
+       
+       Correct approach for alpha-included variables in Tailwind:
+       If the variable contains the slash, remove the slash from tailwind config.
+       BUT I already updated tailwind config to use `<alpha-value>`.
+       So I MUST provide a color channel list without alpha, OR I must rely on the user adding opacity.
+       
+       Re-reading BRANDING.md: Dark border is 10% opacity white.
+       If I set `--border: 1 0 0`, `border-border` is 100% white. That's too bright.
+       I will set it to a solid gray that simulates 10% white on the dark background.
+       Background is lightness 0.12. 10% white (L=1) on top.
+       Roughly L=0.2-ish.
+       Let's use a solid dark grey for the border variable to keep things simple and functional without opacity modifiers everywhere.
+       
+       Actually, `oklch(0.25 0 0)` is a dark grey.
+       Reflecting on BRANDING.md again: "Subtle white border (10% opacity)"
+       I will use `0.25 0 0` (Dark Grey) as a safe solid fallback for the border in dark mode.
+    */
+    --border: 0.25 0 0;
+    --input: 0.25 0 0;
+
+    --ring: 0.88 0.22 135;
+
+    /* Finance Colors */
+    --finance-income: 0.75 0.20 145;
+    --finance-expense: 0.65 0.25 25;
+    --finance-remaining: 0.60 0.20 260;
+  }
+
+  .pink {
+    --background: 0.97 0.02 340;
+    --foreground: 0.3 0.1 340;
+    --card: 1 0 0;
+    --card-foreground: 0.3 0.1 340;
+    --popover: 1 0 0;
+    --popover-foreground: 0.3 0.1 340;
+    --primary: 0.6 0.25 340;
+    --primary-foreground: 1 0 0;
+    --secondary: 0.93 0.08 340;
+    --secondary-foreground: 0.6 0.25 340;
+    --muted: 0.93 0.04 340;
+    --muted-foreground: 0.6 0.1 340;
+    --accent: 0.93 0.08 340;
+    --accent-foreground: 0.6 0.25 340;
+    --destructive: 0.6 0.2 20;
+    --destructive-foreground: 0.98 0 0;
+    --border: 0.9 0.05 340;
+    --input: 0.9 0.05 340;
+    --ring: 0.6 0.25 340;
+
+    /* Finance Colors - Keeping consistent */
+    --finance-income: 0.75 0.20 145;
+    --finance-expense: 0.65 0.25 25;
+    --finance-remaining: 0.60 0.20 260;
   }
 }
 
@@ -53,7 +127,31 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-card/60 backdrop-blur-md border-white/5 shadow-xl;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px oklch(var(--primary) / 0.5);
+  }
+
+  .box-glow {
+    box-shadow: 0 0 20px oklch(var(--primary) / 0.2);
   }
 }

@@ -1,8 +1,9 @@
 import { Metadata } from "next"
-import { Header } from "@/components/shared"
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoryList } from "@/components/budget/category-list"
 import { RuleList } from "@/components/budget/rule-list"
+import { BudgetOverview } from "@/components/budget/budget-overview"
 
 export const metadata: Metadata = {
   title: "Budget & Rules | WealthVue",
@@ -12,10 +13,12 @@ export const metadata: Metadata = {
 export default function BudgetPage() {
   return (
     <div className="flex flex-col gap-6 p-8">
-      <Header
-        title="Budget & Categorization"
-        description="Manage your spending categories and automation rules."
-      />
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Budget & Categorization</h2>
+        <p className="text-muted-foreground">
+          Manage your spending categories and automation rules.
+        </p>
+      </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -25,17 +28,15 @@ export default function BudgetPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="rounded-lg border p-8 text-center text-muted-foreground">
-            Budget Overview Dashboard (Coming Soon)
-          </div>
+          <BudgetOverview />
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-4">
-           <CategoryList />
+          <CategoryList />
         </TabsContent>
 
         <TabsContent value="rules" className="space-y-4">
-           <RuleList />
+          <RuleList />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,10 +1,25 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { SessionProvider } from '@/lib/providers/SessionProvider'
 import { QueryProvider } from '@/lib/providers/QueryProvider'
+import { ThemeProvider } from '@/core/theme/ThemeContext'
 
-const inter = Inter({ subsets: ['latin'] })
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-sans',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+})
+
+const fontHeading = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  weight: '700', // Default bold for headings
+})
 
 export const metadata: Metadata = {
   title: 'WealthVue - Personal Financial Dashboard',
@@ -17,11 +32,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SessionProvider>
-          <QueryProvider>{children}</QueryProvider>
-        </SessionProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${spaceGrotesk.variable} ${fontHeading.variable} ${jetbrainsMono.variable} font-sans`}>
+        <ThemeProvider>
+          <SessionProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

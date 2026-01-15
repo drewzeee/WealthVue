@@ -8,7 +8,7 @@ export class CategoryRepository {
       orderBy: { name: "asc" },
       include: {
         _count: {
-            select: { transactions: true }
+          select: { transactions: true }
         }
       }
     })
@@ -44,3 +44,38 @@ export class CategoryRepository {
 }
 
 export const categoryRepository = new CategoryRepository()
+
+export class CategoryBudgetRepository {
+  async upsert(data: Prisma.CategoryBudgetUncheckedCreateInput) {
+    return prisma.categoryBudget.upsert({
+      where: {
+        categoryId_month: {
+          categoryId: data.categoryId,
+          month: data.month
+        },
+      },
+      create: data,
+      update: data,
+    })
+  }
+
+  async findForMonth(userId: string, month: Date) {
+    return prisma.categoryBudget.findMany({
+      where: {
+        month: month,
+        category: { userId }
+      },
+      include: { category: true }
+    })
+  }
+
+  async findByCategoryId(categoryId: string, month: Date) {
+    return prisma.categoryBudget.findUnique({
+      where: {
+        categoryId_month: { categoryId, month }
+      }
+    })
+  }
+}
+
+export const categoryBudgetRepository = new CategoryBudgetRepository()

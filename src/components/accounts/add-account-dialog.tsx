@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,27 +9,124 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 
-import { PlaidLinkButton } from "@/components/plaid/PlaidLinkButton"
-import { createAccount } from "@/app/actions/accounts"
+
+import { usePlaidLink, PlaidLinkOptions, PlaidLinkOnSuccess } from 'react-plaid-link';
+import { useRouter } from 'next/navigation';
+import { createAccount, updateAccount } from "@/app/actions/accounts"
 import { ArrowLeft, Landmark, CreditCard, TrendingUp, Home, ArrowLeftRight } from "lucide-react"
 
-export function AddAccountDialog({ children }: { children?: React.ReactNode }) {
-    const [step, setStep] = useState<"method" | "manual-type" | "manual-form">("method")
-    const [manualType, setManualType] = useState<string | null>(null)
-    const [open, setOpen] = useState(false)
+interface AccountDialogProps {
+    children?: React.ReactNode
+    mode?: "create" | "edit"
+    initialData?: {
+        id: string
+        name: string
+        balance: number
+        type: string
+        subtype?: string | null
+        interestRate?: number | null
+    }
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+}
+
+export function AccountDialog({ children, mode = "create", initialData, open: controlledOpen, onOpenChange: setControlledOpen }: AccountDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false)
+    const [plaidOpen, setPlaidOpen] = useState(false)
+    const isControlled = controlledOpen !== undefined
+    const open = isControlled ? controlledOpen : internalOpen
+    const setOpen = isControlled ? setControlledOpen! : setInternalOpen
+
+    const router = useRouter();
+    const [token, setToken] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        // Fetch link token on mount if not in edit mode (or always, if we want to allow connecting)
+        // Only fetch if token doesn't exist to avoid loops
+        if (!token) {
+            const createLinkToken = async () => {
+                try {
+                    const response = await fetch('/api/plaid/create-link-token', {
+                        method: 'POST',
+                    });
+                    const data = await response.json();
+                    setToken(data.link_token);
+                } catch (error) {
+                    console.error('Error fetching link token:', error);
+                }
+            };
+            createLinkToken();
+        }
+    }, [token]);
+
+    const onSuccess = useCallback<PlaidLinkOnSuccess>(
+        async (publicToken, _metadata) => {
+            setLoading(true);
+            try {
+                await fetch('/api/plaid/exchange-public-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ publicToken }),
+                });
+
+                router.refresh();
+                // Optionally close the dialog or switch steps
+                setOpen(false);
+            } catch (error) {
+                console.error('Error exchanging public token:', error);
+            } finally {
+                setLoading(false);
+                setPlaidOpen(false);
+            }
+        },
+        [router, setOpen]
+    );
+
+    const config: PlaidLinkOptions = {
+        token,
+        onSuccess,
+        onExit: (error, metadata) => {
+            setPlaidOpen(false);
+            if (error) console.error('Plaid exit with error:', error);
+        },
+    };
+
+    const { open: openPlaid, ready: plaidReady } = usePlaidLink(config);
+
+    const [step, setStep] = useState<"method" | "manual-type" | "manual-form">(
+        mode === "edit" ? "manual-form" : "method"
+    )
+
+    // Initialize manualType correctly based on initialData
+    const [manualType, setManualType] = useState<string | null>(
+        initialData ? mapTypeToManualType(initialData.type) : null
+    )
 
     // Form State
     const [formData, setFormData] = useState({
-        name: "",
-        balance: "",
-        type: "", // Specific subtype (e.g., CHECKING, VISA)
-        interestRate: "",
+        name: initialData?.name || "",
+        balance: initialData?.balance.toString() || "",
+        type: initialData?.subtype || "", // Specific subtype (e.g., CHECKING, VISA)
+        interestRate: initialData?.interestRate?.toString() || "",
     })
 
     const reset = () => {
-        setStep("method")
-        setManualType(null)
-        setFormData({ name: "", balance: "", type: "", interestRate: "" })
+        if (mode === "create") {
+            setStep("method")
+            setManualType(null)
+            setFormData({ name: "", balance: "", type: "", interestRate: "" })
+        } else {
+            // Reset to initial data for edit mode
+            setFormData({
+                name: initialData?.name || "",
+                balance: initialData?.balance.toString() || "",
+                type: initialData?.subtype || "",
+                interestRate: initialData?.interestRate?.toString() || "",
+            })
+        }
     }
 
     const handleOpenChange = (open: boolean) => {
@@ -45,32 +142,44 @@ export function AddAccountDialog({ children }: { children?: React.ReactNode }) {
         }
 
         try {
-            await createAccount({
-                type: manualType as any,
-                name: formData.name,
-                balance: parseFloat(formData.balance),
-                subtype: formData.type,
-                interestRate: formData.interestRate ? parseFloat(formData.interestRate) : undefined
-            })
+            if (mode === "create") {
+                await createAccount({
+                    type: manualType as any,
+                    name: formData.name,
+                    balance: parseFloat(formData.balance),
+                    subtype: formData.type,
+                    interestRate: formData.interestRate ? parseFloat(formData.interestRate) : undefined
+                })
+            } else {
+                if (!initialData?.id) return
+                await updateAccount({
+                    id: initialData.id,
+                    type: manualType as any,
+                    name: formData.name,
+                    balance: parseFloat(formData.balance),
+                    subtype: formData.type,
+                    interestRate: formData.interestRate ? parseFloat(formData.interestRate) : undefined
+                })
+            }
             setOpen(false)
             reset()
         } catch (error) {
             console.error(error)
-            alert("Failed to create account")
+            alert(`Failed to ${mode} account`)
         }
     }
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
+        <Dialog open={open} onOpenChange={handleOpenChange} modal={!plaidOpen}>
             <DialogTrigger asChild>
                 {children || <Button>Add Account</Button>}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {step === "method" && "Add Account"}
-                        {step === "manual-type" && "Select Account Type"}
-                        {step === "manual-form" && "Account Details"}
+                        {mode === "create" && step === "method" && "Add Account"}
+                        {mode === "create" && step === "manual-type" && "Select Account Type"}
+                        {(step === "manual-form" || mode === "edit") && "Account Details"}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -99,7 +208,20 @@ export function AddAccountDialog({ children }: { children?: React.ReactNode }) {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <PlaidLinkButton className="w-full">Connect via Plaid</PlaidLinkButton>
+                                    <Button
+                                        className="w-full"
+                                        onClick={() => {
+                                            setPlaidOpen(true);
+                                            // Allow state to propagate before opening? 
+                                            // Actually with the hook inside AccountDialog, the button remounting doesn't matter for the hook state.
+                                            // But we need to make sure the open() call works.
+                                            // Since AccountDialog doesn't unmount, open() remains valid.
+                                            openPlaid();
+                                        }}
+                                        disabled={!plaidReady || loading}
+                                    >
+                                        {loading ? 'Linking...' : 'Connect via Plaid'}
+                                    </Button>
                                 </CardContent>
                             </Card>
                         </div>
@@ -199,8 +321,14 @@ export function AddAccountDialog({ children }: { children?: React.ReactNode }) {
                         </div>
 
                         <div className="flex justify-between">
-                            <Button variant="ghost" onClick={() => setStep("manual-type")}>Back</Button>
-                            <Button onClick={handleManualSubmit}>Create Account</Button>
+                            {mode === "create" ? (
+                                <Button variant="ghost" onClick={() => setStep("manual-type")}>Back</Button>
+                            ) : (
+                                <div></div> // Spacer
+                            )}
+                            <Button onClick={handleManualSubmit}>
+                                {mode === "create" ? "Create Account" : "Save Changes"}
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -221,4 +349,12 @@ function TypeCard({ icon: Icon, title, description, onClick }: any) {
             </CardHeader>
         </Card>
     )
+}
+
+function mapTypeToManualType(type: string): string {
+    if (type === "CHECKING" || type === "SAVINGS") return "BANK"
+    if (type === "CREDIT_CARD") return "CREDIT"
+    if (type === "BROKERAGE") return "INVESTMENT"
+    if (type === "PERSONAL_LOAN") return "LIABILITY"
+    return "ASSET" // Default fallback
 }
