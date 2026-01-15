@@ -150,6 +150,9 @@ sudo ./scripts/setup-services.sh
 ### Management
 
 ```bash
+# Update the application
+sudo ./scripts/update-app.sh
+
 # Check status
 systemctl status wealthvue
 systemctl status wealthvue-worker

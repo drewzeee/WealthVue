@@ -205,6 +205,7 @@
 - ✅ README with setup and deployment instructions
 - ✅ Systemd service configuration (App + Worker)
 - ✅ Deployment automation script (`setup-services.sh`)
+- ✅ Application update script (`update-app.sh`)
 - 🔲 Database backup and restore scripts
 - ✅ Health check endpoints
 - 🔲 Logging and monitoring setup

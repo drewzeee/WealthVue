@@ -3,11 +3,12 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, useRef } from "react"
 import { X, Search } from "lucide-react"
 import { FilterPopover } from "./filter-popover"
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
+import { useDebounce } from "@/hooks/use-debounce"
 
 interface TransactionFiltersProps {
   accounts: { id: string; name: string }[]
@@ -20,11 +21,8 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
   const searchParams = useSearchParams()
 
   const [search, setSearch] = useState(searchParams.get("search") || "")
-
-  // Sync state with URL when URL changes
-  useEffect(() => {
-    setSearch(searchParams.get("search") || "")
-  }, [searchParams])
+  const debouncedSearch = useDebounce(search, 300)
+  const isInitialMount = useRef(true)
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -40,9 +38,26 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
     [searchParams]
   )
 
-  const handleSearch = () => {
-    router.push(pathname + "?" + createQueryString("search", search))
-  }
+  // Sync search input with URL if changed externally
+  useEffect(() => {
+    const urlSearch = searchParams.get("search") || ""
+    if (urlSearch !== search) {
+      setSearch(urlSearch)
+    }
+  }, [searchParams])
+
+  // Update URL when debounced search changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    const currentSearch = searchParams.get("search") || ""
+    if (debouncedSearch !== currentSearch) {
+      router.push(pathname + "?" + createQueryString("search", debouncedSearch))
+    }
+  }, [debouncedSearch, pathname, createQueryString, searchParams, router])
 
   const clearFilters = () => {
     setSearch("")
@@ -103,8 +118,6 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
             placeholder="Search transactions..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            onBlur={handleSearch}
             className="pl-9 bg-background/50 backdrop-blur-sm"
           />
         </div>
