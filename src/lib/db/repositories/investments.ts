@@ -205,11 +205,25 @@ export class InvestmentRepository {
     }
 
     async create(data: Prisma.InvestmentUncheckedCreateInput) {
-        return prisma.investment.create({
-            data,
-            include: {
-                account: { select: { id: true, name: true, type: true } },
-            },
+        return prisma.$transaction(async (tx) => {
+            const investment = await tx.investment.create({
+                data,
+                include: {
+                    account: { select: { id: true, name: true, type: true } },
+                },
+            })
+
+            if (data.currentPrice) {
+                await tx.assetPrice.create({
+                    data: {
+                        investmentId: investment.id,
+                        price: data.currentPrice,
+                        source: data.manualPrice ? "manual" : "initial",
+                    },
+                })
+            }
+
+            return investment
         })
     }
 

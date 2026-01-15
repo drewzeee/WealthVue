@@ -54,6 +54,9 @@ export async function GET(req: NextRequest) {
     }
 }
 
+import { getLatestStockPrices } from "@/lib/integrations/yahoo-finance"
+import { getLatestCryptoPrices } from "@/lib/integrations/coingecko"
+
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -75,6 +78,27 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        // If automatic price and no price provided, try to fetch it immediately
+        let initialPrice = body.currentPrice
+        if (!body.manualPrice && !initialPrice) {
+            try {
+                if (body.assetClass === AssetClass.CRYPTO) {
+                    const prices = await getLatestCryptoPrices([body.symbol])
+                    if (prices[body.symbol.toLowerCase()]) {
+                        initialPrice = prices[body.symbol.toLowerCase()]
+                    }
+                } else if (([AssetClass.STOCK, AssetClass.ETF, AssetClass.MUTUAL_FUND] as AssetClass[]).includes(body.assetClass)) {
+                    const prices = await getLatestStockPrices([body.symbol])
+                    if (prices[body.symbol]) {
+                        initialPrice = prices[body.symbol]
+                    }
+                }
+            } catch (err) {
+                console.warn("Failed to fetch initial price:", err)
+                // Continue without price, background job will pick it up later
+            }
+        }
+
         const investment = await investmentRepository.create({
             accountId: body.accountId,
             assetClass: body.assetClass,
@@ -83,9 +107,10 @@ export async function POST(req: NextRequest) {
             quantity: body.quantity,
             costBasis: body.costBasis,
             purchaseDate: body.purchaseDate,
-            currentPrice: body.currentPrice,
+            currentPrice: initialPrice,
             manualPrice: body.manualPrice,
             notes: body.notes,
+            lastPriceUpdate: initialPrice ? new Date() : undefined,
         })
 
         return NextResponse.json({ success: true, data: investment }, { status: 201 })
