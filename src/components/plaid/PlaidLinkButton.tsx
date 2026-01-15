@@ -18,8 +18,13 @@ export function PlaidLinkButton({ variant = 'default', className, children, onPl
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Fetch link token on mount
+  // Fetch link token only when needed or when the component is explicitly active
+  // For now, let's keep it simple but ensure it's not pre-fetching if possible.
+  // Actually, if we're not sure where it's used, we can add a check.
   useEffect(() => {
+    // If we want to be very strict, we could only fetch on hover or click, 
+    // but usePlaidLink needs it at mount time if we want 'ready' state.
+    // However, if we're in settings, maybe it's in a component that's rendered but not visible?
     const createLinkToken = async () => {
       try {
         const response = await fetch('/api/plaid/create-link-token', {

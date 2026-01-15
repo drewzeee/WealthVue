@@ -42,9 +42,8 @@ export function AccountDialog({ children, mode = "create", initialData, open: co
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Fetch link token on mount if not in edit mode (or always, if we want to allow connecting)
-        // Only fetch if token doesn't exist to avoid loops
-        if (!token) {
+        // Fetch link token only when dialog is open and in create mode
+        if (open && mode === "create" && !token) {
             const createLinkToken = async () => {
                 try {
                     const response = await fetch('/api/plaid/create-link-token', {
@@ -58,7 +57,7 @@ export function AccountDialog({ children, mode = "create", initialData, open: co
             };
             createLinkToken();
         }
-    }, [token]);
+    }, [open, mode, token]);
 
     const onSuccess = useCallback<PlaidLinkOnSuccess>(
         async (publicToken, _metadata) => {
