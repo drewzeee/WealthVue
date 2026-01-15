@@ -70,10 +70,12 @@ export default async function DashboardPage() {
       )}
 
       {/* Net Worth Card */}
-      <Card>
-        <CardHeader>
-          <CardDescription>Net Worth</CardDescription>
-          <CardTitle className={`text-4xl ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+      <Card className="border-none shadow-card">
+        <CardHeader className="pb-2">
+          <CardDescription className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
+            Net Worth
+          </CardDescription>
+          <CardTitle className={`text-4xl font-bold tracking-tight ${isPositive ? 'text-finance-income' : 'text-finance-expense'}`}>
             {netWorth < 0 ? '-' : ''}${Math.abs(netWorth).toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -82,16 +84,16 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent>
           {netWorthData ? (
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-8 text-sm pt-2">
               <div>
-                <p className="text-muted-foreground">Total Assets</p>
-                <p className="font-semibold text-green-600 dark:text-green-500">
+                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-1">Total Assets</p>
+                <p className="text-xl font-bold text-finance-income tracking-tight">
                   ${netWorthData.totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Total Liabilities</p>
-                <p className="font-semibold text-red-600 dark:text-red-500">
+                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-1">Total Liabilities</p>
+                <p className="text-xl font-bold text-finance-expense tracking-tight">
                   ${netWorthData.totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
               </div>

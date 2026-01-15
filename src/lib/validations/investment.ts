@@ -17,9 +17,9 @@ export type UpdateInvestmentAccountSchema = z.infer<typeof updateInvestmentAccou
 export const createInvestmentSchema = z.object({
     accountId: z.string().min(1, "Investment account is required"),
     assetClass: z.nativeEnum(AssetClass).default("STOCK"),
-    symbol: z.string().min(1, "Symbol is required").toUpperCase(),
+    symbol: z.string().optional().nullable().transform(val => val === "" ? null : val),
     name: z.string().min(1, "Name is required"),
-    quantity: z.coerce.number().positive("Quantity must be positive"),
+    quantity: z.coerce.number().positive("Quantity must be positive (enter 1 if shares don't apply)"),
     costBasis: z.coerce.number().min(0, "Cost basis cannot be negative"),
     purchaseDate: z.coerce.date(),
     currentPrice: z.coerce.number().optional().nullable(),

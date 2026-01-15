@@ -99,21 +99,21 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
                 const displayValue = card.isLiability ? -card.value : card.value
 
                 return (
-                    <Card key={card.title}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
+                    <Card key={card.title} className="border-none shadow-card">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                            <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
                                 {card.title}
                             </CardTitle>
-                            <Icon className="h-4 w-4 text-muted-foreground" />
+                            <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
                         </CardHeader>
                         <CardContent>
-                            <div className={`text-2xl font-bold ${card.isLiability && card.value > 0 ? 'text-destructive' : ''}`}>
+                            <div className={`text-2xl font-bold tracking-tight ${card.isLiability && card.value > 0 ? 'text-destructive' : ''}`}>
                                 {displayValue < 0 ? '-' : ''}${Math.abs(displayValue).toLocaleString('en-US', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 })}
                             </div>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-[10px] text-muted-foreground/60 font-medium">
                                 {card.description}
                             </p>
                         </CardContent>

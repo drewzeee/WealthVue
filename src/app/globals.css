@@ -129,7 +129,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
   h1,
@@ -144,7 +144,7 @@
 
 @layer utilities {
   .glass-panel {
-    @apply bg-card/60 backdrop-blur-md border-white/5 shadow-xl;
+    @apply bg-card/60 backdrop-blur-md border border-white/5 shadow-card;
   }
 
   .text-glow {

@@ -72,30 +72,30 @@ export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
             <MetricCards mode={viewMode} />
 
             {/* Charts */}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
                 {/* Net Worth Over Time */}
-                <Card>
-                    <CardHeader>
+                <Card className="border-none shadow-card">
+                    <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle>Net Worth Over Time</CardTitle>
-                                <CardDescription>Track financial growth</CardDescription>
+                                <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">Net Worth Over Time</CardTitle>
+                                <CardDescription className="text-[10px] font-medium text-muted-foreground/50">Track financial growth</CardDescription>
                             </div>
                             <TimeSelector selected={timeRange} onChange={setTimeRange} />
                         </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-4">
                         <NetWorthChart range={timeRange} mode={viewMode} />
                     </CardContent>
                 </Card>
 
                 {/* Asset Allocation */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Asset Allocation</CardTitle>
-                        <CardDescription>How wealth is distributed</CardDescription>
+                <Card className="border-none shadow-card">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">Asset Allocation</CardTitle>
+                        <CardDescription className="text-[10px] font-medium text-muted-foreground/50">How wealth is distributed</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-4">
                         <AllocationChart data={breakdown} />
                     </CardContent>
                 </Card>

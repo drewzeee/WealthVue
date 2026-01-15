@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoryList } from "@/components/budget/category-list"
@@ -28,7 +29,9 @@ export default function BudgetPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <BudgetOverview />
+          <Suspense fallback={<div>Loading overview...</div>}>
+            <BudgetOverview />
+          </Suspense>
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-4">

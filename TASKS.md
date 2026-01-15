@@ -228,6 +228,8 @@
 - ✅ Fix budget dashboard including transfers in "Income" and "Spent" totals
 - ✅ Fix Plaid modal focus/accessibility issues
 - ✅ Fix budget total spent calculation incorrectly including categorized income
+- ✅ Fix `useSearchParams` Suspense error in `/budget` page
+- ✅ Fix `Suspense` error in `/investments` page (aborted requests)
 
 ## Quick Commands
 

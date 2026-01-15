@@ -91,7 +91,27 @@ export function AllocationChart({ data }: AllocationChartProps) {
                 <Legend
                     verticalAlign="bottom"
                     height={36}
-                    formatter={(value) => <span className="text-sm">{value}</span>}
+                    content={(props) => {
+                        const { payload } = props;
+                        return (
+                            <ul className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+                                {payload?.map((entry: any, index: number) => (
+                                    <li key={`item-${index}`} className="flex items-center gap-1.5">
+                                        <div
+                                            className="w-2 h-2 rounded-full"
+                                            style={{
+                                                backgroundColor: entry.color,
+                                                boxShadow: `0 0 8px ${entry.color}`
+                                            }}
+                                        />
+                                        <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider">
+                                            {entry.value}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        );
+                    }}
                 />
             </PieChart>
         </ResponsiveContainer>

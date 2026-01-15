@@ -315,7 +315,7 @@ model Investment {
 
   // Asset details
   assetClass AssetClass
-  symbol     String // Ticker symbol (AAPL, BTC, etc.)
+  symbol     String? // Ticker symbol (AAPL, BTC, etc., optional)
   name       String // Full name
 
   // Holding details

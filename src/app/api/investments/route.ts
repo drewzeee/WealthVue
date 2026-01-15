@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
         // If automatic price and no price provided, try to fetch it immediately
         let initialPrice = body.currentPrice
-        if (!body.manualPrice && !initialPrice) {
+        if (!body.manualPrice && !initialPrice && body.symbol) {
             try {
                 if (body.assetClass === AssetClass.CRYPTO) {
                     const prices = await getLatestCryptoPrices([body.symbol])

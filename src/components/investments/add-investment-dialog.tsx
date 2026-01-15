@@ -253,10 +253,11 @@ export function AddInvestmentDialog({ investmentToEdit, accounts: propAccounts, 
                                 name="symbol"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Symbol</FormLabel>
+                                        <FormLabel>Symbol (Optional)</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="e.g., AAPL" {...field} className="uppercase" />
+                                            <Input placeholder="e.g., AAPL" {...field} value={field.value || ""} />
                                         </FormControl>
+                                        <FormDescription>Ticker symbol if available</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -283,16 +284,23 @@ export function AddInvestmentDialog({ investmentToEdit, accounts: propAccounts, 
                                 name="quantity"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Quantity (Shares)</FormLabel>
+                                        <FormLabel>
+                                            {["REAL_ESTATE", "OTHER", "PRECIOUS_METAL", "COMMODITY"].includes(form.watch("assetClass"))
+                                                ? "Quantity / Units"
+                                                : "Quantity (Shares)"}
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
                                                 step="any"
-                                                placeholder="0"
+                                                placeholder={["REAL_ESTATE", "OTHER"].includes(form.watch("assetClass")) ? "1" : "0"}
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                             />
                                         </FormControl>
+                                        <FormDescription>
+                                            {["REAL_ESTATE", "OTHER"].includes(form.watch("assetClass")) && "Enter 1 if owning the entire asset"}
+                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}

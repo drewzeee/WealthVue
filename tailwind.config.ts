@@ -63,6 +63,10 @@ const config = {
           remaining: "oklch(var(--finance-remaining) / <alpha-value>)",
         },
       },
+      boxShadow: {
+        'card': '0 24px 60px -12px rgba(0, 0, 0, 0.25), 0 12px 24px -8px rgba(0, 0, 0, 0.15)',
+        'glow': '0 0 15px -3px var(--tw-shadow-color)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

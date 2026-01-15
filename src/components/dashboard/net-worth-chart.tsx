@@ -71,24 +71,30 @@ export function NetWorthChart({ range, mode = 'personal' }: NetWorthChartProps) 
                         <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" vertical={false} />
                 <XAxis
                     dataKey="date"
-                    className="text-xs"
-                    stroke="hsl(var(--muted-foreground))"
+                    className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-tighter"
+                    stroke="none"
+                    tick={{ fill: 'oklch(var(--muted-foreground)/0.5)' }}
                 />
                 <YAxis
-                    className="text-xs"
-                    stroke="hsl(var(--muted-foreground))"
+                    className="text-[10px] font-bold text-muted-foreground/50"
+                    stroke="none"
+                    tick={{ fill: 'oklch(var(--muted-foreground)/0.5)' }}
                     tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '6px',
+                        backgroundColor: 'oklch(var(--card))',
+                        borderRadius: 'var(--radius)',
+                        border: 'none',
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                        fontSize: '12px',
+                        fontWeight: '600'
                     }}
-                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    itemStyle={{ color: 'oklch(var(--foreground))' }}
+                    labelStyle={{ color: 'oklch(var(--muted-foreground))', fontSize: '10px', fontWeight: 'bold' }}
                     formatter={(value: number | undefined) => [`$${(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Net Worth']}
                 />
                 <Area

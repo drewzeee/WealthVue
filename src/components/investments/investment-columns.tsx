@@ -76,9 +76,10 @@ export function getInvestmentColumns(actions?: ColumnActions): ColumnDef<Investm
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             ),
-            cell: ({ row }) => (
-                <div className="font-bold">{row.getValue("symbol")}</div>
-            ),
+            cell: ({ row }) => {
+                const symbol = row.getValue("symbol") as string
+                return <div className="font-bold">{symbol || "—"}</div>
+            },
         },
         {
             accessorKey: "name",

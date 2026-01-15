@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, Suspense } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { RowSelectionState } from "@tanstack/react-table"
@@ -163,87 +163,91 @@ export default function InvestmentsPage() {
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-4">
-                    <InvestmentOverview />
+                    <Suspense fallback={<div>Loading overview...</div>}>
+                        <InvestmentOverview />
+                    </Suspense>
                 </TabsContent>
 
                 <TabsContent value="holdings" className="space-y-4">
-                    {/* Filters and Actions */}
-                    <div className="flex flex-wrap gap-4 items-center justify-between">
-                        <div className="flex flex-wrap gap-2 items-center">
-                            <Input
-                                placeholder="Search by symbol or name..."
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value)
-                                    setPage(1)
-                                }}
-                                className="w-64"
-                            />
-                            <Select
-                                value={accountFilter}
-                                onValueChange={(value) => {
-                                    setAccountFilter(value)
-                                    setPage(1)
-                                }}
-                            >
-                                <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="All Accounts" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Accounts</SelectItem>
-                                    {accounts.map((account) => (
-                                        <SelectItem key={account.id} value={account.id}>
-                                            {account.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <Select
-                                value={assetClassFilter}
-                                onValueChange={(value) => {
-                                    setAssetClassFilter(value)
-                                    setPage(1)
-                                }}
-                            >
-                                <SelectTrigger className="w-40">
-                                    <SelectValue placeholder="All Types" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Types</SelectItem>
-                                    {Object.entries(ASSET_CLASS_CONFIG).map(([key, config]) => (
-                                        <SelectItem key={key} value={key}>
-                                            {config.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex gap-2">
-                            {selectedIds.length > 0 && (
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => setShowBulkDeleteDialog(true)}
+                    <Suspense fallback={<div>Loading holdings...</div>}>
+                        {/* Filters and Actions */}
+                        <div className="flex flex-wrap gap-4 items-center justify-between">
+                            <div className="flex flex-wrap gap-2 items-center">
+                                <Input
+                                    placeholder="Search by symbol or name..."
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value)
+                                        setPage(1)
+                                    }}
+                                    className="w-64"
+                                />
+                                <Select
+                                    value={accountFilter}
+                                    onValueChange={(value) => {
+                                        setAccountFilter(value)
+                                        setPage(1)
+                                    }}
                                 >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete ({selectedIds.length})
-                                </Button>
-                            )}
-                            <AddInvestmentDialog accounts={accounts} />
+                                    <SelectTrigger className="w-48">
+                                        <SelectValue placeholder="All Accounts" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Accounts</SelectItem>
+                                        {accounts.map((account) => (
+                                            <SelectItem key={account.id} value={account.id}>
+                                                {account.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select
+                                    value={assetClassFilter}
+                                    onValueChange={(value) => {
+                                        setAssetClassFilter(value)
+                                        setPage(1)
+                                    }}
+                                >
+                                    <SelectTrigger className="w-40">
+                                        <SelectValue placeholder="All Types" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Types</SelectItem>
+                                        {Object.entries(ASSET_CLASS_CONFIG).map(([key, config]) => (
+                                            <SelectItem key={key} value={key}>
+                                                {config.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex gap-2">
+                                {selectedIds.length > 0 && (
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => setShowBulkDeleteDialog(true)}
+                                    >
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete ({selectedIds.length})
+                                    </Button>
+                                )}
+                                <AddInvestmentDialog accounts={accounts} />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Data Table */}
-                    <InvestmentDataTable
-                        columns={columns}
-                        data={investments}
-                        pageCount={totalPages}
-                        pageIndex={page}
-                        onPageChange={setPage}
-                        rowSelection={rowSelection}
-                        onRowSelectionChange={setRowSelection}
-                        isLoading={isLoading}
-                    />
+                        {/* Data Table */}
+                        <InvestmentDataTable
+                            columns={columns}
+                            data={investments}
+                            pageCount={totalPages}
+                            pageIndex={page}
+                            onPageChange={setPage}
+                            rowSelection={rowSelection}
+                            onRowSelectionChange={setRowSelection}
+                            isLoading={isLoading}
+                        />
+                    </Suspense>
                 </TabsContent>
 
                 <TabsContent value="accounts" className="space-y-4">

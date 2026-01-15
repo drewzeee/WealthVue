@@ -24,8 +24,8 @@ export function SpendingChart({ categories, remaining }: SpendingChartProps) {
     ].filter(d => d.value > 0)
 
     return (
-        <div className="h-[400px] w-full p-6 rounded-xl border bg-card text-card-foreground shadow-sm">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-6">
+        <div className="h-[400px] w-full p-6 rounded-xl bg-card text-card-foreground shadow-card">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground/80 mb-6">
                 Spending Overview
             </h3>
             <div className="h-[280px] w-full">
@@ -35,9 +35,9 @@ export function SpendingChart({ categories, remaining }: SpendingChartProps) {
                             data={data}
                             cx="50%"
                             cy="50%"
-                            innerRadius={60}
-                            outerRadius={90}
-                            paddingAngle={5}
+                            innerRadius={70}
+                            outerRadius={100}
+                            paddingAngle={8}
                             dataKey="value"
                         >
                             {data.map((entry, index) => (
@@ -47,18 +47,39 @@ export function SpendingChart({ categories, remaining }: SpendingChartProps) {
                         <Tooltip
                             formatter={(value: any) => formatCurrency(Number(value))}
                             contentStyle={{
-                                backgroundColor: 'hsl(var(--card))',
+                                backgroundColor: 'oklch(var(--card))',
                                 borderRadius: 'var(--radius)',
-                                border: '1px solid hsl(var(--border))',
-                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                border: 'none',
+                                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                                fontSize: '12px',
+                                fontWeight: '600'
                             }}
-                            itemStyle={{ color: 'hsl(var(--foreground))' }}
+                            itemStyle={{ color: 'oklch(var(--foreground))' }}
                         />
                         <Legend
                             verticalAlign="bottom"
                             height={36}
-                            iconType="circle"
-                            formatter={(value) => <span className="text-xs font-medium ml-1 text-muted-foreground uppercase">{value}</span>}
+                            content={(props) => {
+                                const { payload } = props;
+                                return (
+                                    <ul className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+                                        {payload?.map((entry: any, index: number) => (
+                                            <li key={`item-${index}`} className="flex items-center gap-1.5">
+                                                <div
+                                                    className="w-2 h-2 rounded-full"
+                                                    style={{
+                                                        backgroundColor: entry.color,
+                                                        boxShadow: `0 0 8px ${entry.color}`
+                                                    }}
+                                                />
+                                                <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider">
+                                                    {entry.value}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                );
+                            }}
                         />
                     </PieChart>
                 </ResponsiveContainer>
