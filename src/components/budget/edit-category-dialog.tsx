@@ -38,7 +38,7 @@ export function EditCategoryDialog({ category, open, onOpenChange }: EditCategor
   const queryClient = useQueryClient()
 
   const form = useForm<UpdateCategorySchema>({
-    resolver: zodResolver(updateCategorySchema),
+    resolver: zodResolver(updateCategorySchema) as any,
     defaultValues: {
       name: "",
       monthlyBudget: 0,

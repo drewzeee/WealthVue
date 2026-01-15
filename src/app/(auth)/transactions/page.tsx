@@ -58,7 +58,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
     }),
     prisma.category.findMany({
       where: { userId: session.user.id },
-      select: { id: true, name: true },
+      select: { id: true, name: true, color: true },
       orderBy: { name: "asc" },
     }),
   ])
@@ -85,6 +85,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
         <TransactionsTableShell 
           data={transactions} 
           pageCount={pageCount} 
+          categories={categories}
         />
       </div>
     </div>

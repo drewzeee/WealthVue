@@ -108,7 +108,7 @@
 - ✅ Store encrypted Plaid access tokens in database
 - ✅ Create Account model in Prisma schema
 - ✅ Build Plaid Link UI component
-- 🔲 Create account connection page
+- ✅ Create account connection page
 - ✅ Test Plaid Link flow with sandbox banks
 
 ### 2.2 Transaction Management
@@ -136,21 +136,21 @@
 
 **Goal:** Build investment portfolio management with real-time price updates.
 **Duration:** 3-4 weeks
-**Status:** 🔲 Not Started
+**Status:** 🔄 In Progress
 
-- 🔲 Investment account and asset CRUD
-- 🔲 Support for all asset classes (stocks, crypto, real estate, etc.)
-- 🔲 Manual investment entry form
+- ✅ Investment account and asset CRUD
+- ✅ Support for all asset classes (stocks, crypto, real estate, etc.)
+- ✅ Manual investment entry form
 - 🔲 CSV investment import
-- 🔲 Yahoo Finance API integration for stock prices
-- 🔲 CoinGecko API integration for crypto prices
-- 🔲 Background job for price updates (15-minute intervals)
-- 🔲 Investment portfolio dashboard
-- 🔲 Allocation donut chart by asset class
-- 🔲 Portfolio value over time chart
-- 🔲 Gains/losses calculation and display
-- 🔲 Individual investment detail pages
-- 🔲 Real-time portfolio valuation
+- ✅ Yahoo Finance API integration for stock prices
+- ✅ CoinGecko API integration for crypto prices
+- ✅ Background job for price updates (15-minute intervals)
+- ✅ Investment portfolio dashboard
+- ✅ Allocation donut chart by asset class
+- ✅ Portfolio value over time chart
+- ✅ Gains/losses calculation and display
+- ✅ Individual investment detail pages
+- ✅ Real-time portfolio valuation
 
 ---
 
@@ -202,7 +202,7 @@
 - ✅ Implement budget dashboard overview (summary cards, spending chart, category list)
 - ✅ Implement theme system (Light/Dark/Pink with OKLch colors)
 - ✅ Implement manual account creation
-- 🔲 Implement category editing on transaction list
+- ✅ Implement category editing on transaction list
 - 🔲 Add duplicate account detection
 - 🔲 Add automatic transfer detection for credit cards, loans, account transfers, etc
 - ✅ Identify account creation workflow

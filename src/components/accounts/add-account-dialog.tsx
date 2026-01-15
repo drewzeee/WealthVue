@@ -88,7 +88,7 @@ export function AccountDialog({ children, mode = "create", initialData, open: co
     const config: PlaidLinkOptions = {
         token,
         onSuccess,
-        onExit: (error, metadata) => {
+        onExit: (error, _metadata) => {
             setPlaidOpen(false);
             if (error) console.error('Plaid exit with error:', error);
         },

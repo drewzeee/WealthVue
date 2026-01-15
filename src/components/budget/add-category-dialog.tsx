@@ -34,7 +34,7 @@ export function AddCategoryDialog() {
   const queryClient = useQueryClient()
 
   const form = useForm<CreateCategorySchema>({
-    resolver: zodResolver(createCategorySchema),
+    resolver: zodResolver(createCategorySchema) as any,
     defaultValues: {
       name: "",
       monthlyBudget: 0,

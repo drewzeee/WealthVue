@@ -5,7 +5,7 @@ import { categoryRepository } from "@/lib/db/repositories/budgets"
 import { createCategorySchema } from "@/lib/validations/budget"
 import { z } from "zod"
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })

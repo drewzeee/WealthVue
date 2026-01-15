@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { CategorySelect } from "./category-select"
 
 // We need to extend the Transaction type to include relations
 export type TransactionWithRelations = Transaction & {
@@ -21,7 +22,13 @@ export type TransactionWithRelations = Transaction & {
   account: { id: string; name: string }
 }
 
-export const columns: ColumnDef<TransactionWithRelations>[] = [
+interface Category {
+  id: string
+  name: string
+  color: string
+}
+
+export const getColumns = (categories: Category[]): ColumnDef<TransactionWithRelations>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -67,16 +74,13 @@ export const columns: ColumnDef<TransactionWithRelations>[] = [
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => {
-      const category = row.original.category
-      return category ? (
-        <span
-          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-          style={{ backgroundColor: category.color + "20", color: category.color }}
-        >
-          {category.name}
-        </span>
-      ) : (
-        <span className="text-muted-foreground italic">Uncategorized</span>
+      const transaction = row.original
+      return (
+        <CategorySelect
+          transactionId={transaction.id}
+          categoryId={transaction.categoryId}
+          categories={categories}
+        />
       )
     },
   },

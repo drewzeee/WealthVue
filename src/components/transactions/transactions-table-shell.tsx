@@ -2,8 +2,8 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { DataTable } from "./data-table"
-import { columns, TransactionWithRelations } from "./columns"
-import { useCallback, useState } from "react"
+import { getColumns, TransactionWithRelations } from "./columns"
+import { useCallback, useState, useMemo } from "react"
 import { RowSelectionState } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Trash } from "lucide-react"
@@ -19,9 +19,10 @@ import {
 interface TransactionsTableShellProps {
   data: TransactionWithRelations[]
   pageCount: number
+  categories: { id: string; name: string; color: string }[]
 }
 
-export function TransactionsTableShell({ data, pageCount }: TransactionsTableShellProps) {
+export function TransactionsTableShell({ data, pageCount, categories }: TransactionsTableShellProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -29,6 +30,8 @@ export function TransactionsTableShell({ data, pageCount }: TransactionsTableShe
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const columns = useMemo(() => getColumns(categories), [categories])
 
   const page = Number(searchParams.get("page")) || 1
 

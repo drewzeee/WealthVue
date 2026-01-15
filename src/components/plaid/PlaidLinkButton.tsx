@@ -56,13 +56,13 @@ export function PlaidLinkButton({ variant = 'default', className, children, onPl
         if (onPlaidExit) onPlaidExit();
       }
     },
-    [router]
+    [router, onPlaidExit]
   );
 
   const config: PlaidLinkOptions = {
     token,
     onSuccess,
-    onExit: (error, metadata) => {
+    onExit: (error, _metadata) => {
       if (onPlaidExit) onPlaidExit();
       if (error) console.error('Plaid exit with error:', error);
     },
