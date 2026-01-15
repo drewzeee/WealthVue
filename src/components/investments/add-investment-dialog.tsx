@@ -361,6 +361,9 @@ export function AddInvestmentDialog({ investmentToEdit, accounts: propAccounts, 
                                                 disabled={(date) =>
                                                     date > new Date() || date < new Date("1900-01-01")
                                                 }
+                                                captionLayout="dropdown"
+                                                startMonth={new Date("1900-01")}
+                                                endMonth={new Date()}
                                                 initialFocus
                                             />
                                         </PopoverContent>

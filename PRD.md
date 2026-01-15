@@ -87,6 +87,8 @@ The MVP will deliver a fully-featured financial management platform with multi-u
 - ✅ Transaction categorization rules engine (description contains 'x', amount = 'x')
 - ✅ Transaction editing and deletion
 - ✅ Uncategorized transaction queue
+- ✅ Robust multi-criteria filtering (Account, Category, Date, Type, Amount, Merchant)
+- ✅ Dynamic transaction summary cards (Income/Expense/Count)
 
 **Investment Tracking:**
 - ✅ Support multiple asset classes: stocks, ETFs, retirement accounts, crypto, real estate, precious metals, commodities

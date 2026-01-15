@@ -8,6 +8,11 @@ export type TransactionFilter = {
   accountId?: string
   categoryId?: string
   search?: string
+  type?: 'income' | 'expense' | 'all'
+  amountMin?: number
+  amountMax?: number
+  merchant?: string
+  isTransfer?: boolean
   limit?: number
   offset?: number
 }
@@ -20,6 +25,11 @@ export class TransactionRepository {
     accountId,
     categoryId,
     search,
+    type,
+    amountMin,
+    amountMax,
+    merchant: merchantName,
+    isTransfer,
     limit = 50,
     offset = 0,
   }: TransactionFilter) {
@@ -35,6 +45,20 @@ export class TransactionRepository {
         : {}),
       ...(accountId ? { accountId } : {}),
       ...(categoryId ? { categoryId } : {}),
+      ...(type === 'income' ? { amount: { gt: 0 } } : {}),
+      ...(type === 'expense' ? { amount: { lt: 0 } } : {}),
+      ...(amountMin !== undefined || amountMax !== undefined
+        ? {
+          amount: {
+            ...(amountMin !== undefined ? { gte: amountMin } : {}),
+            ...(amountMax !== undefined ? { lte: amountMax } : {}),
+          },
+        }
+        : {}),
+      ...(merchantName
+        ? { merchant: { contains: merchantName, mode: "insensitive" } }
+        : {}),
+      ...(isTransfer !== undefined ? { isTransfer } : {}),
       ...(search
         ? {
           OR: [
@@ -60,6 +84,85 @@ export class TransactionRepository {
     ])
 
     return { total, transactions }
+  }
+
+  async getSummary({
+    userId,
+    startDate,
+    endDate,
+    accountId,
+    categoryId,
+    search,
+    type,
+    amountMin,
+    amountMax,
+    merchant: merchantName,
+    isTransfer,
+  }: Omit<TransactionFilter, 'limit' | 'offset'>) {
+    const where: Prisma.TransactionWhereInput = {
+      account: { userId },
+      ...(startDate || endDate
+        ? {
+          date: {
+            ...(startDate ? { gte: startDate } : {}),
+            ...(endDate ? { lte: endDate } : {}),
+          },
+        }
+        : {}),
+      ...(accountId ? { accountId } : {}),
+      ...(categoryId ? { categoryId } : {}),
+      ...(type === 'income' ? { amount: { gt: 0 } } : {}),
+      ...(type === 'expense' ? { amount: { lt: 0 } } : {}),
+      ...(amountMin !== undefined || amountMax !== undefined
+        ? {
+          amount: {
+            ...(amountMin !== undefined ? { gte: amountMin } : {}),
+            ...(amountMax !== undefined ? { lte: amountMax } : {}),
+          },
+        }
+        : {}),
+      ...(merchantName
+        ? { merchant: { contains: merchantName, mode: "insensitive" } }
+        : {}),
+      ...(isTransfer !== undefined ? { isTransfer } : {}),
+      ...(search
+        ? {
+          OR: [
+            { description: { contains: search, mode: "insensitive" } },
+            { merchant: { contains: merchantName || search, mode: "insensitive" } },
+          ],
+        }
+        : {}),
+    }
+
+    const aggregations = await prisma.transaction.aggregate({
+      where,
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        id: true,
+      },
+    })
+
+    // To get income vs expense separated, we need two parallel queries or use a groupby/custom query
+    // Given Prisma's aggregate limits, doing another set of queries for separated totals is clearest
+    const [incomeAgg, expenseAgg] = await Promise.all([
+      prisma.transaction.aggregate({
+        where: { ...where, amount: { gt: 0 } },
+        _sum: { amount: true },
+      }),
+      prisma.transaction.aggregate({
+        where: { ...where, amount: { lt: 0 } },
+        _sum: { amount: true },
+      }),
+    ])
+
+    return {
+      count: aggregations._count.id,
+      totalIncome: incomeAgg._sum.amount || new Prisma.Decimal(0),
+      totalExpenses: expenseAgg._sum.amount || new Prisma.Decimal(0),
+    }
   }
 
   async create(data: Prisma.TransactionUncheckedCreateInput) {

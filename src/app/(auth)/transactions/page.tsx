@@ -9,6 +9,7 @@ import { TransactionFilters } from "@/components/transactions/transaction-filter
 import { ImportCSVDialog } from "@/components/transactions/import-csv-dialog"
 import { AddTransactionDialog } from "@/components/transactions/add-transaction-dialog"
 import { ProcessTransactionsButton } from "@/components/transactions/process-transactions-button"
+import { TransactionSummaryCards } from "@/components/transactions/transaction-summary-cards"
 
 export const metadata: Metadata = {
   title: "Transactions",
@@ -23,6 +24,11 @@ interface TransactionsPageProps {
     accountId?: string
     categoryId?: string
     search?: string
+    type?: 'income' | 'expense' | 'all'
+    amountMin?: string
+    amountMax?: string
+    merchant?: string
+    isTransfer?: string
   }
 }
 
@@ -39,6 +45,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
   // Fetch data in parallel
   const [
     { transactions, total },
+    summary,
     accounts,
     categories
   ] = await Promise.all([
@@ -49,8 +56,26 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
       accountId: searchParams.accountId,
       categoryId: searchParams.categoryId,
       search: searchParams.search,
+      type: searchParams.type,
+      amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
+      amountMax: searchParams.amountMax ? parseFloat(searchParams.amountMax) : undefined,
+      merchant: searchParams.merchant,
+      isTransfer: searchParams.isTransfer === "true",
       limit,
       offset,
+    }),
+    transactionRepository.getSummary({
+      userId: session.user.id,
+      startDate: searchParams.from ? new Date(searchParams.from) : undefined,
+      endDate: searchParams.to ? new Date(searchParams.to) : undefined,
+      accountId: searchParams.accountId,
+      categoryId: searchParams.categoryId,
+      search: searchParams.search,
+      type: searchParams.type,
+      amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
+      amountMax: searchParams.amountMax ? parseFloat(searchParams.amountMax) : undefined,
+      merchant: searchParams.merchant,
+      isTransfer: searchParams.isTransfer === "true",
     }),
     prisma.account.findMany({
       where: { userId: session.user.id },
@@ -81,6 +106,12 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
           <AddTransactionDialog accounts={accounts} categories={categories} />
         </div>
       </div>
+
+      <TransactionSummaryCards
+        totalCount={summary.count}
+        totalIncome={Number(summary.totalIncome)}
+        totalExpenses={Number(summary.totalExpenses)}
+      />
 
       <div className="space-y-4">
         <TransactionFilters accounts={accounts} categories={categories} />

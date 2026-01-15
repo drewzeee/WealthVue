@@ -222,6 +222,8 @@
 - ✅ Add automatic transfer detection for credit cards, loans, account transfers, etc
 - ✅ Identify account creation workflow
 - ✅ Implement month navigation selector for budget overview
+- ✅ Implement robust multi-criteria transaction filtering (Popover, multi-tab, search chips)
+- ✅ Implement dynamic transaction summary cards (Income/Expense/Count)
 
 ## Bugs
 
@@ -262,4 +264,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-15 (Glassmorphism UI Polish)
+**Last Updated:** 2026-01-15 (Enhanced Transaction Filtering & Summaries)
