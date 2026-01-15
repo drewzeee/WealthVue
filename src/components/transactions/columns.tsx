@@ -3,8 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Transaction } from "@prisma/client"
 import { format } from "date-fns"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal, Repeat } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
@@ -69,6 +70,20 @@ export const getColumns = (categories: Category[]): ColumnDef<TransactionWithRel
   {
     accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      const transaction = row.original
+      return (
+        <div className="flex items-center gap-2">
+          <span>{transaction.description}</span>
+          {transaction.isTransfer && (
+            <Badge variant="outline" className="flex items-center gap-1 font-normal text-muted-foreground">
+              <Repeat className="h-3 w-3" />
+              Transfer
+            </Badge>
+          )}
+        </div>
+      )
+    },
   },
   {
     accessorKey: "category",
@@ -107,9 +122,14 @@ export const getColumns = (categories: Category[]): ColumnDef<TransactionWithRel
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
-      }).format(amount)
+      }).format(Math.abs(amount))
 
-      return <div className="text-right font-medium">{formatted}</div>
+      return (
+        <div className={`text-right font-medium ${amount < 0 ? "text-destructive" : amount > 0 ? "text-green-600 dark:text-green-500" : ""
+          }`}>
+          {amount < 0 ? "-" : ""}{formatted}
+        </div>
+      )
     },
   },
   {

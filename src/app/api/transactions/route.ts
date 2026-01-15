@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { transactionRepository } from "@/lib/db/repositories/transactions"
 import { createTransactionSchema } from "@/lib/validations/transaction"
 import { z } from "zod"
+import { transferDetectionService } from "@/lib/services/transfer-detection.service"
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -78,6 +79,9 @@ export async function POST(req: NextRequest) {
       notes: body.notes,
       source: body.source,
     })
+
+    // Run transfer detection
+    await transferDetectionService.detectAndLinkTransfers(session.user.id)
 
     return NextResponse.json({ success: true, data: transaction }, { status: 201 })
   } catch (error) {

@@ -6,13 +6,16 @@ interface CategoryBudgetListProps {
 }
 
 export function CategoryBudgetList({ categories }: CategoryBudgetListProps) {
-    const sorted = [...categories].sort((a, b) => b.spent - a.spent).slice(0, 5)
+    // Only show categories that have actual spending for the month
+    const filteredAndSorted = [...categories]
+        .filter(cat => cat.spent !== 0)
+        .sort((a, b) => b.spent - a.spent)
 
     return (
         <div className="space-y-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Top Categories</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Budget Categories</h3>
             <div className="space-y-6">
-                {sorted.map(cat => {
+                {filteredAndSorted.map(cat => {
                     const totalAvailable = cat.budgeted + cat.carryOver
                     return (
                         <div key={cat.id} className="space-y-2">
@@ -37,8 +40,8 @@ export function CategoryBudgetList({ categories }: CategoryBudgetListProps) {
                         </div>
                     )
                 })}
-                {sorted.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No category spending yet.</p>
+                {filteredAndSorted.length === 0 && (
+                    <p className="text-sm text-muted-foreground">No active categories this month.</p>
                 )}
             </div>
         </div>

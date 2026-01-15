@@ -1,7 +1,10 @@
 import { CountryCode, Products, LinkTokenCreateRequest, ItemPublicTokenExchangeRequest, AccountsGetRequest, TransactionsSyncRequest, AccountBase, Transaction as PlaidTransaction } from 'plaid';
 import { plaidClient } from '@/lib/integrations/plaid';
 import { prisma } from '@/lib/db/client';
-import { AccountType, TransactionSource } from '@prisma/client';
+import { AccountType, TransactionSource, Prisma } from '@prisma/client';
+import { transferDetectionService } from './transfer-detection.service';
+import { categorizationEngine } from './categorization.engine';
+import { ruleRepository } from '@/lib/db/repositories/rules';
 
 export class PlaidService {
   /**
@@ -40,7 +43,7 @@ export class PlaidService {
     };
     const accountsResponse = await plaidClient.accountsGet(accountsRequest);
     const institutionId = accountsResponse.data.item.institution_id;
-    
+
     let institutionName = 'Unknown Bank';
     if (institutionId) {
       try {
@@ -72,7 +75,12 @@ export class PlaidService {
     // 5. Trigger initial transaction sync
     // We do this asynchronously or simply await it if we want the user to see data immediately.
     // For now, let's await it to ensure data is there.
-    await this.syncTransactions(plaidItem.id);
+    try {
+      await this.syncTransactions(plaidItem.id);
+    } catch (error) {
+      console.error('Initial transaction sync failed:', error);
+      // We don't want to fail the entire linking process if sync fails
+    }
 
     return { plaidItem };
   }
@@ -93,6 +101,9 @@ export class PlaidService {
     let modified: PlaidTransaction[] = [];
     let removed: { transaction_id: string }[] = [];
 
+    // Predeterministically fetch rules for categorization
+    const rules = await ruleRepository.findMany(plaidItem.userId);
+
     // Iterate through pages
     while (hasMore) {
       const request: TransactionsSyncRequest = {
@@ -106,7 +117,7 @@ export class PlaidService {
       added = added.concat(data.added);
       modified = modified.concat(data.modified);
       removed = removed.concat(data.removed);
-      
+
       hasMore = data.has_more;
       cursor = data.next_cursor;
     }
@@ -117,48 +128,67 @@ export class PlaidService {
       const account = await prisma.account.findUnique({
         where: { plaidAccountId: txn.account_id },
       });
-      
+
       if (account) {
-        await prisma.transaction.create({
-          data: {
+        // Use upsert to handle potential duplicates/re-syncs without crashing
+        await prisma.transaction.upsert({
+          where: { plaidTransactionId: txn.transaction_id },
+          create: {
             accountId: account.id,
             plaidTransactionId: txn.transaction_id,
             date: new Date(txn.date),
             description: txn.name,
             merchant: txn.merchant_name,
-            amount: txn.amount, // Plaid: positive = spent. DB: positive = spent (usually). 
-            // NOTE: Check if we want negative for income? 
-            // Convention: Expense is positive, Income is negative in Plaid? 
-            // Actually Plaid: Positive means money leaving account. Negative means money entering.
-            // WealthVue should probably follow this or store income as positive in 'Income' category.
-            // Let's stick to raw value for now.
+            amount: -txn.amount, // Standardized: Negative = spent. Plaid: Positive = spent.
             pending: txn.pending,
+
             source: TransactionSource.PLAID,
-            // categoryId: try to map later
+            // Apply categorization
+            categoryId: await categorizationEngine.categorize({
+              description: txn.name,
+              amount: new Prisma.Decimal(-txn.amount), // Use Decimal for consistency with engine
+              merchant: txn.merchant_name || null
+            }, plaidItem.userId, rules)
           },
+          update: {
+            // Update mutable fields if it already exists
+            date: new Date(txn.date),
+            description: txn.name,
+            merchant: txn.merchant_name,
+            amount: new Prisma.Decimal(-txn.amount),
+            pending: txn.pending,
+          }
         });
+
+        // We only categorize new transactions in the CREATE block above. 
+        // For updates, should we re-categorize? 
+        // Usually, if user manually changed it, we shouldn't overwrite.
+        // But if it was never categorized, maybe we should?
+        // Current logic in 'create' block only sets it on insert.
+        // If we want to re-run rules on updates, we need to check if it's already categorized manually.
+        // For now, let's stick to categorizing on creation.
       }
     }
 
     // 2. Modified
     for (const txn of modified) {
-        await prisma.transaction.updateMany({
-            where: { plaidTransactionId: txn.transaction_id },
-            data: {
-                date: new Date(txn.date),
-                description: txn.name,
-                merchant: txn.merchant_name,
-                amount: txn.amount,
-                pending: txn.pending,
-            }
-        });
+      await prisma.transaction.updateMany({
+        where: { plaidTransactionId: txn.transaction_id },
+        data: {
+          date: new Date(txn.date),
+          description: txn.name,
+          merchant: txn.merchant_name,
+          amount: -txn.amount,
+          pending: txn.pending,
+        }
+      });
     }
 
     // 3. Removed
     for (const rem of removed) {
-        await prisma.transaction.deleteMany({
-            where: { plaidTransactionId: rem.transaction_id }
-        });
+      await prisma.transaction.deleteMany({
+        where: { plaidTransactionId: rem.transaction_id }
+      });
     }
 
     // Update cursor
@@ -167,13 +197,16 @@ export class PlaidService {
       data: { cursor },
     });
 
+    // Run transfer detection
+    await transferDetectionService.detectAndLinkTransfers(plaidItem.userId);
+
     return { addedCount: added.length, modifiedCount: modified.length, removedCount: removed.length };
   }
 
   private async upsertAccounts(userId: string, plaidItemId: string, accounts: AccountBase[]) {
     for (const acc of accounts) {
       const type = this.mapAccountType(acc.type, acc.subtype);
-      
+
       await prisma.account.upsert({
         where: { plaidAccountId: acc.account_id },
         update: {
@@ -181,6 +214,9 @@ export class PlaidService {
           availableBalance: acc.balances.available,
           creditLimit: acc.balances.limit,
           name: acc.name,
+          // Ensure these are set in case it was an orphaned account or re-link
+          userId,
+          plaidItemId,
         },
         create: {
           userId,

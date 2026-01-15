@@ -218,10 +218,16 @@
 - ✅ Implement manual account creation
 - ✅ Implement category editing on transaction list
 - 🔲 Add duplicate account detection
-- 🔲 Add automatic transfer detection for credit cards, loans, account transfers, etc
+- ✅ Add automatic transfer detection for credit cards, loans, account transfers, etc
 - ✅ Identify account creation workflow
+- ✅ Implement month navigation selector for budget overview
 
+## Bugs
 
+- ✅ Fix transaction sign inversion for Plaid imports
+- ✅ Fix budget dashboard including transfers in "Income" and "Spent" totals
+- ✅ Fix Plaid modal focus/accessibility issues
+- ✅ Fix budget total spent calculation incorrectly including categorized income
 
 ## Quick Commands
 
@@ -253,4 +259,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-15
+**Last Updated:** 2026-01-15 (Month Selector Implementation)

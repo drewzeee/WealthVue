@@ -8,6 +8,7 @@ import { TransactionsTableShell } from "@/components/transactions/transactions-t
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { ImportCSVDialog } from "@/components/transactions/import-csv-dialog"
 import { AddTransactionDialog } from "@/components/transactions/add-transaction-dialog"
+import { ProcessTransactionsButton } from "@/components/transactions/process-transactions-button"
 
 export const metadata: Metadata = {
   title: "Transactions",
@@ -75,16 +76,17 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
           </p>
         </div>
         <div className="flex items-center space-x-2">
+          <ProcessTransactionsButton />
           <ImportCSVDialog accounts={accounts} />
           <AddTransactionDialog accounts={accounts} categories={categories} />
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <TransactionFilters accounts={accounts} categories={categories} />
-        <TransactionsTableShell 
-          data={transactions} 
-          pageCount={pageCount} 
+        <TransactionsTableShell
+          data={transactions}
+          pageCount={pageCount}
           categories={categories}
         />
       </div>

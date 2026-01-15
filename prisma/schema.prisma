@@ -177,6 +177,10 @@ model Transaction {
   // User notes
   notes String?
 
+  // Transfer tracking
+  isTransfer Boolean @default(false)
+  transferId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -184,6 +188,7 @@ model Transaction {
   @@index([categoryId])
   @@index([date])
   @@index([plaidTransactionId])
+  @@index([transferId])
   @@map("transactions")
 }
 

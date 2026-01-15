@@ -6,6 +6,7 @@ import { ruleRepository } from "@/lib/db/repositories/rules"
 import { categorizationEngine } from "@/lib/services/categorization.engine"
 import { createTransactionSchema } from "@/lib/validations/transaction"
 import { z } from "zod"
+import { transferDetectionService } from "@/lib/services/transfer-detection.service"
 
 const importSchema = z.object({
   transactions: z.array(createTransactionSchema),
@@ -57,6 +58,9 @@ export async function POST(req: NextRequest) {
     )
 
     const created = await transactionRepository.createMany(categorizedTransactions)
+
+    // Run transfer detection
+    await transferDetectionService.detectAndLinkTransfers(session.user.id)
 
     return NextResponse.json({ success: true, count: created.count }, { status: 201 })
   } catch (error) {

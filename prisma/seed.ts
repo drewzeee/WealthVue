@@ -32,6 +32,7 @@ async function main() {
     { name: 'Utilities', color: '#f59e0b', icon: '⚡' },
     { name: 'Healthcare', color: '#06b6d4', icon: '🏥' },
     { name: 'Income', color: '#10b981', icon: '💰' },
+    { name: 'Transfer', color: '#94a3b8', icon: '🔁' },
   ]
 
   for (const cat of categories) {
