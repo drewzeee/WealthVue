@@ -46,12 +46,21 @@ export async function GET(req: NextRequest) {
           });
         });
 
-        const merged = Array.from(dateMap.entries()).map(([dateStr, values]) => ({
+        let merged = Array.from(dateMap.entries()).map(([dateStr, values]) => ({
           date: new Date(dateStr),
           netWorth: values.netWorth.toNumber(),
           totalAssets: values.totalAssets.toNumber(),
           totalLiabilities: values.totalLiabilities.toNumber(),
         })).sort((a, b) => a.date.getTime() - b.date.getTime());
+
+        // Append current live household value for all ranges
+        const current = await NetWorthService.calculateHouseholdNetWorth(session.user.id);
+        merged.push({
+          date: new Date(),
+          netWorth: current.netWorth.toNumber(),
+          totalAssets: current.totalAssets.toNumber(),
+          totalLiabilities: current.totalLiabilities.toNumber(),
+        });
 
         return NextResponse.json({ success: true, data: merged });
       }
@@ -59,14 +68,29 @@ export async function GET(req: NextRequest) {
 
     const snapshots = await NetWorthService.getHistory(session.user.id, range);
 
+    const data = snapshots.map((s) => ({
+      ...s,
+      netWorth: s.netWorth.toNumber(),
+      totalAssets: s.totalAssets.toNumber(),
+      totalLiabilities: s.totalLiabilities.toNumber(),
+    }));
+
+    // Append current live personal value for all ranges
+    const current = await NetWorthService.calculateCurrentNetWorth(session.user.id);
+    data.push({
+      id: 'live',
+      userId: session.user.id,
+      date: new Date(),
+      netWorth: current.netWorth.toNumber(),
+      totalAssets: current.totalAssets.toNumber(),
+      totalLiabilities: current.totalLiabilities.toNumber(),
+      allocation: current.breakdown as any,
+      createdAt: new Date(),
+    });
+
     return NextResponse.json({
       success: true,
-      data: snapshots.map((s) => ({
-        ...s,
-        netWorth: s.netWorth.toNumber(),
-        totalAssets: s.totalAssets.toNumber(),
-        totalLiabilities: s.totalLiabilities.toNumber(),
-      })),
+      data: data,
     });
   } catch (error) {
     console.error("Failed to fetch net worth history:", error);

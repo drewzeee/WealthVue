@@ -31,6 +31,12 @@ export async function GET(req: NextRequest) {
           investmentAssets: data.breakdown.investmentAssets.toNumber(),
           manualAssets: data.breakdown.manualAssets.toNumber(),
           manualLiabilities: data.breakdown.manualLiabilities.toNumber(),
+          investmentBreakdown: {
+            stocks: data.breakdown.investmentBreakdown.stocks.toNumber(),
+            etfs: data.breakdown.investmentBreakdown.etfs.toNumber(),
+            crypto: data.breakdown.investmentBreakdown.crypto.toNumber(),
+            other: data.breakdown.investmentBreakdown.other.toNumber(),
+          },
         },
       },
     });

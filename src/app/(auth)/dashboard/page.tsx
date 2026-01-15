@@ -4,9 +4,6 @@ import { authOptions } from '@/lib/auth'
 import { NetWorthService } from '@/lib/services/net-worth.service'
 import {
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import { DashboardClient } from '@/components/dashboard/dashboard-client'
 import { GlassCard } from '@/components/ui/glass-card'
@@ -39,6 +36,12 @@ export default async function DashboardPage() {
         investmentAssets: data.breakdown.investmentAssets.toNumber(),
         manualAssets: data.breakdown.manualAssets.toNumber(),
         manualLiabilities: data.breakdown.manualLiabilities.toNumber(),
+        investmentBreakdown: {
+          stocks: data.breakdown.investmentBreakdown.stocks.toNumber(),
+          etfs: data.breakdown.investmentBreakdown.etfs.toNumber(),
+          crypto: data.breakdown.investmentBreakdown.crypto.toNumber(),
+          other: data.breakdown.investmentBreakdown.other.toNumber(),
+        },
       },
     }
   } catch (err) {
@@ -46,8 +49,8 @@ export default async function DashboardPage() {
     error = 'Failed to load financial data'
   }
 
-  const netWorth = netWorthData?.netWorth || 0
-  const isPositive = netWorth >= 0
+
+
 
   return (
     <div className="space-y-8">
@@ -69,45 +72,11 @@ export default async function DashboardPage() {
         </GlassCard>
       )}
 
-      {/* Net Worth Card */}
-      <GlassCard glowColor="primary" className="p-0">
-        <CardHeader className="pb-2">
-          <CardDescription className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
-            Net Worth
-          </CardDescription>
-          <CardTitle className={`text-4xl font-bold tracking-tight ${isPositive ? 'text-finance-income' : 'text-finance-expense'}`}>
-            {netWorth < 0 ? '-' : ''}${Math.abs(netWorth).toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {netWorthData ? (
-            <div className="grid grid-cols-2 gap-8 text-sm pt-2">
-              <div>
-                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-1">Total Assets</p>
-                <p className="text-xl font-bold text-finance-income tracking-tight">
-                  ${netWorthData.totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-1">Total Liabilities</p>
-                <p className="text-xl font-bold text-finance-expense tracking-tight">
-                  ${netWorthData.totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Connect your accounts to see your net worth
-            </p>
-          )}
-        </CardContent>
-      </GlassCard>
-
       {/* Client-side components with charts and time selector */}
-      <DashboardClient initialBreakdown={netWorthData?.breakdown || null} />
+      <DashboardClient
+        initialBreakdown={netWorthData?.breakdown || null}
+        initialNetWorth={netWorthData?.netWorth || 0}
+      />
     </div>
   )
 }

@@ -8,18 +8,29 @@ interface AllocationData {
     investmentAssets: number
     manualAssets: number
     manualLiabilities: number
+    investmentBreakdown: {
+        stocks: number
+        etfs: number
+        crypto: number
+        other: number
+    }
 }
 
 interface AllocationChartProps {
     data: AllocationData | null
 }
 
+// Sleek modern palette
 const COLORS = {
-    cash: 'hsl(142, 76%, 36%)', // Green
-    investments: 'hsl(221, 83%, 53%)', // Blue
-    realEstate: 'hsl(262, 83%, 58%)', // Purple
-    other: 'hsl(48, 96%, 53%)', // Yellow
+    cash: 'hsl(160, 60%, 45%)', // Emerald Green
+    stocks: 'hsl(215, 90%, 55%)', // Vibrant Blue
+    etfs: 'hsl(195, 85%, 50%)', // Cyan/Azure
+    crypto: 'hsl(270, 80%, 65%)', // Royal Purple
+    realEstate: 'hsl(320, 70%, 60%)', // Magenta/Pink
+    other: 'hsl(200, 20%, 30%)', // Slate Grey (was 'hsl(0, 0%, 50%)' but slate fits dark mode better)
 }
+
+
 
 export function AllocationChart({ data }: AllocationChartProps) {
     if (!data) {
@@ -33,19 +44,34 @@ export function AllocationChart({ data }: AllocationChartProps) {
     // Group into meaningful categories
     const chartData = [
         {
-            name: 'Cash & Accounts',
+            name: 'Cash',
             value: data.accountAssets,
             color: COLORS.cash,
         },
         {
-            name: 'Investments',
-            value: data.investmentAssets,
-            color: COLORS.investments,
+            name: 'Stocks',
+            value: data.investmentBreakdown?.stocks || 0,
+            color: COLORS.stocks,
         },
         {
-            name: 'Real Estate & Assets',
-            value: data.manualAssets,
+            name: 'ETFs',
+            value: data.investmentBreakdown?.etfs || 0,
+            color: COLORS.etfs,
+        },
+        {
+            name: 'Crypto',
+            value: data.investmentBreakdown?.crypto || 0,
+            color: COLORS.crypto,
+        },
+        {
+            name: 'Real Estate',
+            value: data.manualAssets, // Assuming manuals are mostly Real Estate/Physical
             color: COLORS.realEstate,
+        },
+        {
+            name: 'Other',
+            value: data.investmentBreakdown?.other || 0,
+            color: COLORS.other,
         },
     ].filter(item => item.value > 0) // Only show categories with value
 
@@ -69,9 +95,12 @@ export function AllocationChart({ data }: AllocationChartProps) {
                     cy="50%"
                     innerRadius={60}
                     outerRadius={100}
-                    paddingAngle={5}
+                    paddingAngle={2}
                     dataKey="value"
+                    stroke="none"
+                    strokeWidth={0}
                     label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+                    labelLine={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1 }}
                 >
                     {chartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />

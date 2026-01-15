@@ -233,6 +233,8 @@
 - ✅ Fix budget total spent calculation incorrectly including categorized income
 - ✅ Fix `useSearchParams` Suspense error in `/budget` page
 - ✅ Fix `Suspense` error in `/investments` page (aborted requests)
+- ✅ Fix inflated investment value on dashboard (NetWorthService logic)
+- ✅ Fix Net Worth Chart display (colors) and scaling (dynamic Y-axis, live data point)
 
 ## Quick Commands
 

@@ -13,6 +13,12 @@ export interface NetWorthResult {
     investmentAssets: Decimal;
     manualAssets: Decimal;
     manualLiabilities: Decimal;
+    investmentBreakdown: {
+      stocks: Decimal;
+      etfs: Decimal;
+      crypto: Decimal;
+      other: Decimal;
+    };
   };
 }
 
@@ -58,12 +64,40 @@ export class NetWorthService {
     });
 
     let investmentAssetsSum = new Decimal(0);
+    const investmentBreakdown = {
+      stocks: new Decimal(0),
+      etfs: new Decimal(0),
+      crypto: new Decimal(0),
+      other: new Decimal(0),
+    };
+
     for (const account of investmentAccounts) {
       for (const inv of account.investments) {
-        // Fallback to costBasis if currentPrice is null
-        const price = inv.currentPrice ?? inv.costBasis;
-        const value = inv.quantity.mul(price);
+        let value: Decimal;
+        if (inv.currentPrice) {
+          value = inv.quantity.mul(inv.currentPrice);
+        } else {
+          // Fallback to costBasis (which is total value) if currentPrice is null
+          value = inv.costBasis;
+        }
         investmentAssetsSum = investmentAssetsSum.add(value);
+
+        // Aggregate by type
+        switch (inv.assetClass) {
+          case 'STOCK':
+          case 'MUTUAL_FUND':
+            investmentBreakdown.stocks = investmentBreakdown.stocks.add(value);
+            break;
+          case 'ETF':
+            investmentBreakdown.etfs = investmentBreakdown.etfs.add(value);
+            break;
+          case 'CRYPTO':
+            investmentBreakdown.crypto = investmentBreakdown.crypto.add(value);
+            break;
+          default:
+            investmentBreakdown.other = investmentBreakdown.other.add(value);
+            break;
+        }
       }
     }
 
@@ -109,6 +143,7 @@ export class NetWorthService {
         investmentAssets: investmentAssetsSum,
         manualAssets: totalManualAssets,
         manualLiabilities: totalManualLiabilities,
+        investmentBreakdown,
       },
     };
   }
@@ -139,6 +174,12 @@ export class NetWorthService {
         investmentAssets: member1.breakdown.investmentAssets.add(member2.breakdown.investmentAssets),
         manualAssets: member1.breakdown.manualAssets.add(member2.breakdown.manualAssets),
         manualLiabilities: member1.breakdown.manualLiabilities.add(member2.breakdown.manualLiabilities),
+        investmentBreakdown: {
+          stocks: member1.breakdown.investmentBreakdown.stocks.add(member2.breakdown.investmentBreakdown.stocks),
+          etfs: member1.breakdown.investmentBreakdown.etfs.add(member2.breakdown.investmentBreakdown.etfs),
+          crypto: member1.breakdown.investmentBreakdown.crypto.add(member2.breakdown.investmentBreakdown.crypto),
+          other: member1.breakdown.investmentBreakdown.other.add(member2.breakdown.investmentBreakdown.other),
+        },
       },
     };
   }
@@ -179,6 +220,12 @@ export class NetWorthService {
     const now = new Date();
 
     switch (range) {
+      case '24H':
+        dateFilter = new Date(now.setDate(now.getDate() - 2));
+        break;
+      case '1W':
+        dateFilter = new Date(now.setDate(now.getDate() - 7));
+        break;
       case '1M':
         dateFilter = new Date(now.setMonth(now.getMonth() - 1));
         break;

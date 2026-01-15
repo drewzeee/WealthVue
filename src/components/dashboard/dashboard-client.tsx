@@ -17,18 +17,30 @@ interface DashboardClientProps {
         investmentAssets: number
         manualAssets: number
         manualLiabilities: number
+        investmentBreakdown: {
+            stocks: number
+            etfs: number
+            crypto: number
+            other: number
+        }
     } | null
+    initialNetWorth: number
 }
 
-export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
+export function DashboardClient({
+    initialBreakdown,
+    initialNetWorth,
+}: DashboardClientProps) {
     const [timeRange, setTimeRange] = useState<TimeRange>('1M')
     const [viewMode, setViewMode] = useState<'personal' | 'household'>('personal')
     const [breakdown, setBreakdown] = useState(initialBreakdown)
+    const [netWorth, setNetWorth] = useState(initialNetWorth)
 
-    // Update breakdown when viewMode changes
+    // Update data when viewMode changes
     useEffect(() => {
         if (viewMode === 'personal') {
             setBreakdown(initialBreakdown)
+            setNetWorth(initialNetWorth)
             return
         }
 
@@ -38,23 +50,21 @@ export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
                 const result = await res.json()
                 if (result.success) {
                     setBreakdown(result.data.breakdown)
+                    setNetWorth(result.data.netWorth)
                 }
             } catch (error) {
-                console.error('Failed to fetch household breakdown:', error)
+                console.error('Failed to fetch household data:', error)
             }
         }
         fetchHouseholdBreakdown()
-    }, [viewMode, initialBreakdown])
+    }, [viewMode, initialBreakdown, initialNetWorth])
+
+    const isPositive = netWorth >= 0
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                    <p className="text-muted-foreground">
-                        {viewMode === 'personal' ? 'Your personal financial overview' : 'Combined household financial overview'}
-                    </p>
-                </div>
+        <div className="space-y-8">
+            {/* View Toggle */}
+            <div className="flex justify-end">
                 <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
                     <TabsList>
                         <TabsTrigger value="personal" className="flex items-center gap-2">
@@ -68,6 +78,21 @@ export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
                     </TabsList>
                 </Tabs>
             </div>
+
+            {/* Net Worth Card */}
+            <GlassCard glowColor="primary" className="p-0">
+                <CardHeader className="pb-6">
+                    <CardDescription className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
+                        Net Worth
+                    </CardDescription>
+                    <CardTitle className={`text-5xl font-bold tracking-tight ${isPositive ? 'text-finance-income' : 'text-finance-expense'}`}>
+                        {netWorth < 0 ? '-' : ''}${Math.abs(netWorth).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}
+                    </CardTitle>
+                </CardHeader>
+            </GlassCard>
 
             {/* Metric Cards */}
             <MetricCards mode={viewMode} />
