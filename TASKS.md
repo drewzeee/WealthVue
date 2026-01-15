@@ -222,7 +222,7 @@
 - ✅ Add automatic transfer detection for credit cards, loans, account transfers, etc
 - ✅ Identify account creation workflow
 - ✅ Implement month navigation selector for budget overview
-- ✅ Implement robust multi-criteria transaction filtering (Popover, multi-tab, search chips)
+- ✅ Implement robust multi-criteria transaction filtering (Popover, multi-tab, search chips, uncategorized filter)
 - ✅ Implement dynamic transaction summary cards (Income/Expense/Count)
 
 ## Bugs

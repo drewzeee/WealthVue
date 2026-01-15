@@ -85,6 +85,9 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
     if (searchParams.get("merchant")) {
       active.push({ key: "merchant", label: "Merchant", value: searchParams.get("merchant")! })
     }
+    if (searchParams.get("uncategorized") === "true") {
+      active.push({ key: "uncategorized", label: "Uncategorized", value: "Only" })
+    }
 
     return active
   }

@@ -13,6 +13,7 @@ export type TransactionFilter = {
   amountMax?: number
   merchant?: string
   isTransfer?: boolean
+  uncategorized?: boolean
   limit?: number
   offset?: number
 }
@@ -30,6 +31,7 @@ export class TransactionRepository {
     amountMax,
     merchant: merchantName,
     isTransfer,
+    uncategorized,
     limit = 50,
     offset = 0,
   }: TransactionFilter) {
@@ -45,6 +47,7 @@ export class TransactionRepository {
         : {}),
       ...(accountId ? { accountId } : {}),
       ...(categoryId ? { categoryId } : {}),
+      ...(uncategorized ? { categoryId: null } : {}),
       ...(type === 'income' ? { amount: { gt: 0 } } : {}),
       ...(type === 'expense' ? { amount: { lt: 0 } } : {}),
       ...(amountMin !== undefined || amountMax !== undefined
@@ -98,6 +101,7 @@ export class TransactionRepository {
     amountMax,
     merchant: merchantName,
     isTransfer,
+    uncategorized,
   }: Omit<TransactionFilter, 'limit' | 'offset'>) {
     const where: Prisma.TransactionWhereInput = {
       account: { userId },
@@ -111,6 +115,7 @@ export class TransactionRepository {
         : {}),
       ...(accountId ? { accountId } : {}),
       ...(categoryId ? { categoryId } : {}),
+      ...(uncategorized ? { categoryId: null } : {}),
       ...(type === 'income' ? { amount: { gt: 0 } } : {}),
       ...(type === 'expense' ? { amount: { lt: 0 } } : {}),
       ...(amountMin !== undefined || amountMax !== undefined

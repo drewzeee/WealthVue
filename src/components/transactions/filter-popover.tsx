@@ -61,6 +61,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
     const [amountMin, setAmountMin] = React.useState(searchParams.get("amountMin") || "")
     const [amountMax, setAmountMax] = React.useState(searchParams.get("amountMax") || "")
     const [merchant, setMerchant] = React.useState(searchParams.get("merchant") || "")
+    const [uncategorized, setUncategorized] = React.useState(searchParams.get("uncategorized") === "true")
 
     const [accountSearch, setAccountSearch] = React.useState("")
     const [categorySearch, setCategorySearch] = React.useState("")
@@ -76,6 +77,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
             setAmountMin(searchParams.get("amountMin") || "")
             setAmountMax(searchParams.get("amountMax") || "")
             setMerchant(searchParams.get("merchant") || "")
+            setUncategorized(searchParams.get("uncategorized") === "true")
         }
     }, [isOpen, searchParams])
 
@@ -106,6 +108,9 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         if (merchant) params.set("merchant", merchant)
         else params.delete("merchant")
 
+        if (uncategorized) params.set("uncategorized", "true")
+        else params.delete("uncategorized")
+
         params.set("page", "1")
         router.push(pathname + "?" + params.toString())
         setIsOpen(false)
@@ -120,6 +125,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         setAmountMin("")
         setAmountMax("")
         setMerchant("")
+        setUncategorized(false)
 
         const params = new URLSearchParams(searchParams.toString())
         params.delete("accountId")
@@ -130,6 +136,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         params.delete("amountMin")
         params.delete("amountMax")
         params.delete("merchant")
+        params.delete("uncategorized")
         params.set("page", "1")
 
         router.push(pathname + "?" + params.toString())
@@ -221,6 +228,16 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
                                         className="h-9"
                                     />
                                     <div className="space-y-2">
+                                        <div className="flex items-center space-x-2 py-2 border-b">
+                                            <Checkbox
+                                                id="cat-uncategorized"
+                                                checked={uncategorized}
+                                                onCheckedChange={(checked) => setUncategorized(!!checked)}
+                                            />
+                                            <Label htmlFor="cat-uncategorized" className="text-sm font-medium cursor-pointer flex-1 py-1">
+                                                Uncategorized Only
+                                            </Label>
+                                        </div>
                                         {filteredCategories.map((cat) => (
                                             <div key={cat.id} className="flex items-center space-x-2">
                                                 <Checkbox
