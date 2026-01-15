@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
+import { NetWorthService } from '@/lib/services/net-worth.service'
 import {
   Card,
   CardContent,
@@ -8,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Wallet, CreditCard, TrendingUp, Building2 } from 'lucide-react'
+import { DashboardClient } from '@/components/dashboard/dashboard-client'
 
 export const metadata = {
   title: 'Dashboard - WealthVue',
@@ -22,32 +23,31 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const placeholderCards = [
-    {
-      title: 'Total Cash',
-      value: '$0.00',
-      icon: Wallet,
-      description: 'Bank accounts',
-    },
-    {
-      title: 'Credit Balance',
-      value: '$0.00',
-      icon: CreditCard,
-      description: 'Credit cards',
-    },
-    {
-      title: 'Investments',
-      value: '$0.00',
-      icon: TrendingUp,
-      description: 'Portfolio value',
-    },
-    {
-      title: 'Real Estate',
-      value: '$0.00',
-      icon: Building2,
-      description: 'Property value',
-    },
-  ]
+  // Fetch current net worth on server
+  let netWorthData = null
+  let error = null
+
+  try {
+    const data = await NetWorthService.calculateCurrentNetWorth(session.user.id)
+    netWorthData = {
+      netWorth: data.netWorth.toNumber(),
+      totalAssets: data.totalAssets.toNumber(),
+      totalLiabilities: data.totalLiabilities.toNumber(),
+      breakdown: {
+        accountAssets: data.breakdown.accountAssets.toNumber(),
+        accountLiabilities: data.breakdown.accountLiabilities.toNumber(),
+        investmentAssets: data.breakdown.investmentAssets.toNumber(),
+        manualAssets: data.breakdown.manualAssets.toNumber(),
+        manualLiabilities: data.breakdown.manualLiabilities.toNumber(),
+      },
+    }
+  } catch (err) {
+    console.error('Failed to fetch net worth:', err)
+    error = 'Failed to load financial data'
+  }
+
+  const netWorth = netWorthData?.netWorth || 0
+  const isPositive = netWorth >= 0
 
   return (
     <div className="space-y-8">
@@ -61,63 +61,51 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {error && (
+        <Card className="border-destructive">
+          <CardContent className="pt-6">
+            <p className="text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Net Worth Card */}
       <Card>
         <CardHeader>
           <CardDescription>Net Worth</CardDescription>
-          <CardTitle className="text-4xl">$0.00</CardTitle>
+          <CardTitle className={`text-4xl ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+            {netWorth < 0 ? '-' : ''}${Math.abs(netWorth).toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Connect your accounts to see your net worth
-          </p>
+          {netWorthData ? (
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Total Assets</p>
+                <p className="font-semibold text-green-600 dark:text-green-500">
+                  ${netWorthData.totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Total Liabilities</p>
+                <p className="font-semibold text-red-600 dark:text-red-500">
+                  ${netWorthData.totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Connect your accounts to see your net worth
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      {/* Metric Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {placeholderCards.map((card) => {
-          const Icon = card.icon
-          return (
-            <Card key={card.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {card.title}
-                </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {card.description}
-                </p>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
-
-      {/* Placeholder for Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Net Worth Over Time</CardTitle>
-            <CardDescription>Track your financial growth</CardDescription>
-          </CardHeader>
-          <CardContent className="h-64 flex items-center justify-center text-muted-foreground">
-            Chart placeholder - Coming in Phase 4
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Asset Allocation</CardTitle>
-            <CardDescription>How your wealth is distributed</CardDescription>
-          </CardHeader>
-          <CardContent className="h-64 flex items-center justify-center text-muted-foreground">
-            Chart placeholder - Coming in Phase 4
-          </CardContent>
-        </Card>
-      </div>
+      {/* Client-side components with charts and time selector */}
+      <DashboardClient initialBreakdown={netWorthData?.breakdown || null} />
     </div>
   )
 }

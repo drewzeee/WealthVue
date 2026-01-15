@@ -1,6 +1,7 @@
+import { startOfMonth, endOfMonth, subMonths } from "date-fns"
+import { prisma } from "@/lib/db/client"
 import { categoryRepository, categoryBudgetRepository } from "@/lib/db/repositories/budgets"
 import { transactionRepository } from "@/lib/db/repositories/transactions"
-import { startOfMonth, endOfMonth, subMonths } from "date-fns"
 
 export class BudgetService {
     async getBudgetOverview(userId: string, date: Date) {
@@ -67,7 +68,7 @@ export class BudgetService {
                     carryOver = Number(catBudget.carryOverAmount)
                 } else {
                     // Calculate dynamic from previous month
-                    carryOver = await this.calculateCarryOver(userId, cat.id, start)
+                    carryOver = await BudgetService.calculateCarryOver(userId, cat.id, start)
                 }
             }
 
@@ -133,7 +134,7 @@ export class BudgetService {
         }
     }
 
-    private async calculateCarryOver(userId: string, categoryId: string, currentMonth: Date): Promise<number> {
+    static async calculateCarryOver(userId: string, categoryId: string, currentMonth: Date): Promise<number> {
         const prevMonthStr = subMonths(currentMonth, 1)
         const startPrev = startOfMonth(prevMonthStr)
         const endPrev = endOfMonth(prevMonthStr)
@@ -147,7 +148,7 @@ export class BudgetService {
             prevBudgeted = Number(prevBudgetSnapshot.budgetedAmount) + Number(prevBudgetSnapshot.carryOverAmount)
         } else {
             // Fetch category to get default
-            const cat = await categoryRepository.findById(categoryId, userId)
+            const cat = await prisma.category.findUnique({ where: { id: categoryId } })
             if (cat) prevBudgeted = Number(cat.monthlyBudget)
         }
 
@@ -159,10 +160,35 @@ export class BudgetService {
             categoryId,
             limit: 10000
         })
-        const prevSpent = transactions.reduce((sum, t) => sum + Number(t.amount), 0)
+        const prevSpent = transactions.reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0)
 
         const remaining = prevBudgeted - prevSpent
-        return remaining > 0 ? remaining : 0 // Only positive roll-over? Usually yes.
+        return remaining > 0 ? remaining : 0 // Only positive roll-over
+    }
+
+    static async processCarryOver(date: Date) {
+        const startOfCurrentMonth = startOfMonth(date)
+        const categories = await prisma.category.findMany({
+            where: { carryOver: true }
+        })
+
+        const results = []
+        for (const cat of categories) {
+            const carryOverAmount = await this.calculateCarryOver(cat.userId, cat.id, startOfCurrentMonth)
+
+            // Fetch existing budget for current month if any
+            const existing = await categoryBudgetRepository.findByCategoryId(cat.id, startOfCurrentMonth)
+
+            const budget = await categoryBudgetRepository.upsert({
+                categoryId: cat.id,
+                month: startOfCurrentMonth,
+                budgetedAmount: existing ? existing.budgetedAmount : cat.monthlyBudget,
+                carryOverAmount: carryOverAmount,
+                actualSpent: existing ? existing.actualSpent : 0
+            })
+            results.push(budget)
+        }
+        return results
     }
 }
 

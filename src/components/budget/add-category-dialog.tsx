@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -58,10 +59,14 @@ export function AddCategoryDialog() {
       return response.json()
     },
     onSuccess: () => {
+      toast.success("Category created")
       queryClient.invalidateQueries({ queryKey: ["categories"] })
       setOpen(false)
       form.reset()
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to create category")
+    }
   })
 
   function onSubmit(values: CreateCategorySchema) {

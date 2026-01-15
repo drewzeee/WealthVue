@@ -158,19 +158,33 @@
 
 **Goal:** Complete the dashboard, net worth tracking, asset/liability management, and family linking.
 **Duration:** 2-3 weeks
-**Status:** 🔄 In Progress
+**Status:** ✅ Completed
 
-- 🔲 Complete dashboard implementation (net worth, metrics, charts)
-- 🔲 Net worth calculation engine (aggregates all assets/liabilities)
-- 🔲 Time selector for net worth history (24h, 1w, 1m, 3m, 6m, 1y, all)
-- 🔲 Asset and liability CRUD (loans, real estate, credit cards, etc.)
-- 🔲 Liability tracking with payment schedules
-- 🔲 Family account linking (invitation system)
-- 🔲 Combined household view for linked accounts
-- 🔲 Toggle between individual and household views
-- 🔲 Monthly budget carry-over logic (scheduled job)
-- 🔲 Responsive design for mobile/tablet
-- 🔲 Final UI polish and consistency pass
+### Sprint 1: Dashboard Implementation ✅
+- ✅ Net worth calculation engine (backend service complete)
+- ✅ Net worth snapshot job (daily BullMQ job)
+- ✅ API endpoints for net worth data (/api/net-worth, /api/net-worth/history)
+- ✅ Dashboard page with real data (replaced placeholders)
+- ✅ Time selector component (24h, 1w, 1m, 3m, 6m, 1y, all)
+- ✅ Net worth area chart with historical data
+- ✅ Asset allocation donut chart
+- ✅ Metric cards (cash, credit, investments, real estate)
+- ✅ Test dashboard on live development server
+- ✅ Verify mobile/tablet responsive design
+
+### Sprint 2: Asset & Liability Management (Complete)
+- ✅ Asset CRUD API endpoints (POST, GET, PATCH, DELETE)
+- ✅ Liability CRUD API endpoints
+- ✅ Asset management UI (loans, real estate, vehicles, etc.)
+- ✅ Liability tracking with payment schedules
+- ✅ Integrate into Settings page
+
+### Sprint 3: Polish & Family Linking ✅
+- ✅ Family account linking (invitation system)
+- ✅ Combined household view for linked accounts
+- ✅ Toggle between individual and household views
+- ✅ Monthly budget carry-over logic (scheduled job)
+- ✅ Final UI polish and consistency pass
 
 ---
 
@@ -180,17 +194,17 @@
 **Duration:** 1-2 weeks
 **Status:** 🔲 Not Started
 
-- 🔲 Comprehensive error handling and user-friendly error messages
-- 🔲 Loading states and optimistic UI updates
+- 🔄 Comprehensive error handling and user-friendly error messages
+- ✅ Loading states and optimistic UI updates
 - 🔲 Rate limiting on API endpoints
-- 🔲 API input validation with Zod schemas
+- ✅ API input validation with Zod schemas
 - 🔲 Integration tests for critical workflows
 - 🔲 Docker Compose production configuration
 - 🔲 Nginx reverse proxy setup with SSL
-- 🔲 Environment variable documentation (.env.example)
-- 🔲 README with setup and deployment instructions
+- ✅ Environment variable documentation (.env.example)
+- ✅ README with setup and deployment instructions
 - 🔲 Database backup and restore scripts
-- 🔲 Health check endpoints
+- ✅ Health check endpoints
 - 🔲 Logging and monitoring setup
 
 ---

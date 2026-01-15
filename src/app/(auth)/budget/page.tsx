@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function BudgetPage() {
   return (
-    <div className="flex flex-col gap-6 p-8">
+    <div className="flex flex-col gap-6 p-4 md:p-8">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Budget & Categorization</h2>
         <p className="text-muted-foreground">

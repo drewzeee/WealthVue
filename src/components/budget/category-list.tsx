@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Category } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
+import { toast } from "sonner"
 
 import {
   Table,
@@ -46,8 +47,12 @@ export function CategoryList() {
       return res.json()
     },
     onSuccess: () => {
+      toast.success("Category deleted")
       queryClient.invalidateQueries({ queryKey: ["categories"] })
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete category")
+    }
   })
 
   if (isLoading) return <div>Loading categories...</div>
@@ -91,8 +96,8 @@ export function CategoryList() {
                   </TableCell>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell>
-                    {category.monthlyBudget 
-                      ? formatCurrency(Number(category.monthlyBudget)) 
+                    {category.monthlyBudget
+                      ? formatCurrency(Number(category.monthlyBudget))
                       : formatCurrency(0)}
                   </TableCell>
                   <TableCell>{category.carryOver ? "Yes" : "No"}</TableCell>
@@ -107,7 +112,7 @@ export function CategoryList() {
                         <DropdownMenuItem onClick={() => setEditingCategory(category)}>
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => {
                             if (confirm("Are you sure you want to delete this category?")) {
@@ -127,10 +132,10 @@ export function CategoryList() {
         </Table>
       </div>
 
-      <EditCategoryDialog 
-        category={editingCategory} 
-        open={!!editingCategory} 
-        onOpenChange={(open) => !open && setEditingCategory(null)} 
+      <EditCategoryDialog
+        category={editingCategory}
+        open={!!editingCategory}
+        onOpenChange={(open) => !open && setEditingCategory(null)}
       />
     </div>
   )

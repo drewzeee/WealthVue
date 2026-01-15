@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Category } from "@prisma/client"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -76,9 +77,13 @@ export function EditCategoryDialog({ category, open, onOpenChange }: EditCategor
       return response.json()
     },
     onSuccess: () => {
+      toast.success("Category updated")
       queryClient.invalidateQueries({ queryKey: ["categories"] })
       onOpenChange(false)
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update category")
+    }
   })
 
   function onSubmit(values: UpdateCategorySchema) {

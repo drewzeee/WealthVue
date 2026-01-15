@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { CategorizationRule } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
+import { toast } from "sonner"
 
 import {
   Table,
@@ -50,8 +51,12 @@ export function RuleList() {
       return res.json()
     },
     onSuccess: () => {
+      toast.success("Rule deleted")
       queryClient.invalidateQueries({ queryKey: ["rules"] })
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete rule")
+    }
   })
 
   if (isLoading) return <div>Loading rules...</div>

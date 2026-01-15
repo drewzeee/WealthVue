@@ -4,7 +4,16 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/db/client"
 import { AccountDialog } from "@/components/accounts/add-account-dialog"
 import { AccountList } from "@/components/settings/account-list"
+import { AssetList } from "@/components/assets/asset-list"
+import { LiabilityList } from "@/components/liabilities/liability-list"
+import { FamilyManagement } from "@/components/settings/family-management"
 import { Separator } from "@/components/ui/separator"
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
 
 export const metadata = {
     title: "Settings - WealthVue",
@@ -20,7 +29,7 @@ export default async function SettingsPage() {
 
     const userId = session.user.id
 
-    // Fetch all account types
+    // Fetch data for all sections
     const accounts = await prisma.account.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
@@ -47,29 +56,55 @@ export default async function SettingsPage() {
             <div>
                 <h3 className="text-lg font-medium">Settings</h3>
                 <p className="text-sm text-muted-foreground">
-                    Manage your account connections and preferences.
+                    Manage your account connections, assets, and liabilities.
                 </p>
             </div>
             <Separator />
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h4 className="text-base font-medium">Accounts & Assets</h4>
-                        <p className="text-sm text-muted-foreground">
-                            Connect banks, add manual accounts, or track assets.
-                        </p>
-                    </div>
-                    <AccountDialog />
-                </div>
+            <Tabs defaultValue="accounts" className="space-y-6">
+                <TabsList>
+                    <TabsTrigger value="accounts">Bank Accounts</TabsTrigger>
+                    <TabsTrigger value="assets">Manual Assets</TabsTrigger>
+                    <TabsTrigger value="liabilities">Manual Liabilities</TabsTrigger>
+                    <TabsTrigger value="family">Family</TabsTrigger>
+                </TabsList>
 
-                <AccountList
-                    accounts={accounts.map(a => ({ ...a, currentBalance: a.currentBalance.toNumber(), availableBalance: a.availableBalance?.toNumber() || null, creditLimit: a.creditLimit?.toNumber() || null }))}
-                    assets={assets.map(a => ({ ...a, currentValue: a.currentValue.toNumber() }))}
-                    liabilities={liabilities.map(l => ({ ...l, currentBalance: l.currentBalance.toNumber(), interestRate: l.interestRate?.toNumber() || null, minimumPayment: l.minimumPayment?.toNumber() || null }))}
-                    investmentAccounts={investmentAccounts}
-                />
-            </div>
+                <TabsContent value="accounts" className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h4 className="text-base font-medium">Accounts</h4>
+                            <p className="text-sm text-muted-foreground">
+                                Connect banks or add manual bank accounts.
+                            </p>
+                        </div>
+                        <AccountDialog />
+                    </div>
+
+                    <AccountList
+                        accounts={accounts.map(a => ({
+                            ...a,
+                            currentBalance: a.currentBalance.toNumber(),
+                            availableBalance: a.availableBalance?.toNumber() || null,
+                            creditLimit: a.creditLimit?.toNumber() || null
+                        }))}
+                        assets={assets.map(a => ({ ...a, currentValue: a.currentValue.toNumber() }))}
+                        liabilities={liabilities.map(l => ({ ...l, currentBalance: l.currentBalance.toNumber(), interestRate: l.interestRate?.toNumber() || null, minimumPayment: l.minimumPayment?.toNumber() || null }))}
+                        investmentAccounts={investmentAccounts}
+                    />
+                </TabsContent>
+
+                <TabsContent value="assets">
+                    <AssetList />
+                </TabsContent>
+
+                <TabsContent value="liabilities">
+                    <LiabilityList />
+                </TabsContent>
+
+                <TabsContent value="family">
+                    <FamilyManagement />
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

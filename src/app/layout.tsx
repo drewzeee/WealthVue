@@ -4,6 +4,7 @@ import './globals.css'
 import { SessionProvider } from '@/lib/providers/SessionProvider'
 import { QueryProvider } from '@/lib/providers/QueryProvider'
 import { ThemeProvider } from '@/core/theme/ThemeContext'
+import { Toaster } from 'sonner'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -38,6 +39,7 @@ export default function RootLayout({
           <SessionProvider>
             <QueryProvider>{children}</QueryProvider>
           </SessionProvider>
+          <Toaster position="top-center" richColors />
         </ThemeProvider>
       </body>
     </html>

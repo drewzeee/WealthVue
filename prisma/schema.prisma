@@ -456,6 +456,6 @@ model NetWorthSnapshot {
 
   createdAt DateTime @default(now())
 
-  @@unique([userId, date])
+  @@unique([userId, date], name: "userId_date")
   @@map("net_worth_snapshots")
 }

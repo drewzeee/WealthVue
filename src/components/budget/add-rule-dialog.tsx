@@ -5,6 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Plus, Trash2 } from "lucide-react"
+import { toast } from "sonner"
 import { Category } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
@@ -111,10 +112,14 @@ export function RuleDialog({
       return response.json()
     },
     onSuccess: () => {
+      toast.success(isEditing ? "Rule updated" : "Rule created")
       queryClient.invalidateQueries({ queryKey: ["rules"] })
       setShowModal(false)
       form.reset()
     },
+    onError: (error: any) => {
+      toast.error(error.message || `Failed to ${isEditing ? 'update' : 'create'} rule`)
+    }
   })
 
   function onSubmit(values: CreateRuleSchema) {
