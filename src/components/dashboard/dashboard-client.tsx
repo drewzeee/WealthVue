@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { GlassCard } from '@/components/ui/glass-card'
 import { TimeSelector, TimeRange } from './time-selector'
 import { NetWorthChart } from './net-worth-chart'
 import { AllocationChart } from './allocation-chart'
@@ -74,7 +75,7 @@ export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
             {/* Charts */}
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Net Worth Over Time */}
-                <Card className="border-none shadow-card">
+                <GlassCard glowColor="primary" className="p-0">
                     <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <div>
@@ -87,10 +88,10 @@ export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
                     <CardContent className="pt-4">
                         <NetWorthChart range={timeRange} mode={viewMode} />
                     </CardContent>
-                </Card>
+                </GlassCard>
 
                 {/* Asset Allocation */}
-                <Card className="border-none shadow-card">
+                <GlassCard glowColor="blue" className="p-0">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">Asset Allocation</CardTitle>
                         <CardDescription className="text-[10px] font-medium text-muted-foreground/50">How wealth is distributed</CardDescription>
@@ -98,7 +99,7 @@ export function DashboardClient({ initialBreakdown }: DashboardClientProps) {
                     <CardContent className="pt-4">
                         <AllocationChart data={breakdown} />
                     </CardContent>
-                </Card>
+                </GlassCard>
             </div>
         </div>
     )

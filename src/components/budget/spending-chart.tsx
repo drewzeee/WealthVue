@@ -3,6 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import { CategoryBudgetSummary } from "@/types/budget"
 import { formatCurrency } from "@/lib/utils"
+import { GlassCard } from "@/components/ui/glass-card"
 
 interface SpendingChartProps {
     categories: CategoryBudgetSummary[]
@@ -24,7 +25,7 @@ export function SpendingChart({ categories, remaining }: SpendingChartProps) {
     ].filter(d => d.value > 0)
 
     return (
-        <div className="h-[400px] w-full p-6 rounded-xl bg-card text-card-foreground shadow-card">
+        <GlassCard glowColor="primary" className="h-[400px] w-full p-6">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground/80 mb-6">
                 Spending Overview
             </h3>
@@ -84,6 +85,6 @@ export function SpendingChart({ categories, remaining }: SpendingChartProps) {
                     </PieChart>
                 </ResponsiveContainer>
             </div>
-        </div>
+        </GlassCard>
     )
 }

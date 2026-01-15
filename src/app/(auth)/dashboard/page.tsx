@@ -3,13 +3,13 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import { NetWorthService } from '@/lib/services/net-worth.service'
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
 import { DashboardClient } from '@/components/dashboard/dashboard-client'
+import { GlassCard } from '@/components/ui/glass-card'
 
 export const metadata = {
   title: 'Dashboard - WealthVue',
@@ -62,15 +62,15 @@ export default async function DashboardPage() {
       </div>
 
       {error && (
-        <Card className="border-destructive">
+        <GlassCard glowColor="rose">
           <CardContent className="pt-6">
-            <p className="text-destructive">{error}</p>
+            <p className="text-destructive font-bold">{error}</p>
           </CardContent>
-        </Card>
+        </GlassCard>
       )}
 
       {/* Net Worth Card */}
-      <Card className="border-none shadow-card">
+      <GlassCard glowColor="primary" className="p-0">
         <CardHeader className="pb-2">
           <CardDescription className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
             Net Worth
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
             </p>
           )}
         </CardContent>
-      </Card>
+      </GlassCard>
 
       {/* Client-side components with charts and time selector */}
       <DashboardClient initialBreakdown={netWorthData?.breakdown || null} />

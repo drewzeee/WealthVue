@@ -21,6 +21,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { GlassCard } from "@/components/ui/glass-card"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -76,7 +77,7 @@ export function InvestmentDataTable<TData, TValue>({
                     </span>
                 </div>
             )}
-            <div className="rounded-md border">
+            <GlassCard glowColor="primary" className="p-0 overflow-visible">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -132,7 +133,7 @@ export function InvestmentDataTable<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-            </div>
+            </GlassCard>
             <div className="flex items-center justify-between py-4">
                 <div className="text-sm text-muted-foreground">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}

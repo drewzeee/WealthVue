@@ -3,7 +3,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { ArrowDown, ArrowUp, DollarSign, PieChart as PieChartIcon, TrendingUp, Wallet } from "lucide-react"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { GlassCard } from "@/components/ui/glass-card"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AllocationChart } from "./allocation-chart"
 import { PortfolioHistoryChart } from "./portfolio-history-chart"
 import { formatCurrency } from "@/lib/utils"
@@ -48,7 +49,7 @@ export function InvestmentOverview() {
         <div className="space-y-6">
             {/* Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <GlassCard glowColor="blue" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Value</CardTitle>
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -59,8 +60,8 @@ export function InvestmentOverview() {
                             Current portfolio value
                         </p>
                     </CardContent>
-                </Card>
-                <Card>
+                </GlassCard>
+                <GlassCard glowColor={isPositive ? "emerald" : "rose"} className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Gain/Loss</CardTitle>
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -74,8 +75,8 @@ export function InvestmentOverview() {
                             {overview.totalGainLossPercent.toFixed(2)}% all time
                         </p>
                     </CardContent>
-                </Card>
-                <Card>
+                </GlassCard>
+                <GlassCard glowColor="amber" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Cost Basis</CardTitle>
                         <Wallet className="h-4 w-4 text-muted-foreground" />
@@ -86,8 +87,8 @@ export function InvestmentOverview() {
                             Total invested amount
                         </p>
                     </CardContent>
-                </Card>
-                <Card>
+                </GlassCard>
+                <GlassCard glowColor="primary" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Asset Count</CardTitle>
                         <PieChartIcon className="h-4 w-4 text-muted-foreground" />
@@ -98,27 +99,27 @@ export function InvestmentOverview() {
                             Active asset classes
                         </p>
                     </CardContent>
-                </Card>
+                </GlassCard>
             </div>
 
             {/* Charts */}
             <div className="grid gap-4 md:grid-cols-2">
-                <Card>
+                <GlassCard glowColor="primary" className="p-0">
                     <CardHeader>
                         <CardTitle>Portfolio History</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
                         <PortfolioHistoryChart data={overview.history} />
                     </CardContent>
-                </Card>
-                <Card>
+                </GlassCard>
+                <GlassCard glowColor="blue" className="p-0">
                     <CardHeader>
                         <CardTitle>Allocation</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
                         <AllocationChart data={overview.allocation} />
                     </CardContent>
-                </Card>
+                </GlassCard>
             </div>
         </div>
     )

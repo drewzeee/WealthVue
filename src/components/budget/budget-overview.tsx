@@ -9,6 +9,7 @@ import { SpendingChart } from "./spending-chart"
 import { CategoryBudgetList } from "./category-budget-list"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { MonthSelector } from "./month-selector"
+import { GlassCard } from "@/components/ui/glass-card"
 
 export function BudgetOverview() {
     const searchParams = useSearchParams()
@@ -54,9 +55,9 @@ export function BudgetOverview() {
                         remaining={data.overall.remaining}
                     />
                 </div>
-                <div className="lg:col-span-1 rounded-xl p-6 bg-card text-card-foreground shadow-card h-fit">
+                <GlassCard glowColor="primary" className="lg:col-span-1 h-fit">
                     <CategoryBudgetList categories={data.categories} />
-                </div>
+                </GlassCard>
             </div>
         </div>
     )

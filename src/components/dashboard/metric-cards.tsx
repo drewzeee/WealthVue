@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Wallet, CreditCard, TrendingUp, Building2 } from 'lucide-react'
+import { GlassCard } from '@/components/ui/glass-card'
 
 interface NetWorthData {
     netWorth: number
@@ -49,14 +50,14 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
         return (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {[...Array(4)].map((_, i) => (
-                    <Card key={i}>
+                    <GlassCard key={i} className="p-0">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Loading...</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">$0.00</div>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 ))}
             </div>
         )
@@ -64,12 +65,13 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
 
     const breakdown = data?.breakdown
 
-    const cards = [
+    const cards: { title: string; value: number; icon: any; description: string; isLiability?: boolean; glow: "emerald" | "blue" | "rose" | "amber" }[] = [
         {
             title: 'Total Cash',
             value: breakdown?.accountAssets || 0,
             icon: Wallet,
             description: 'Bank accounts',
+            glow: 'emerald'
         },
         {
             title: 'Credit Balance',
@@ -77,18 +79,21 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
             icon: CreditCard,
             description: 'Credit cards & loans',
             isLiability: true,
+            glow: 'rose'
         },
         {
             title: 'Investments',
             value: breakdown?.investmentAssets || 0,
             icon: TrendingUp,
             description: 'Portfolio value',
+            glow: 'blue'
         },
         {
             title: 'Real Estate',
             value: breakdown?.manualAssets || 0,
             icon: Building2,
             description: 'Property value',
+            glow: 'amber'
         },
     ]
 
@@ -99,7 +104,7 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
                 const displayValue = card.isLiability ? -card.value : card.value
 
                 return (
-                    <Card key={card.title} className="border-none shadow-card">
+                    <GlassCard key={card.title} glowColor={card.glow} className="p-0">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
                             <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
                                 {card.title}
@@ -117,7 +122,7 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
                                 {card.description}
                             </p>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 )
             })}
         </div>

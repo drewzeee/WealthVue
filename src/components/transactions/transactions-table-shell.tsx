@@ -7,6 +7,7 @@ import { useCallback, useState, useMemo } from "react"
 import { RowSelectionState } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Trash } from "lucide-react"
+import { GlassCard } from "@/components/ui/glass-card"
 import {
   Dialog,
   DialogContent,
@@ -112,15 +113,17 @@ export function TransactionsTableShell({ data, pageCount, categories }: Transact
         </div>
       )}
 
-      <DataTable
-        columns={columns}
-        data={data}
-        pageCount={pageCount}
-        pageIndex={page}
-        onPageChange={onPageChange}
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-      />
+      <GlassCard glowColor="primary" className="p-0 overflow-visible">
+        <DataTable
+          columns={columns}
+          data={data}
+          pageCount={pageCount}
+          pageIndex={page}
+          onPageChange={onPageChange}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+        />
+      </GlassCard>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>

@@ -213,11 +213,32 @@ A warm, modern pink theme with a soft aesthetic.
 
 ```css
 .glass-panel {
-    @apply bg-card/60 backdrop-blur-md border border-white/5 shadow-xl;
+    @apply bg-card/60 backdrop-blur-md border border-white/5;
+    /* Custom deep shadow for "floating" effect */
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.15);
 }
 ```
 
-Use for cards and panels that need the frosted glass effect (especially in dark theme).
+Use for cards and panels to create a premium frosted glass effect with high elevation.
+
+### Floating Shadow Standard
+
+The application uses an extreme high-contrast floating shadow to create depth and focus. This is applied via the `shadow-card` utility or inline `box-shadow` for critical components.
+
+- **Standard**: `0 20px 50px -10px rgba(0, 0, 0, 0.15)`
+- **Strength**: High contrast (visible clearly on both light and dark backgrounds)
+- **Elevation**: Level 4 (Deep)
+
+### Dynamic Performance Glows
+
+Components like `InvestmentOverview` and `Budget` use dynamic glow colors to indicate performance at a glance.
+
+| Color | Meaning |
+|-------|---------|
+| **Emerald** | Positive performance / Profit / Under budget |
+| **Rose** | Negative performance / Loss / Over budget |
+| **Blue/Primary** | General info / Neutral |
+| **Amber** | Warning / Near limit |
 
 ### Text Glow
 

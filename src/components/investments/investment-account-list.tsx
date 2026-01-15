@@ -6,7 +6,8 @@ import { MoreHorizontal, Pencil, Trash2, Wallet } from "lucide-react"
 import { InvestmentAccountType } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { GlassCard } from "@/components/ui/glass-card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -74,10 +75,10 @@ export function InvestmentAccountList() {
         return (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3].map((i) => (
-                    <Card key={i} className="animate-pulse">
+                    <GlassCard key={i} className="animate-pulse p-0">
                         <CardHeader className="h-20 bg-muted" />
                         <CardContent className="h-24 bg-muted/50" />
-                    </Card>
+                    </GlassCard>
                 ))}
             </div>
         )
@@ -85,7 +86,7 @@ export function InvestmentAccountList() {
 
     if (accounts.length === 0) {
         return (
-            <Card>
+            <GlassCard glowColor="primary" className="p-0">
                 <CardContent className="flex flex-col items-center justify-center py-12">
                     <Wallet className="h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No Investment Accounts</h3>
@@ -94,7 +95,7 @@ export function InvestmentAccountList() {
                     </p>
                     <AddInvestmentAccountDialog />
                 </CardContent>
-            </Card>
+            </GlassCard>
         )
     }
 
@@ -125,7 +126,7 @@ export function InvestmentAccountList() {
                     const isPositive = account.totalGainLoss >= 0
 
                     return (
-                        <Card key={account.id}>
+                        <GlassCard key={account.id} glowColor={isPositive ? "emerald" : "rose"} className="p-0">
                             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                                 <div>
                                     <CardTitle className="text-base font-medium">
@@ -182,7 +183,7 @@ export function InvestmentAccountList() {
                                     {account.investments.length} holding{account.investments.length !== 1 ? "s" : ""}
                                 </p>
                             </CardContent>
-                        </Card>
+                        </GlassCard>
                     )
                 })}
             </div>

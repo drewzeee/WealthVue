@@ -19,9 +19,34 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "sans-serif"],
-        heading: ["var(--font-heading)", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        sans: [
+          "Space Grotesk",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "Oxygen",
+          "Ubuntu",
+          "Cantarell",
+          "Fira Sans",
+          "Droid Sans",
+          "Helvetica Neue",
+          "sans-serif"
+        ],
+        heading: [
+          "Space Grotesk",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif"
+        ],
+        mono: [
+          "JetBrains Mono",
+          "Courier New",
+          "Courier",
+          "monospace"
+        ],
       },
       colors: {
         border: "oklch(var(--border) / <alpha-value>)",
@@ -64,7 +89,7 @@ const config = {
         },
       },
       boxShadow: {
-        'card': '0 24px 60px -12px rgba(0, 0, 0, 0.25), 0 12px 24px -8px rgba(0, 0, 0, 0.15)',
+        'card': '0 4px 6px -1px rgba(255, 0, 0, 0.5), 0 20px 50px -10px rgba(255, 0, 0, 0.8)',
         'glow': '0 0 15px -3px var(--tw-shadow-color)',
       },
       borderRadius: {
