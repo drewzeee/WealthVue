@@ -85,7 +85,7 @@ export function DashboardClient({
                     <CardDescription className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
                         Net Worth
                     </CardDescription>
-                    <CardTitle className={`text-5xl font-bold tracking-tight ${isPositive ? 'text-finance-income' : 'text-finance-expense'}`}>
+                    <CardTitle className={`text-5xl font-bold tracking-tight ${isPositive ? 'text-primary' : 'text-finance-expense'}`}>
                         {netWorth < 0 ? '-' : ''}${Math.abs(netWorth).toLocaleString('en-US', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
@@ -102,12 +102,14 @@ export function DashboardClient({
                 {/* Net Worth Over Time */}
                 <GlassCard glowColor="primary" className="p-0">
                     <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                             <div>
                                 <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">Net Worth Over Time</CardTitle>
                                 <CardDescription className="text-[10px] font-medium text-muted-foreground/50">Track financial growth</CardDescription>
                             </div>
-                            <TimeSelector selected={timeRange} onChange={setTimeRange} />
+                            <div className="flex justify-start md:justify-end">
+                                <TimeSelector selected={timeRange} onChange={setTimeRange} />
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-4">

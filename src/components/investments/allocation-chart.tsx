@@ -42,24 +42,28 @@ export function AllocationChart({ data }: AllocationChartProps) {
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
+                    innerRadius={70}
+                    outerRadius={100}
                     paddingAngle={2}
                     dataKey="value"
+                    stroke="none"
+                    strokeWidth={0}
                 >
                     {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                     ))}
                 </Pie>
                 <Tooltip
                     formatter={(value: any) => formatCurrency(Number(value))}
                     contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
+                        backgroundColor: 'oklch(var(--card))',
                         borderRadius: 'var(--radius)',
-                        border: '1px solid hsl(var(--border))',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                        border: 'none',
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                        fontSize: '12px',
+                        fontWeight: '600'
                     }}
-                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                    itemStyle={{ color: 'oklch(var(--foreground))' }}
                 />
                 <Legend
                     verticalAlign="bottom"

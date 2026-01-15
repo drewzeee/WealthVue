@@ -111,7 +111,7 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
                             </CardTitle>
                             <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="px-3 pb-3 pt-0 md:px-6 md:pb-6 md:pt-0">
                             <div className={`text-2xl font-bold tracking-tight ${card.isLiability && card.value > 0 ? 'text-destructive' : ''}`}>
                                 {displayValue < 0 ? '-' : ''}${Math.abs(displayValue).toLocaleString('en-US', {
                                     minimumFractionDigits: 2,

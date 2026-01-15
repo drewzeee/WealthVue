@@ -102,15 +102,15 @@ export interface PortfolioResponse {
 
 // Asset class display configuration
 export const ASSET_CLASS_CONFIG: Record<AssetClass, { label: string; color: string }> = {
-    STOCK: { label: "Stocks", color: "#3B82F6" },
-    ETF: { label: "ETFs", color: "#10B981" },
-    MUTUAL_FUND: { label: "Mutual Funds", color: "#8B5CF6" },
-    BOND: { label: "Bonds", color: "#F59E0B" },
-    CRYPTO: { label: "Crypto", color: "#EC4899" },
-    REAL_ESTATE: { label: "Real Estate", color: "#6366F1" },
-    PRECIOUS_METAL: { label: "Precious Metals", color: "#EAB308" },
-    COMMODITY: { label: "Commodities", color: "#14B8A6" },
-    OTHER: { label: "Other", color: "#6B7280" },
+    STOCK: { label: "Stocks", color: "hsl(195, 100%, 55%)" }, // Bright Cyan
+    ETF: { label: "ETFs", color: "hsl(50, 100%, 55%)" }, // Electric Yellow
+    MUTUAL_FUND: { label: "Mutual Funds", color: "hsl(285, 90%, 60%)" },
+    BOND: { label: "Bonds", color: "hsl(30, 100%, 55%)" },
+    CRYPTO: { label: "Crypto", color: "hsl(270, 100%, 70%)" }, // Glowing Violet
+    REAL_ESTATE: { label: "Real Estate", color: "hsl(220, 15%, 40%)" }, // Neutral Grey
+    PRECIOUS_METAL: { label: "Precious Metals", color: "hsl(45, 100%, 50%)" },
+    COMMODITY: { label: "Commodities", color: "hsl(170, 100%, 45%)" },
+    OTHER: { label: "Other", color: "hsl(340, 100%, 65%)" }, // Neon Pink
 }
 
 // Investment account type display configuration

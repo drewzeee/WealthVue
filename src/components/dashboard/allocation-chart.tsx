@@ -20,14 +20,13 @@ interface AllocationChartProps {
     data: AllocationData | null
 }
 
-// Sleek modern palette
 const COLORS = {
-    cash: 'hsl(160, 60%, 45%)', // Emerald Green
-    stocks: 'hsl(215, 90%, 55%)', // Vibrant Blue
-    etfs: 'hsl(195, 85%, 50%)', // Cyan/Azure
-    crypto: 'hsl(270, 80%, 65%)', // Royal Purple
-    realEstate: 'hsl(320, 70%, 60%)', // Magenta/Pink
-    other: 'hsl(200, 20%, 30%)', // Slate Grey (was 'hsl(0, 0%, 50%)' but slate fits dark mode better)
+    cash: 'hsl(90, 100%, 55%)', // Neon Lime
+    stocks: 'hsl(195, 100%, 55%)', // Bright Cyan
+    crypto: 'hsl(270, 100%, 70%)', // Glowing Violet
+    etfs: 'hsl(50, 100%, 55%)', // Electric Yellow
+    other: 'hsl(340, 100%, 65%)', // Neon Pink
+    realEstate: 'hsl(220, 15%, 40%)', // Neutral Grey
 }
 
 
@@ -99,8 +98,6 @@ export function AllocationChart({ data }: AllocationChartProps) {
                     dataKey="value"
                     stroke="none"
                     strokeWidth={0}
-                    label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                    labelLine={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1 }}
                 >
                     {chartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -112,9 +109,9 @@ export function AllocationChart({ data }: AllocationChartProps) {
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '6px',
                     }}
-                    formatter={(value: number | undefined) => [
+                    formatter={(value: number | undefined, name: string | undefined) => [
                         `$${(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${(((value || 0) / total) * 100).toFixed(1)}%)`,
-                        'Value'
+                        name || 'Value'
                     ]}
                 />
                 <Legend

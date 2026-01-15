@@ -192,7 +192,7 @@
 
 **Goal:** Production-ready application with documentation and deployment assets.
 **Duration:** 1-2 weeks
-**Status:** 🔲 Not Started
+**Status:** 🔄 In Progress
 
 - 🔄 Comprehensive error handling and user-friendly error messages
 - ✅ Loading states and optimistic UI updates
@@ -203,9 +203,13 @@
 - 🔲 Nginx reverse proxy setup with SSL
 - ✅ Environment variable documentation (.env.example)
 - ✅ README with setup and deployment instructions
+- ✅ Systemd service configuration (App + Worker)
+- ✅ Deployment automation script (`setup-services.sh`)
 - 🔲 Database backup and restore scripts
 - ✅ Health check endpoints
 - 🔲 Logging and monitoring setup
+
+**Phase 5 Progress: 7/14 tasks completed (50%)**
 
 ---
 
@@ -235,6 +239,8 @@
 - ✅ Fix `Suspense` error in `/investments` page (aborted requests)
 - ✅ Fix inflated investment value on dashboard (NetWorthService logic)
 - ✅ Fix Net Worth Chart display (colors) and scaling (dynamic Y-axis, live data point)
+- ✅ Improve mobile responsiveness: reclaim container space and optimize chart headers
+- ✅ Optimize chart Y-axis scaling for high-precision ranges (e.g. $66.2k)
 
 ## Quick Commands
 
@@ -266,4 +272,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-15 (Enhanced Transaction Filtering & Summaries)
+**Last Updated:** 2026-01-15 (Enhanced Transaction Filtering & Mobile Optimization)

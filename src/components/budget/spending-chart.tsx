@@ -38,11 +38,13 @@ export function SpendingChart({ categories, remaining }: SpendingChartProps) {
                             cy="50%"
                             innerRadius={70}
                             outerRadius={100}
-                            paddingAngle={8}
+                            paddingAngle={2}
                             dataKey="value"
+                            stroke="none"
+                            strokeWidth={0}
                         >
                             {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                                <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                             ))}
                         </Pie>
                         <Tooltip

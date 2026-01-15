@@ -1,0 +1,17 @@
+[Unit]
+Description=WealthVue Background Worker
+After=network.target postgresql.service redis.service wealthvue.service
+
+[Service]
+Type=simple
+User=andrew
+WorkingDirectory=/home/andrew/wealthvue
+# Ensure environment variables are loaded
+EnvironmentFile=/home/andrew/wealthvue/.env
+ExecStart=/usr/bin/npm run worker
+Restart=always
+# StandardOutput=append:/var/log/wealthvue/worker.log
+# StandardError=append:/var/log/wealthvue/worker.error.log
+
+[Install]
+WantedBy=multi-user.target

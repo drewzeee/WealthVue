@@ -64,7 +64,7 @@ export function NetWorthChart({ range, mode = 'personal' }: NetWorthChartProps) 
 
     return (
         <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                     <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="oklch(var(--primary))" stopOpacity={0.3} />
@@ -77,13 +77,21 @@ export function NetWorthChart({ range, mode = 'personal' }: NetWorthChartProps) 
                     className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-tighter"
                     stroke="none"
                     tick={{ fill: 'oklch(var(--muted-foreground)/0.5)' }}
+                    minTickGap={30}
+                    hide
                 />
                 <YAxis
                     className="text-[10px] font-bold text-muted-foreground/50"
                     stroke="none"
                     tick={{ fill: 'oklch(var(--muted-foreground)/0.5)' }}
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    domain={['dataMin', 'dataMax']}
+                    tickFormatter={(value) => {
+                        if (value >= 1000) return `$${(value / 1000).toFixed(1)}k`
+                        return `$${value}`
+                    }}
+                    domain={['auto', 'auto']}
+                    width={45}
+                    tickCount={5}
+                    hide
                 />
                 <Tooltip
                     contentStyle={{
@@ -104,6 +112,7 @@ export function NetWorthChart({ range, mode = 'personal' }: NetWorthChartProps) 
                     stroke="oklch(var(--primary))"
                     strokeWidth={2}
                     fill="url(#netWorthGradient)"
+                    animationDuration={1000}
                 />
             </AreaChart>
         </ResponsiveContainer>

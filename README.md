@@ -135,9 +135,34 @@ npx prisma migrate deploy  # Apply migrations (production)
 4. Update [TASKS.md](./TASKS.md) as tasks complete
 5. Run tests and ensure type safety
 
-## Docker Deployment
+## Production Deployment (Systemd)
 
-**Coming in Phase 5** - Full Docker Compose setup with Nginx, PostgreSQL, Redis, and automatic SSL.
+For running WealthVue on a Linux server without Docker, you can use systemd to manage the application and worker processes.
+
+### Setup
+
+Run the automated setup script to build the app, run migrations, and install the services:
+
+```bash
+sudo ./scripts/setup-services.sh
+```
+
+### Management
+
+```bash
+# Check status
+systemctl status wealthvue
+systemctl status wealthvue-worker
+
+# View logs
+journalctl -u wealthvue -f
+journalctl -u wealthvue-worker -f
+
+# Restart services
+sudo systemctl restart wealthvue wealthvue-worker
+```
+
+## Docker Deployment
 
 ## Contributing
 

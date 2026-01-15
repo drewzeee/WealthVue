@@ -1,0 +1,17 @@
+[Unit]
+Description=WealthVue Next.js App
+After=network.target postgresql.service redis.service
+
+[Service]
+Type=simple
+User=andrew
+WorkingDirectory=/home/andrew/wealthvue
+# Ensure environment variables are loaded
+EnvironmentFile=/home/andrew/wealthvue/.env
+ExecStart=/usr/bin/npm start
+Restart=always
+# StandardOutput=append:/var/log/wealthvue/app.log
+# StandardError=append:/var/log/wealthvue/app.error.log
+
+[Install]
+WantedBy=multi-user.target
