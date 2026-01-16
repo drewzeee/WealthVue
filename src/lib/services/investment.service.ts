@@ -120,11 +120,27 @@ export class InvestmentService {
             }
         });
 
+        const totalDayChange = Array.from(assetMap.values()).reduce((sum, a) => sum + a.dayChange, 0);
+
+        // Denominator logic: 
+        // We want % change = (Change / Open) * 100
+        // Open = Current - Change
+        // So % change = (Change / (Current - Change)) * 100
+        const totalOpenValue = totalValue - totalDayChange;
+        const totalDayChangePercent = totalOpenValue > 0 ? (totalDayChange / totalOpenValue) * 100 : 0;
+
+        const biggestMover = Array.from(assetMap.values())
+            .filter(a => a.symbol)
+            .sort((a, b) => Math.abs(b.dayChangePercent) - Math.abs(a.dayChangePercent))[0] || null;
+
         return {
             totalValue,
             totalCostBasis,
             totalGainLoss,
             totalGainLossPercent,
+            totalDayChange,
+            totalDayChangePercent,
+            biggestMover,
             allocation,
             history: chartData,
             cryptoAllocation,

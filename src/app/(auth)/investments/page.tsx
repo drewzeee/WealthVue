@@ -147,7 +147,7 @@ export default function InvestmentsPage() {
     const selectedIds = Object.keys(rowSelection).map((index) => investments[parseInt(index)]?.id).filter(Boolean)
 
     return (
-        <div className="flex flex-col gap-6 p-8">
+        <div className="flex flex-col gap-6 p-4 md:p-8">
             <div>
                 <h2 className="text-3xl font-bold tracking-tight">Investments</h2>
                 <p className="text-muted-foreground">
@@ -171,8 +171,8 @@ export default function InvestmentsPage() {
                 <TabsContent value="holdings" className="space-y-4">
                     <Suspense fallback={<div>Loading holdings...</div>}>
                         {/* Filters and Actions */}
-                        <div className="flex flex-wrap gap-4 items-center justify-between">
-                            <div className="flex flex-wrap gap-2 items-center">
+                        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                            <div className="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center w-full md:w-auto">
                                 <Input
                                     placeholder="Search by symbol or name..."
                                     value={search}
@@ -180,48 +180,50 @@ export default function InvestmentsPage() {
                                         setSearch(e.target.value)
                                         setPage(1)
                                     }}
-                                    className="w-64"
+                                    className="w-full sm:w-64"
                                 />
-                                <Select
-                                    value={accountFilter}
-                                    onValueChange={(value) => {
-                                        setAccountFilter(value)
-                                        setPage(1)
-                                    }}
-                                >
-                                    <SelectTrigger className="w-48">
-                                        <SelectValue placeholder="All Accounts" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Accounts</SelectItem>
-                                        {accounts.map((account) => (
-                                            <SelectItem key={account.id} value={account.id}>
-                                                {account.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <Select
-                                    value={assetClassFilter}
-                                    onValueChange={(value) => {
-                                        setAssetClassFilter(value)
-                                        setPage(1)
-                                    }}
-                                >
-                                    <SelectTrigger className="w-40">
-                                        <SelectValue placeholder="All Types" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Types</SelectItem>
-                                        {Object.entries(ASSET_CLASS_CONFIG).map(([key, config]) => (
-                                            <SelectItem key={key} value={key}>
-                                                {config.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex gap-2">
+                                    <Select
+                                        value={accountFilter}
+                                        onValueChange={(value) => {
+                                            setAccountFilter(value)
+                                            setPage(1)
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full sm:w-48">
+                                            <SelectValue placeholder="All Accounts" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Accounts</SelectItem>
+                                            {accounts.map((account) => (
+                                                <SelectItem key={account.id} value={account.id}>
+                                                    {account.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Select
+                                        value={assetClassFilter}
+                                        onValueChange={(value) => {
+                                            setAssetClassFilter(value)
+                                            setPage(1)
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full sm:w-40">
+                                            <SelectValue placeholder="All Types" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Types</SelectItem>
+                                            {Object.entries(ASSET_CLASS_CONFIG).map(([key, config]) => (
+                                                <SelectItem key={key} value={key}>
+                                                    {config.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 w-full md:w-auto justify-end">
                                 {selectedIds.length > 0 && (
                                     <Button
                                         variant="destructive"
@@ -246,6 +248,8 @@ export default function InvestmentsPage() {
                             rowSelection={rowSelection}
                             onRowSelectionChange={setRowSelection}
                             isLoading={isLoading}
+                            onEdit={setEditInvestment}
+                            onDelete={setDeleteInvestment}
                         />
                     </Suspense>
                 </TabsContent>

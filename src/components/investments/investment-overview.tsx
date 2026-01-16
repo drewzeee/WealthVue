@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { ArrowDown, ArrowUp, Clock, DollarSign, PieChart as PieChartIcon, TrendingUp, Wallet } from "lucide-react"
+import { ArrowDown, ArrowUp, Clock, DollarSign, PieChart as PieChartIcon, TrendingUp } from "lucide-react"
 import { AssetClass } from "@prisma/client"
 
 import { GlassCard } from "@/components/ui/glass-card"
@@ -35,6 +35,14 @@ export interface InvestmentOverviewData {
         dayChangePercent: number
         lastPriceUpdate: string | null
     }[]
+    totalDayChange: number
+    totalDayChangePercent: number
+    biggestMover: {
+        symbol: string | null
+        name: string
+        dayChangePercent: number
+        currentPrice: number
+    } | null
 }
 
 export function InvestmentOverview() {
@@ -95,28 +103,48 @@ export function InvestmentOverview() {
                         </p>
                     </CardContent>
                 </GlassCard>
-                <GlassCard glowColor="amber" className="p-0">
+                <GlassCard glowColor={overview.totalDayChange >= 0 ? "emerald" : "rose"} className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-semibold">Cost Basis</CardTitle>
-                        <Wallet className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-semibold">Total Daily Change</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-semibold">{formatCurrency(overview.totalCostBasis)}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Total invested amount
+                        <div className={`text-2xl font-semibold ${overview.totalDayChange >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            {overview.totalDayChange >= 0 ? "+" : ""}{formatCurrency(overview.totalDayChange)}
+                        </div>
+                        <p className={`text-xs flex items-center ${overview.totalDayChange >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            {overview.totalDayChange >= 0 ? <ArrowUp className="mr-1 h-3 w-3" /> : <ArrowDown className="mr-1 h-3 w-3" />}
+                            {overview.totalDayChangePercent.toFixed(2)}% today
                         </p>
                     </CardContent>
                 </GlassCard>
                 <GlassCard glowColor="primary" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-semibold">Asset Count</CardTitle>
+                        <CardTitle className="text-sm font-semibold">Biggest Mover</CardTitle>
                         <PieChartIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-semibold">{overview.assetDetails.length}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Total unique holdings
-                        </p>
+                        {overview.biggestMover ? (
+                            <>
+                                <div className="text-2xl font-semibold flex items-center gap-2">
+                                    {overview.biggestMover.symbol}
+                                    <span className={`text-sm flex items-center ${overview.biggestMover.dayChangePercent >= 0 ? "text-green-600" : "text-red-600"}`}>
+                                        {overview.biggestMover.dayChangePercent >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                                        {Math.abs(overview.biggestMover.dayChangePercent).toFixed(2)}%
+                                    </span>
+                                </div>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {overview.biggestMover.name}
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-semibold">--</div>
+                                <p className="text-xs text-muted-foreground">
+                                    No price data
+                                </p>
+                            </>
+                        )}
                     </CardContent>
                 </GlassCard>
             </div>

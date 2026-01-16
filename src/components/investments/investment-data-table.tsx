@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { GlassCard } from "@/components/ui/glass-card"
+import { InvestmentMobileCard } from "./investment-mobile-card"
+import { InvestmentRow } from "./investment-columns"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -32,6 +34,8 @@ interface DataTableProps<TData, TValue> {
     rowSelection?: RowSelectionState
     onRowSelectionChange?: OnChangeFn<RowSelectionState>
     isLoading?: boolean
+    onEdit?: (investment: TData) => void
+    onDelete?: (investment: TData) => void
 }
 
 export function InvestmentDataTable<TData, TValue>({
@@ -43,6 +47,8 @@ export function InvestmentDataTable<TData, TValue>({
     rowSelection,
     onRowSelectionChange,
     isLoading,
+    onEdit,
+    onDelete,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
 
@@ -71,13 +77,53 @@ export function InvestmentDataTable<TData, TValue>({
     return (
         <div className="space-y-4">
             {selectedCount > 0 && (
-                <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                <div className="flex items-center gap-2 p-2 bg-muted rounded-md mb-4">
                     <span className="text-sm text-muted-foreground">
                         {selectedCount} investment{selectedCount > 1 ? "s" : ""} selected
                     </span>
                 </div>
             )}
-            <GlassCard glowColor="primary" className="p-0 overflow-visible">
+
+            {/* Mobile View */}
+            <div className="flex flex-col md:hidden border rounded-lg divide-y divide-border bg-background/50 backdrop-blur-sm overflow-hidden">
+                {isLoading ? (
+                    <div className="p-8 text-center text-muted-foreground">
+                        Loading investments...
+                    </div>
+                ) : data.length === 0 ? (
+                    <div className="p-8 text-center text-muted-foreground">
+                        No investments found. Add your first investment to get started.
+                    </div>
+                ) : (
+                    data.map((row, index) => {
+                        // Cast to InvestmentRow since TData is generic but we know it's InvestmentRow in this context
+                        // ideally we'd make the component generic properly but for now casting is safer than changing all types
+                        const investment = row as unknown as InvestmentRow
+                        const isSelected = !!rowSelection?.[index]
+
+                        return (
+                            <InvestmentMobileCard
+                                key={investment.id}
+                                investment={investment}
+                                isSelected={isSelected}
+                                onSelectChange={(checked) => {
+                                    if (onRowSelectionChange && rowSelection) {
+                                        onRowSelectionChange({
+                                            ...rowSelection,
+                                            [index]: checked
+                                        })
+                                    }
+                                }}
+                                onEdit={() => onEdit?.(row)}
+                                onDelete={() => onDelete?.(row)}
+                            />
+                        )
+                    })
+                )}
+            </div>
+
+            {/* Desktop View */}
+            <GlassCard glowColor="primary" className="p-0 overflow-visible hidden md:block">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
