@@ -240,6 +240,8 @@
 - ✅ Fix non-functional account edit button and improve Plaid account edit UX
 - ✅ Move "Process History" button from Transactions to Rules page and clean up unused imports
 - ✅ Enhance asset allocation and budget spending donut charts with interactive "glow" effects, segment scaling, and inactive fading
+- ✅ Fix hidden transfer transactions and implement robust UI filtering toggle
+- ✅ Refine transfer category logic to use plural 'Transfers' and ensure automatic category provisioning
 
 ## Bugs
 
@@ -255,6 +257,7 @@
 - ✅ Optimize chart Y-axis scaling for high-precision ranges (e.g. $66.2k)
 - ✅ Fix account edit state synchronization and Plaid account naming/sync issues
 - ✅ Fix legend synchronization bug in donut charts where wrong categories were highlighted on hover
+- ✅ Fix transaction sorting inconsistency: use effective date (authorized date) for both sorting and display
 
 ## Quick Commands
 
@@ -286,4 +289,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-16 (Interactive Donut Charts & Legend Sync Fix)
+**Last Updated:** 2026-01-16 (Show Transfers Fix, Transfers Category Pluralization & Logic)

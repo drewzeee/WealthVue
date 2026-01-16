@@ -21,10 +21,11 @@ import { TransactionMobileCard } from "./transaction-mobile-card"
 interface TransactionsTableShellProps {
   data: TransactionWithRelations[]
   pageCount: number
-  categories: { id: string; name: string; color: string }[]
+  categories: any[]
+  accounts: any[]
 }
 
-export function TransactionsTableShell({ data, pageCount, categories }: TransactionsTableShellProps) {
+export function TransactionsTableShell({ data, pageCount, categories, accounts }: TransactionsTableShellProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -33,7 +34,7 @@ export function TransactionsTableShell({ data, pageCount, categories }: Transact
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const columns = useMemo(() => getColumns(categories), [categories])
+  const columns = useMemo(() => getColumns(categories, accounts), [categories, accounts])
 
   const page = Number(searchParams.get("page")) || 1
 
@@ -132,6 +133,7 @@ export function TransactionsTableShell({ data, pageCount, categories }: Transact
                   <TransactionMobileCard
                     transaction={transaction}
                     categories={categories}
+                    accounts={accounts}
                     isSelected={isSelected}
                     onSelectChange={(checked: boolean) => {
                       setRowSelection((prev) => {

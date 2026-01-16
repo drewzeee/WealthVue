@@ -34,7 +34,15 @@ export class TransactionRepository {
     uncategorized,
     limit = 50,
     offset = 0,
-  }: TransactionFilter) {
+  }: TransactionFilter): Promise<{
+    total: number
+    transactions: (Prisma.TransactionGetPayload<{
+      include: {
+        category: { select: { id: true; name: true; color: true; icon: true } }
+        account: { select: { id: true; name: true; customName: true } }
+      }
+    }>)[]
+  }> {
     const where: Prisma.TransactionWhereInput = {
       account: { userId },
       ...(startDate || endDate
@@ -67,6 +75,7 @@ export class TransactionRepository {
           OR: [
             { description: { contains: search, mode: "insensitive" } },
             { merchant: { contains: search, mode: "insensitive" } },
+            { notes: { contains: search, mode: "insensitive" } },
           ],
         }
         : {}),
@@ -81,12 +90,12 @@ export class TransactionRepository {
         orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
         include: {
           category: { select: { id: true, name: true, color: true, icon: true } },
-          account: { select: { id: true, name: true, customName: true } },
+          account: true,
         },
       }),
     ])
 
-    return { total, transactions }
+    return { total, transactions: transactions as any }
   }
 
   async getSummary({
@@ -135,6 +144,7 @@ export class TransactionRepository {
           OR: [
             { description: { contains: search, mode: "insensitive" } },
             { merchant: { contains: merchantName || search, mode: "insensitive" } },
+            { notes: { contains: search, mode: "insensitive" } },
           ],
         }
         : {}),

@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description: "View and manage your transactions",
 }
 
+// (removed TransactionFiltersProps)
+
 interface TransactionsPageProps {
   searchParams: {
     page?: string
@@ -81,12 +83,11 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
     }),
     prisma.account.findMany({
       where: { userId: session.user.id },
-      select: { id: true, name: true, customName: true },
       orderBy: { name: "asc" },
     }),
     prisma.category.findMany({
       where: { userId: session.user.id },
-      select: { id: true, name: true, color: true },
+      select: { id: true, name: true, color: true, icon: true },
       orderBy: { name: "asc" },
     }),
   ])
@@ -120,6 +121,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
           data={transactions}
           pageCount={pageCount}
           categories={categories}
+          accounts={accounts}
         />
       </div>
     </div>

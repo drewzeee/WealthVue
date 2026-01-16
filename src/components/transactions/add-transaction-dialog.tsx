@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { Plus, Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import { Textarea } from "@/components/ui/textarea"
 
 interface AddTransactionDialogProps {
   accounts: { id: string; name: string }[]
@@ -41,7 +43,7 @@ interface AddTransactionDialogProps {
 export function AddTransactionDialog({ accounts, categories }: AddTransactionDialogProps) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
-  
+
   const form = useForm<CreateTransactionSchema>({
     resolver: zodResolver(createTransactionSchema) as any,
     defaultValues: {
@@ -65,12 +67,15 @@ export function AddTransactionDialog({ accounts, categories }: AddTransactionDia
         throw new Error("Failed to create transaction")
       }
 
+      toast.success("Transaction created successfully")
       setOpen(false)
       form.reset()
       router.refresh()
     } catch (error) {
       console.error(error)
-      // Ideally show toast
+      toast.error("Something went wrong. Please try again.")
+    } finally {
+      // Done handling submit
     }
   }
 
@@ -111,11 +116,11 @@ export function AddTransactionDialog({ accounts, categories }: AddTransactionDia
                   <FormItem>
                     <FormLabel>Amount</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01" 
-                        placeholder="0.00" 
-                        {...field} 
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        {...field}
                         onChange={e => field.onChange(parseFloat(e.target.value))}
                       />
                     </FormControl>
@@ -130,8 +135,8 @@ export function AddTransactionDialog({ accounts, categories }: AddTransactionDia
                   <FormItem>
                     <FormLabel>Date</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="date" 
+                      <Input
+                        type="date"
                         {...field}
                         value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
                         onChange={e => field.onChange(new Date(e.target.value))}
@@ -142,7 +147,7 @@ export function AddTransactionDialog({ accounts, categories }: AddTransactionDia
                 )}
               />
             </div>
-            
+
             <FormField
               control={form.control}
               name="accountId"
@@ -188,6 +193,25 @@ export function AddTransactionDialog({ accounts, categories }: AddTransactionDia
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add any additional details..."
+                      className="resize-none"
+                      {...field}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

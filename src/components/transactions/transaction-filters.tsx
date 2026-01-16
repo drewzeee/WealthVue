@@ -11,8 +11,8 @@ import { format } from "date-fns"
 import { useDebounce } from "@/hooks/use-debounce"
 
 interface TransactionFiltersProps {
-  accounts: { id: string; name: string; customName: string | null }[]
-  categories: { id: string; name: string }[]
+  accounts: any[]
+  categories: any[]
 }
 
 export function TransactionFilters({ accounts, categories }: TransactionFiltersProps) {
@@ -44,7 +44,7 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
     if (urlSearch !== search) {
       setSearch(urlSearch)
     }
-  }, [searchParams])
+  }, [searchParams, search])
 
   // Update URL when debounced search changes
   useEffect(() => {
