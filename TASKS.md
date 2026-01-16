@@ -230,6 +230,7 @@
 - ✅ Implement month navigation selector for budget overview
 - ✅ Implement robust multi-criteria transaction filtering (Popover, multi-tab, search chips, uncategorized filter)
 - ✅ Implement dynamic transaction summary cards (Income/Expense/Count)
+- ✅ Refine typography: reduce font weights across the app for a lighter aesthetic
 
 ## Bugs
 

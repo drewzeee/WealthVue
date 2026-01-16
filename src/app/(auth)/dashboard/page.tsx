@@ -56,7 +56,7 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-3xl font-semibold tracking-tight">
           Welcome back, {session.user?.name?.split(' ')[0] || 'there'}!
         </h1>
         <p className="text-muted-foreground">

@@ -35,7 +35,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-primary">WealthVue</span>
+          <span className="text-xl font-semibold text-primary">WealthVue</span>
         </Link>
 
         {/* Desktop Navigation */}

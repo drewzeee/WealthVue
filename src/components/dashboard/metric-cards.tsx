@@ -106,19 +106,19 @@ export function MetricCards({ mode = 'personal' }: MetricCardsProps) {
                 return (
                     <GlassCard key={card.title} glowColor={card.glow} className="p-0">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                            <CardTitle className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-[0.15em]">
+                            <CardTitle className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-[0.15em]">
                                 {card.title}
                             </CardTitle>
                             <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
                         </CardHeader>
                         <CardContent className="px-3 pb-3 pt-0 md:px-6 md:pb-6 md:pt-0">
-                            <div className={`text-2xl font-bold tracking-tight ${card.isLiability && card.value > 0 ? 'text-destructive' : ''}`}>
+                            <div className={`text-2xl font-semibold tracking-tight ${card.isLiability && card.value > 0 ? 'text-destructive' : ''}`}>
                                 {displayValue < 0 ? '-' : ''}${Math.abs(displayValue).toLocaleString('en-US', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 })}
                             </div>
-                            <p className="text-[10px] text-muted-foreground/60 font-medium">
+                            <p className="text-[10px] text-muted-foreground/60 font-normal">
                                 {card.description}
                             </p>
                         </CardContent>

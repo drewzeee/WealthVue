@@ -51,11 +51,11 @@ export function InvestmentOverview() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <GlassCard glowColor="blue" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+                        <CardTitle className="text-sm font-semibold">Total Value</CardTitle>
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{formatCurrency(overview.totalValue)}</div>
+                        <div className="text-2xl font-semibold">{formatCurrency(overview.totalValue)}</div>
                         <p className="text-xs text-muted-foreground">
                             Current portfolio value
                         </p>
@@ -63,11 +63,11 @@ export function InvestmentOverview() {
                 </GlassCard>
                 <GlassCard glowColor={isPositive ? "emerald" : "rose"} className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Gain/Loss</CardTitle>
+                        <CardTitle className="text-sm font-semibold">Total Gain/Loss</CardTitle>
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold ${isPositive ? "text-green-600" : "text-red-600"}`}>
+                        <div className={`text-2xl font-semibold ${isPositive ? "text-green-600" : "text-red-600"}`}>
                             {isPositive ? "+" : ""}{formatCurrency(overview.totalGainLoss)}
                         </div>
                         <p className={`text-xs flex items-center ${isPositive ? "text-green-600" : "text-red-600"}`}>
@@ -78,11 +78,11 @@ export function InvestmentOverview() {
                 </GlassCard>
                 <GlassCard glowColor="amber" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Cost Basis</CardTitle>
+                        <CardTitle className="text-sm font-semibold">Cost Basis</CardTitle>
                         <Wallet className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{formatCurrency(overview.totalCostBasis)}</div>
+                        <div className="text-2xl font-semibold">{formatCurrency(overview.totalCostBasis)}</div>
                         <p className="text-xs text-muted-foreground">
                             Total invested amount
                         </p>
@@ -90,11 +90,11 @@ export function InvestmentOverview() {
                 </GlassCard>
                 <GlassCard glowColor="primary" className="p-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Asset Count</CardTitle>
+                        <CardTitle className="text-sm font-semibold">Asset Count</CardTitle>
                         <PieChartIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{overview.allocation.length}</div>
+                        <div className="text-2xl font-semibold">{overview.allocation.length}</div>
                         <p className="text-xs text-muted-foreground">
                             Active asset classes
                         </p>

@@ -1,19 +1,34 @@
 import { startOfMonth, endOfMonth, subMonths } from "date-fns"
 import { prisma } from "@/lib/db/client"
-import { categoryRepository, categoryBudgetRepository } from "@/lib/db/repositories/budgets"
+import { categoryBudgetRepository } from "@/lib/db/repositories/budgets"
+import { CategoryBudget, Category } from "@prisma/client"
 
 export class BudgetService {
-    async getBudgetOverview(userId: string, date: Date) {
+    async getBudgetOverview(userId: string, date: Date, mode: 'personal' | 'household' = 'personal') {
         const start = startOfMonth(date)
         const end = endOfMonth(date)
 
-        // 1. Fetch Categories
-        const categories = await categoryRepository.findMany(userId)
+        // 0. Identify Users
+        let userIds = [userId]
+        if (mode === 'household') {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { linkedUserId: true, linkStatus: true }
+            })
+            if (user?.linkedUserId && user.linkStatus === 'LINKED') {
+                userIds.push(user.linkedUserId)
+            }
+        }
 
-        // 2. Fetch Transactions for this month (Direct Prisma call to ensure isTransfer is present)
+        // 1. Fetch Categories for all relevant users
+        const categories = await prisma.category.findMany({
+            where: { userId: { in: userIds } }
+        })
+
+        // 2. Fetch Transactions for this month for all relevant users
         const allTransactions = await prisma.transaction.findMany({
             where: {
-                account: { userId },
+                account: { userId: { in: userIds } },
                 date: { gte: start, lte: end }
             },
             include: {
@@ -26,32 +41,48 @@ export class BudgetService {
         const transactions = allTransactions.filter(t => !t.isTransfer)
 
         // 3. Fetch CategoryBudgets for this month (snapshots/overrides)
-        const categoryBudgets = await categoryBudgetRepository.findForMonth(userId, start)
+        const categoryBudgets = await categoryBudgetRepository.findForUsersInMonth(userIds, start)
 
-        // 4. Calculate stats per category
-        const categoryStats = await Promise.all(categories.map(async (cat) => {
-            const catTransactions = transactions.filter(t => t.categoryId === cat.id)
+        // 4. Calculate stats per category (consolidate by name if household)
+        // Group categories by name to handle household consolidation
+        const groupedCategoryNames = Array.from(new Set(categories.map(c => c.name)))
+
+        const categoryStats = await Promise.all(groupedCategoryNames.map(async (name) => {
+            const sameNameCats = categories.filter(c => c.name === name)
+            const catIds = sameNameCats.map(c => c.id)
+            const catTransactions = transactions.filter(t => t.categoryId && catIds.includes(t.categoryId))
 
             // Standardized Convention: Negative = Spent/Expense, Positive = Income.
-            // spent = total activity for the category, inverted to show as positive cost.
             const spent = -catTransactions.reduce((sum, t) => sum + Number(t.amount), 0)
 
-            // Determine Budgeted Amount
-            const catBudget = categoryBudgets.find(cb => cb.categoryId === cat.id)
-            let budgeted = catBudget ? Number(catBudget.budgetedAmount) : Number(cat.monthlyBudget)
+            // Determine Budgeted Amount (Sum of all same-named categories' budgets)
+            let budgeted = 0
+            for (const cat of sameNameCats) {
+                const catBudget = categoryBudgets.find((cb: CategoryBudget & { category: Category }) => cb.categoryId === cat.id)
+                budgeted += catBudget ? Number(catBudget.budgetedAmount) : Number(cat.monthlyBudget)
+            }
 
             // Determine Carry-Over
             let carryOver = 0
-            if (cat.carryOver) {
-                if (catBudget && Number(catBudget.carryOverAmount) !== 0) {
-                    carryOver = Number(catBudget.carryOverAmount)
-                } else {
-                    carryOver = await BudgetService.calculateCarryOver(userId, cat.id, start)
+            for (const cat of sameNameCats) {
+                if (cat.carryOver) {
+                    const catBudget = categoryBudgets.find((cb: CategoryBudget & { category: Category }) => cb.categoryId === cat.id)
+                    if (catBudget && Number(catBudget.carryOverAmount) !== 0) {
+                        carryOver += Number(catBudget.carryOverAmount)
+                    } else {
+                        carryOver += await BudgetService.calculateCarryOver(cat.userId, cat.id, start)
+                    }
                 }
             }
 
+            // Use the first category's style for the group
+            const firstCat = sameNameCats[0]
+
             return {
-                ...cat,
+                id: firstCat.id,
+                name: firstCat.name,
+                color: firstCat.color,
+                icon: firstCat.icon,
                 budgeted,
                 spent,
                 carryOver,
@@ -61,7 +92,6 @@ export class BudgetService {
         }))
 
         // 5. Calculate Overall Income/Expense
-        // Income = Uncategorized positive transactions + Net-positive categories
         const uncategorizedIncome = transactions
             .filter(t => !t.categoryId && Number(t.amount) > 0)
             .reduce((sum, t) => sum + Number(t.amount), 0)
@@ -71,11 +101,8 @@ export class BudgetService {
             .reduce((sum, c) => sum - c.spent, 0)
 
         const totalIncome = uncategorizedIncome + categorizedIncome
-
-        // Budgeted
         const totalBudgeted = categoryStats.reduce((sum, c) => sum + c.budgeted, 0)
 
-        // Spent = Uncategorized negative transactions + Net-negative categories
         const uncategorizedSpent = -transactions
             .filter(t => !t.categoryId && Number(t.amount) < 0)
             .reduce((sum, t) => sum + Number(t.amount), 0)
@@ -85,7 +112,6 @@ export class BudgetService {
             .reduce((sum, c) => sum + c.spent, 0)
 
         const totalSpent = categorizedSpent + uncategorizedSpent
-
         const totalCarryOver = categoryStats.reduce((sum, c) => sum + c.carryOver, 0)
         const totalRemaining = (totalBudgeted + totalCarryOver) - totalSpent
 
@@ -97,7 +123,7 @@ export class BudgetService {
                 remaining: totalRemaining,
                 progress: (totalBudgeted + totalCarryOver) > 0 ? (totalSpent / (totalBudgeted + totalCarryOver)) * 100 : 0
             },
-            categories: categoryStats,
+            categories: categoryStats.sort((a, b) => b.spent - a.spent),
             transactionsCount: transactions.length
         }
     }

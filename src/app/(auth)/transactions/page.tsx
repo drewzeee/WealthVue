@@ -95,15 +95,15 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
   const pageCount = Math.ceil(total / limit)
 
   return (
-    <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
-      <div className="flex items-center justify-between space-y-2">
+    <div className="h-full flex-1 flex flex-col space-y-4 p-4 md:space-y-8 md:p-8">
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Transactions</h2>
           <p className="text-muted-foreground">
             View and manage your financial transactions.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <ProcessTransactionsButton />
           <ImportCSVDialog accounts={accounts} />
           <AddTransactionDialog accounts={accounts} categories={categories} />

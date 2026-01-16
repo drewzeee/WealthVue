@@ -69,6 +69,16 @@ export class CategoryBudgetRepository {
     })
   }
 
+  async findForUsersInMonth(userIds: string[], month: Date) {
+    return prisma.categoryBudget.findMany({
+      where: {
+        month: month,
+        category: { userId: { in: userIds } }
+      },
+      include: { category: true }
+    })
+  }
+
   async findByCategoryId(categoryId: string, month: Date) {
     return prisma.categoryBudget.findUnique({
       where: {

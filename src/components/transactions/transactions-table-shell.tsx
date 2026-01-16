@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { TransactionMobileCard } from "./transaction-mobile-card"
 
 interface TransactionsTableShellProps {
   data: TransactionWithRelations[]
@@ -113,17 +114,79 @@ export function TransactionsTableShell({ data, pageCount, categories }: Transact
         </div>
       )}
 
-      <GlassCard glowColor="primary" className="p-0 overflow-visible">
-        <DataTable
-          columns={columns}
-          data={data}
-          pageCount={pageCount}
-          pageIndex={page}
-          onPageChange={onPageChange}
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
-        />
-      </GlassCard>
+      <div className="flex flex-col gap-4">
+        {/* Mobile View */}
+        <div className="flex flex-col md:hidden border rounded-lg divide-y divide-border bg-background/50 backdrop-blur-sm overflow-hidden">
+          {data.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              No transactions found.
+            </div>
+          ) : (
+            data.map((transaction, index) => {
+              const isSelected = !!rowSelection[index]
+              return (
+                <div
+                  key={transaction.id}
+                  className={isSelected ? "bg-muted/30" : "bg-transparent"}
+                >
+                  <TransactionMobileCard
+                    transaction={transaction}
+                    categories={categories}
+                    isSelected={isSelected}
+                    onSelectChange={(checked: boolean) => {
+                      setRowSelection((prev) => {
+                        const next = { ...prev }
+                        if (checked) {
+                          next[index] = true
+                        } else {
+                          delete next[index]
+                        }
+                        return next
+                      })
+                    }}
+                  />
+                </div>
+              )
+            })
+          )}
+        </div>
+
+        {/* Desktop View */}
+        <GlassCard glowColor="primary" className="p-0 overflow-visible hidden md:block">
+          <DataTable
+            columns={columns}
+            data={data}
+            pageCount={pageCount}
+            pageIndex={page}
+            onPageChange={onPageChange}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
+          />
+        </GlassCard>
+
+        {/* Mobile Pagination - Simple version */}
+        <div className="flex items-center justify-between py-2 md:hidden">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+          >
+            Previous
+          </Button>
+          <div className="text-xs text-muted-foreground font-medium">
+            Page {page} of {pageCount}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= pageCount}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>

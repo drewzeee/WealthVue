@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const monthParam = searchParams.get('month')
 
+    const mode = (searchParams.get('mode') as 'personal' | 'household') || 'personal'
+
     let date = new Date()
     if (monthParam) {
         const parsed = new Date(monthParam)
@@ -21,7 +23,7 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const data = await budgetService.getBudgetOverview(session.user.id, date)
+        const data = await budgetService.getBudgetOverview(session.user.id, date, mode)
         return NextResponse.json(data)
     } catch (error) {
         console.error("[BUDGET_OVERVIEW]", error)

@@ -10,10 +10,12 @@ import { CategoryBudgetList } from "./category-budget-list"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { MonthSelector } from "./month-selector"
 import { GlassCard } from "@/components/ui/glass-card"
+import { ViewModeSelector } from "@/components/shared/view-mode-selector"
 
 export function BudgetOverview() {
     const searchParams = useSearchParams()
     const monthParam = searchParams.get("month")
+    const mode = (searchParams.get("mode") as "personal" | "household") || "personal"
 
     // Robust parsing for "yyyy-MM-dd" to avoid UTC shifts
     const selectedMonth = (() => {
@@ -22,7 +24,7 @@ export function BudgetOverview() {
         return startOfMonth(new Date(y, m - 1, d || 1))
     })()
 
-    const { data, isLoading, error } = useBudgetOverview(selectedMonth)
+    const { data, isLoading, error } = useBudgetOverview(selectedMonth, mode)
 
     if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading budget data...</div>
     // Simple error display
@@ -38,7 +40,10 @@ export function BudgetOverview() {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h3 className="text-xl font-semibold">Budget Overview</h3>
-                <MonthSelector />
+                <div className="flex items-center gap-4">
+                    <ViewModeSelector />
+                    <MonthSelector />
+                </div>
             </div>
 
             <SummaryCards
