@@ -33,12 +33,18 @@ type SimpleLiability = Omit<Liability, "currentBalance" | "interestRate" | "mini
     interestRate: number | null;
     minimumPayment: number | null
 }
+type SimpleInvestmentAccount = InvestmentAccount & {
+    investments: {
+        quantity: any;
+        currentPrice: any;
+    }[]
+}
 
 interface AccountListProps {
     accounts: SimpleAccount[]
     assets: SimpleAsset[]
     liabilities: SimpleLiability[]
-    investmentAccounts: InvestmentAccount[]
+    investmentAccounts: SimpleInvestmentAccount[]
 }
 
 export function AccountList({ accounts, assets, liabilities, investmentAccounts }: AccountListProps) {
@@ -103,18 +109,24 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
 
             {investmentAccounts.length > 0 && (
                 <Section title="Investment Portfolios" description="Manually tracked investments">
-                    {investmentAccounts.map(account => (
-                        <AccountItem
-                            id={account.id}
-                            key={account.id}
-                            name={account.name}
-                            balance={0} // TODO: Calculate total value
-                            type={account.type}
-                            onDelete={() => handleDelete("investment", account.id)}
-                            onEdit={() => handleEdit({ ...account, balance: 0 })} // Balance TODO
-                            deletingId={deletingId}
-                        />
-                    ))}
+                    {investmentAccounts.map(account => {
+                        const totalValue = account.investments.reduce((sum, inv) => {
+                            return sum + (Number(inv.quantity) * Number(inv.currentPrice || 0))
+                        }, 0)
+
+                        return (
+                            <AccountItem
+                                id={account.id}
+                                key={account.id}
+                                name={account.name}
+                                balance={totalValue}
+                                type={account.type}
+                                onDelete={() => handleDelete("investment", account.id)}
+                                onEdit={() => handleEdit({ ...account, balance: totalValue })}
+                                deletingId={deletingId}
+                            />
+                        )
+                    })}
                 </Section>
             )}
 

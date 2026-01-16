@@ -56,6 +56,14 @@ export default async function SettingsPage() {
 
     const investmentAccounts = await prisma.investmentAccount.findMany({
         where: { userId },
+        include: {
+            investments: {
+                select: {
+                    quantity: true,
+                    currentPrice: true,
+                }
+            }
+        },
         orderBy: { createdAt: "desc" },
     })
 
@@ -93,11 +101,25 @@ export default async function SettingsPage() {
                     </div>
 
                     <AccountList
-                        accounts={accounts.map(a => ({
-                            ...a,
+                        accounts={accounts.map((a: any) => ({
+                            id: a.id,
+                            userId: a.userId,
+                            name: a.name,
+                            officialName: a.officialName,
+                            type: a.type,
+                            subtype: a.subtype,
+                            mask: a.mask,
+                            customName: a.customName,
+                            plaidAccountId: a.plaidAccountId,
+                            plaidItemId: a.plaidItemId,
+                            plaidItem: a.plaidItem,
                             currentBalance: a.currentBalance.toNumber(),
                             availableBalance: a.availableBalance?.toNumber() || null,
-                            creditLimit: a.creditLimit?.toNumber() || null
+                            creditLimit: a.creditLimit?.toNumber() || null,
+                            isActive: a.isActive,
+                            lastSyncedAt: a.lastSyncedAt,
+                            createdAt: a.createdAt,
+                            updatedAt: a.updatedAt,
                         }))}
                         assets={assets.map(a => ({ ...a, currentValue: a.currentValue.toNumber() }))}
                         liabilities={liabilities.map(l => ({ ...l, currentBalance: l.currentBalance.toNumber(), interestRate: l.interestRate?.toNumber() || null, minimumPayment: l.minimumPayment?.toNumber() || null }))}

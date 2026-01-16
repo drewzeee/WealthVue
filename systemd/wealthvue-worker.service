@@ -4,10 +4,10 @@ After=network.target postgresql.service redis.service wealthvue.service
 
 [Service]
 Type=simple
-User=andrew
-WorkingDirectory=/home/andrew/wealthvue
+User=<USER>
+WorkingDirectory=<PROJECT_ROOT>
 # Ensure environment variables are loaded
-EnvironmentFile=/home/andrew/wealthvue/.env
+EnvironmentFile=<PROJECT_ROOT>/.env
 ExecStart=/usr/bin/npm run worker
 Restart=always
 # StandardOutput=append:/var/log/wealthvue/worker.log

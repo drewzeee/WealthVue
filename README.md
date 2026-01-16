@@ -167,18 +167,26 @@ sudo systemctl restart wealthvue wealthvue-worker
 
 ## Docker Deployment
 
+To run the entire stack using Docker Compose:
+
+1. Copy `.env.example` to `.env` and fill in the required values.
+2. Run `docker-compose up -d`.
+3. The application will be available at `http://localhost:3000`.
+
+Note: Make sure to set `DATABASE_URL` to `postgresql://wealthvue:${DB_PASSWORD:-wealthvue_dev_password}@postgres:5432/wealthvue?schema=public` in your `.env` file to connect to the Docker Postgres instance.
+
 ## Contributing
 
 This is a personal project, but suggestions and feedback are welcome via GitHub issues.
 
 ## License
 
-Private project - All rights reserved
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Current Phase**: Polish, Testing & Deployment (Phase 5)
-**Last Major Update**: Interactive Donut Charts & Polish
-**Next Phase**: Production Release
+**Current Phase**: MVP Release (v1.0.0)
+**Last Major Update**: Pre-release Housekeeping & Cleanup
+**Next Phase**: Community Feedback & Feature Expansion
 
 See [TASKS.md](./TASKS.md) for detailed progress tracking.

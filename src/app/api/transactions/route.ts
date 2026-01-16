@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/db/client"
 import { transactionRepository } from "@/lib/db/repositories/transactions"
 import { createTransactionSchema } from "@/lib/validations/transaction"
 import { z } from "zod"
@@ -74,11 +75,14 @@ export async function POST(req: NextRequest) {
     const json = await req.json()
     const body = createTransactionSchema.parse(json)
 
-    // For safety, Prisma will error if accountId doesn't exist.
-    // In a real app, we should check if accountId belongs to user.
-    // For now, relying on FK constraint (but it doesn't prevent cross-user if ID is leaked).
-    // Adding TODO for future hardening.
-    // TODO: Verify account ownership.
+    // Verify account ownership
+    const account = await prisma.account.findUnique({
+      where: { id: body.accountId, userId: session.user.id }
+    })
+
+    if (!account) {
+      return NextResponse.json({ success: false, error: "Account not found or unauthorized" }, { status: 404 })
+    }
 
     const transaction = await transactionRepository.create({
       accountId: body.accountId,

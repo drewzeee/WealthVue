@@ -5,9 +5,9 @@
 
 set -e
 
-PROJECT_ROOT="/home/andrew/wealthvue"
+PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
 SYSTEMD_PATH="/etc/systemd/system"
-USER_NAME="andrew"
+USER_NAME="${USER_NAME:-$(whoami)}"
 
 echo "🚀 Starting WealthVue service setup..."
 

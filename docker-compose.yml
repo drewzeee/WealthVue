@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: wealthvue
-      POSTGRES_PASSWORD: wealthvue_dev_password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-wealthvue_dev_password}
       POSTGRES_DB: wealthvue
     ports:
       - "5433:5432"
