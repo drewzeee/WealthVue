@@ -107,14 +107,14 @@ export function InvestmentAccountList() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div>
                     <h3 className="text-lg font-semibold">Investment Accounts</h3>
                     <p className="text-sm text-muted-foreground">
                         {accounts.length} account{accounts.length !== 1 ? "s" : ""}
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full md:w-auto">
                     <ImportInvestmentsDialog accounts={accounts.map(a => ({ id: a.id, name: a.name }))} />
                     <AddInvestmentAccountDialog />
                 </div>

@@ -243,6 +243,7 @@
 - ✅ Fix hidden transfer transactions and implement robust UI filtering toggle
 - ✅ Refine transfer category logic to use plural 'Transfers' and ensure automatic category provisioning
 - ✅ Implement transaction notes and enhanced editing (desktop/mobile) with search support
+- ✅ Replace Cost Basis and Unique Asset Count cards with Total Daily Change and Biggest Mover on Investment Overview
 
 ## Bugs
 
@@ -290,4 +291,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-16 (Show Transfers Fix, Transfers Category Pluralization & Logic)
+**Last Updated:** 2026-01-16 (Investment Overview Cards)
