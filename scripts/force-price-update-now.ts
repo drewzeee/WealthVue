@@ -1,41 +1,36 @@
-import { createQueue, createWorker } from './queue';
-import { investmentRepository } from '@/lib/db/repositories/investments';
-import { getLatestStockPrices } from '@/lib/integrations/yahoo-finance';
-import { getLatestCryptoPrices } from '@/lib/integrations/coingecko';
+import { investmentRepository } from '../src/lib/db/repositories/investments';
+import { getLatestStockPrices } from '../src/lib/integrations/yahoo-finance';
+import { getLatestCryptoPrices } from '../src/lib/integrations/coingecko';
 import { AssetClass } from '@prisma/client';
 
-export const PRICE_UPDATE_QUEUE_NAME = 'price-update';
-
-export const priceUpdateQueue = createQueue(PRICE_UPDATE_QUEUE_NAME);
-
-export const priceUpdateWorker = createWorker(PRICE_UPDATE_QUEUE_NAME, async (job) => {
-    console.log(`[PriceUpdate] Starting job ${job.id}`);
+async function main() {
+    console.log('[ForceUpdate] Starting manual price update...');
 
     try {
         // 1. Get all investments that need update (manualPrice = false)
         const investments = await investmentRepository.getInvestmentsForPriceUpdate();
 
         if (investments.length === 0) {
-            console.log('[PriceUpdate] No investments to update.');
-            return { updated: 0 };
+            console.log('[ForceUpdate] No investments to update.');
+            return;
         }
 
+        console.log(`[ForceUpdate] Found ${investments.length} investments to update.`);
+
         // 2. Group by type
-        // Yahoo Finance handles Stocks, ETFs, Mutual Funds, and potentially others if symbol is valid
         const yahooAssets = investments.filter(i =>
             ([AssetClass.STOCK, AssetClass.ETF, AssetClass.MUTUAL_FUND, AssetClass.BOND, AssetClass.COMMODITY] as AssetClass[]).includes(i.assetClass)
         );
 
-        // CoinGecko for Crypto
         const cryptoAssets = investments.filter(i => i.assetClass === AssetClass.CRYPTO);
 
-        const updates: { id: string; price: number; change?: number; changePercent?: number; source: string }[] = [];
+        const updates: any[] = [];
 
         // 3. Fetch Yahoo Finance Prices
         if (yahooAssets.length > 0) {
             const symbols = yahooAssets.map(i => i.symbol).filter((s): s is string => !!s);
             if (symbols.length > 0) {
-                console.log(`[PriceUpdate] Fetching Yahoo prices for ${symbols.length} assets...`);
+                console.log(`[ForceUpdate] Fetching Yahoo prices for symbols: ${symbols.join(', ')}`);
                 const prices = await getLatestStockPrices(symbols);
 
                 yahooAssets.forEach(asset => {
@@ -47,7 +42,7 @@ export const priceUpdateWorker = createWorker(PRICE_UPDATE_QUEUE_NAME, async (jo
                                 price: data.price,
                                 change: data.change,
                                 changePercent: data.changePercent,
-                                source: 'yahoo'
+                                source: 'yahoo-manual'
                             });
                         }
                     }
@@ -59,20 +54,19 @@ export const priceUpdateWorker = createWorker(PRICE_UPDATE_QUEUE_NAME, async (jo
         if (cryptoAssets.length > 0) {
             const ids = cryptoAssets.map(i => i.symbol).filter((s): s is string => !!s);
             if (ids.length > 0) {
-                console.log(`[PriceUpdate] Fetching CoinGecko prices for ${ids.length} assets...`);
+                console.log(`[ForceUpdate] Fetching CoinGecko prices for ids: ${ids.join(', ')}`);
                 const prices = await getLatestCryptoPrices(ids);
 
                 cryptoAssets.forEach(crypto => {
                     if (crypto.symbol) {
-                        // CoinGecko IDs are lowercase
                         const data = prices[crypto.symbol.toLowerCase()];
                         if (data !== undefined) {
                             updates.push({
                                 id: crypto.id,
                                 price: data.price,
-                                change: 0, // CoinGecko integration doesn't return absolute change yet, just percent
+                                change: 0,
                                 changePercent: data.change24h,
-                                source: 'coingecko'
+                                source: 'coingecko-manual'
                             });
                         }
                     }
@@ -82,16 +76,19 @@ export const priceUpdateWorker = createWorker(PRICE_UPDATE_QUEUE_NAME, async (jo
 
         // 5. Bulk Update
         if (updates.length > 0) {
-            await investmentRepository.bulkUpdatePrices(updates as any);
-            console.log(`[PriceUpdate] Successfully updated ${updates.length} investment prices.`);
+            console.log(`[ForceUpdate] Updating ${updates.length} records in database...`);
+            await investmentRepository.bulkUpdatePrices(updates);
+            console.log('[ForceUpdate] Successfully updated all prices.');
         } else {
-            console.log('[PriceUpdate] No new prices found to update.');
+            console.log('[ForceUpdate] No updates found.');
         }
 
-        return { updated: updates.length };
-
     } catch (error) {
-        console.error('[PriceUpdate] Job failed:', error);
-        throw error;
+        console.error('[ForceUpdate] Failed:', error);
     }
+}
+
+main().then(() => process.exit(0)).catch((err) => {
+    console.error(err);
+    process.exit(1);
 });

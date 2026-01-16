@@ -44,19 +44,19 @@ export async function POST(req: NextRequest) {
         // We'll separate by likely asset class or just try both if generic.
         // For simplicity in import, we assume most are STOCKS/ETFs unless specified otherwise,
         // but if the user mapped 'assetClass', we use it.
-        
+
         const cryptoSymbols = investments.filter(i => i.assetClass === AssetClass.CRYPTO).map(i => i.symbol)
         const stockSymbols = investments.filter(i => i.assetClass !== AssetClass.CRYPTO).map(i => i.symbol)
 
-        let stockPrices: Record<string, number> = {}
-        let cryptoPrices: Record<string, number> = {}
+        let stockData: Record<string, any> = {}
+        let cryptoData: Record<string, any> = {}
 
         const fetchPromises = []
 
         if (stockSymbols.length > 0) {
             fetchPromises.push(
                 getLatestStockPrices(stockSymbols)
-                    .then(res => { stockPrices = res })
+                    .then(res => { stockData = res })
                     .catch(err => console.warn("Failed to fetch stock prices during import", err))
             )
         }
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         if (cryptoSymbols.length > 0) {
             fetchPromises.push(
                 getLatestCryptoPrices(cryptoSymbols)
-                    .then(res => { cryptoPrices = res })
+                    .then(res => { cryptoData = res })
                     .catch(err => console.warn("Failed to fetch crypto prices during import", err))
             )
         }
@@ -77,9 +77,10 @@ export async function POST(req: NextRequest) {
         // Given the volume might be 10-100, a loop with Promise.all is fine.
 
         const results = await Promise.all(investments.map(async (inv) => {
-            const priceMap = inv.assetClass === AssetClass.CRYPTO ? cryptoPrices : stockPrices
+            const dataMap = inv.assetClass === AssetClass.CRYPTO ? cryptoData : stockData
             // Try symbol match, then lowercase match
-            const currentPrice = priceMap[inv.symbol] || priceMap[inv.symbol.toLowerCase()]
+            const priceInfo = dataMap[inv.symbol] || dataMap[inv.symbol.toLowerCase()]
+            const currentPrice = priceInfo?.price
 
             return investmentRepository.create({
                 accountId,

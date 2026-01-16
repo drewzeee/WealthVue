@@ -6,7 +6,7 @@ A comprehensive personal financial dashboard that unifies budget management, inv
 
 - **Budget Management**: Create custom categories, set monthly budgets, and track spending
 - **Transaction Sync**: Automatic bank account syncing via Plaid + manual entry + CSV import
-- **Investment Tracking**: Multi-asset class support (stocks, crypto, real estate, metals, commodities) with real-time pricing
+- **Investment Tracking**: Multi-asset class support (stocks, crypto, real estate, metals, commodities) with real-time pricing, 24h performance tracking, and dedicated crypto/stock allocation views
 - **Net Worth Dashboard**: Complete financial overview with allocation charts, key metrics, and timezone-aware historical snapshots
 - **Family Accounts**: Link accounts with family members for household finance management
 - **Self-Hosted**: Run on your own infrastructure via Docker Compose
@@ -178,6 +178,7 @@ Private project - All rights reserved
 ---
 
 **Current Phase**: Polish, Testing & Deployment (Phase 5)
+**Last Major Update**: Investment Overview Enhancements
 **Next Phase**: Production Release
 
 See [TASKS.md](./TASKS.md) for detailed progress tracking.

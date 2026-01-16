@@ -20,7 +20,12 @@ const COMMON_CRYPTO_MAP: Record<string, string> = {
   avax: 'avalanche-2'
 };
 
-export async function getLatestCryptoPrices(inputs: string[]): Promise<Record<string, number>> {
+export interface CryptoPriceData {
+  price: number;
+  change24h: number;
+}
+
+export async function getLatestCryptoPrices(inputs: string[]): Promise<Record<string, CryptoPriceData>> {
   if (inputs.length === 0) return {};
 
   // Map inputs (symbols or IDs) to CoinGecko IDs
@@ -33,33 +38,37 @@ export async function getLatestCryptoPrices(inputs: string[]): Promise<Record<st
     idMap[lowerInput] = mappedId;
     uniqueIds.add(mappedId);
   });
-  
+
   const params = new URLSearchParams({
     ids: Array.from(uniqueIds).join(','),
     vs_currencies: 'usd',
+    include_24hr_change: 'true',
   });
 
   try {
     const response = await fetch(`${COINGECKO_API_URL}/simple/price?${params}`);
     if (!response.ok) {
-        throw new Error(`CoinGecko API error: ${response.status} ${response.statusText}`);
+      throw new Error(`CoinGecko API error: ${response.status} ${response.statusText}`);
     }
-    
+
     const data = await response.json();
-    const prices: Record<string, number> = {};
+    const results: Record<string, CryptoPriceData> = {};
 
     // Map results back to original inputs
-    // data format: { "bitcoin": { "usd": 50000 }, "ethereum": { "usd": 3000 } }
+    // data format: { "bitcoin": { "usd": 50000, "usd_24h_change": 2.5 }, "ethereum": { "usd": 3000, "usd_24h_change": -1.2 } }
     inputs.forEach(input => {
-        const lowerInput = input.toLowerCase();
-        const mappedId = idMap[lowerInput];
-        
-        if (data[mappedId] && data[mappedId].usd) {
-            prices[lowerInput] = data[mappedId].usd;
-        }
+      const lowerInput = input.toLowerCase();
+      const mappedId = idMap[lowerInput];
+
+      if (data[mappedId] && data[mappedId].usd !== undefined) {
+        results[lowerInput] = {
+          price: data[mappedId].usd,
+          change24h: data[mappedId].usd_24h_change || 0
+        };
+      }
     });
 
-    return prices;
+    return results;
   } catch (error) {
     console.error('Failed to fetch crypto prices from CoinGecko:', error);
     return {};

@@ -328,6 +328,8 @@ model Investment {
 
   // Current pricing (cached)
   currentPrice    Decimal?  @db.Decimal(15, 2)
+  dayChange       Decimal?  @db.Decimal(15, 2)
+  dayChangePercent Decimal? @db.Decimal(15, 4)
   lastPriceUpdate DateTime?
 
   // Manual price entry for unsupported assets

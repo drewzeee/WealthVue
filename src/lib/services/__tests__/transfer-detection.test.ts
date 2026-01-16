@@ -4,24 +4,28 @@ import { Transaction, TransactionSource } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 
 describe('TransferDetectionService', () => {
-    const createTxn = (overrides: Partial<Transaction>): Transaction => ({
-        id: Math.random().toString(36).substring(7),
-        accountId: 'acc1',
-        date: new Date('2024-01-01'),
-        description: 'Test Txn',
-        merchant: null,
-        amount: new Decimal(0),
-        categoryId: null,
-        pending: false,
-        source: TransactionSource.PLAID,
-        plaidTransactionId: null,
-        notes: null,
-        isTransfer: false,
-        transferId: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...overrides,
-    })
+    const createTxn = (overrides: Partial<Transaction>): Transaction => {
+        const base: Transaction = {
+            id: Math.random().toString(36).substring(7),
+            accountId: 'acc1',
+            date: new Date('2024-01-01'),
+            description: 'Test Txn',
+            merchant: null,
+            amount: new Decimal(0),
+            categoryId: null,
+            pending: false,
+            source: TransactionSource.PLAID,
+            plaidTransactionId: null,
+            notes: null,
+            isTransfer: false,
+            transferId: null,
+            authorizedDate: null,
+            rawDescription: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        }
+        return { ...base, ...overrides } as Transaction
+    }
 
     describe('isTransferPair', () => {
         it('should match an exact transfer pair', () => {

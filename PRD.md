@@ -99,6 +99,10 @@ The MVP will deliver a fully-featured financial management platform with multi-u
 - ✅ Real-time crypto prices (CoinGecko API)
 - ✅ Portfolio value over time
 - ✅ Allocation breakdown by asset class
+- ✅ Dedicated crypto allocation chart (by coin)
+- ✅ Dedicated stock allocation chart (by symbol/ticker)
+- ✅ Real-time 24h performance tracking (Market Movers)
+- ✅ Persistent daily change data in database
 - ✅ Gains/losses calculation (total and unrealized)
 - ✅ Multiple portfolio/account support
 

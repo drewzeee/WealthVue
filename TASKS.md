@@ -151,6 +151,10 @@
 - ✅ Gains/losses calculation and display
 - ✅ Individual investment detail pages
 - ✅ Real-time portfolio valuation
+- ✅ 24h price change tracking and Market Movers grid
+- ✅ Crypto-specific allocation chart (by coin)
+- ✅ Stock-specific allocation chart (by symbol)
+- ✅ Persistent database storage for daily performance data
 
 ---
 
@@ -231,6 +235,7 @@
 - ✅ Implement robust multi-criteria transaction filtering (Popover, multi-tab, search chips, uncategorized filter)
 - ✅ Implement dynamic transaction summary cards (Income/Expense/Count)
 - ✅ Refine typography: reduce font weights across the app for a lighter aesthetic
+- ✅ Implement advanced investment overview: dedicated crypto/stock charts and real-time performance tracking
 
 ## Bugs
 
@@ -275,4 +280,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-16 (Timezone-Aware Net Worth Snapshots)
+**Last Updated:** 2026-01-16 (Investment Overview Enhancements)

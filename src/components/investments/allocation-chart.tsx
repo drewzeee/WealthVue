@@ -14,15 +14,26 @@ interface AllocationChartProps {
     data: AllocationData[]
 }
 
+const COLOR_PALETTE = [
+    "hsl(195, 100%, 55%)", // Bright Cyan
+    "hsl(50, 100%, 55%)",  // Electric Yellow
+    "hsl(285, 90%, 60%)",  // Violet
+    "hsl(30, 100%, 55%)",  // Orange
+    "hsl(270, 100%, 70%)", // Purple
+    "hsl(170, 100%, 45%)", // Teal
+    "hsl(340, 100%, 65%)", // Pink
+    "hsl(210, 100%, 50%)", // Blue
+]
+
 export function AllocationChart({ data }: AllocationChartProps) {
     const chartData = data
         .filter(d => d.value > 0)
-        .map(d => {
-            const config = ASSET_CLASS_CONFIG[d.name as AssetClass] || ASSET_CLASS_CONFIG.OTHER
+        .map((d, index) => {
+            const config = ASSET_CLASS_CONFIG[d.name as AssetClass]
             return {
-                name: config.label,
+                name: config ? config.label : d.name,
                 value: d.value,
-                color: config.color,
+                color: config ? config.color : COLOR_PALETTE[index % COLOR_PALETTE.length],
                 percentage: d.percentage
             }
         })

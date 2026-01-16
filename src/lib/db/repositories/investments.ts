@@ -163,9 +163,8 @@ export class InvestmentRepository {
                 currentValue,
                 gainLoss,
                 gainLossPercent,
-                // Placeholder for day change - will be populated by price service
-                dayChange: 0,
-                dayChangePercent: 0,
+                dayChange: Number(inv.dayChange || 0),
+                dayChangePercent: Number(inv.dayChangePercent || 0),
             }
         })
 
@@ -199,8 +198,8 @@ export class InvestmentRepository {
             currentValue,
             gainLoss,
             gainLossPercent,
-            dayChange: 0,
-            dayChangePercent: 0,
+            dayChange: Number(investment.dayChange || 0),
+            dayChangePercent: Number(investment.dayChangePercent || 0),
         }
     }
 
@@ -298,12 +297,14 @@ export class InvestmentRepository {
     }
 
     // Bulk update prices for multiple investments
-    async bulkUpdatePrices(updates: { id: string; price: number; source: string }[]) {
+    async bulkUpdatePrices(updates: { id: string; price: number; change?: number; changePercent?: number; source: string }[]) {
         const operations = updates.flatMap((update) => [
             prisma.investment.update({
                 where: { id: update.id },
                 data: {
                     currentPrice: update.price,
+                    dayChange: update.change,
+                    dayChangePercent: update.changePercent,
                     lastPriceUpdate: new Date(),
                 },
             }),

@@ -67,8 +67,6 @@ export interface InvestmentWithCalculations extends Investment {
     currentValue: number
     gainLoss: number
     gainLossPercent: number
-    dayChange: number
-    dayChangePercent: number
 }
 
 // Filters for investment queries

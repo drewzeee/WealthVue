@@ -1,7 +1,8 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { ArrowDown, ArrowUp, DollarSign, PieChart as PieChartIcon, TrendingUp, Wallet } from "lucide-react"
+import { ArrowDown, ArrowUp, Clock, DollarSign, PieChart as PieChartIcon, TrendingUp, Wallet } from "lucide-react"
+import { AssetClass } from "@prisma/client"
 
 import { GlassCard } from "@/components/ui/glass-card"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,13 +10,31 @@ import { AllocationChart } from "./allocation-chart"
 import { PortfolioHistoryChart } from "./portfolio-history-chart"
 import { formatCurrency } from "@/lib/utils"
 
-interface InvestmentOverviewData {
+import { CryptoAllocationChart } from "./crypto-allocation-chart"
+import { StockAllocationChart } from "./stock-allocation-chart"
+import { AssetDailyChangeCard } from "./asset-daily-change-card"
+
+export interface InvestmentOverviewData {
     totalValue: number
     totalCostBasis: number
     totalGainLoss: number
     totalGainLossPercent: number
     allocation: { name: string; value: number; percentage: number }[]
     history: { date: string; value: number }[]
+    cryptoAllocation: { symbol: string; name: string; value: number; percentage: number }[]
+    stockAllocation: { symbol: string; name: string; value: number; percentage: number }[]
+    assetDetails: {
+        id: string
+        symbol: string | null
+        name: string
+        assetClass: AssetClass
+        quantity: number
+        currentPrice: number
+        currentValue: number
+        dayChange: number
+        dayChangePercent: number
+        lastPriceUpdate: string | null
+    }[]
 }
 
 export function InvestmentOverview() {
@@ -46,7 +65,7 @@ export function InvestmentOverview() {
     const isPositive = overview.totalGainLoss >= 0
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <GlassCard glowColor="blue" className="p-0">
@@ -94,17 +113,17 @@ export function InvestmentOverview() {
                         <PieChartIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-semibold">{overview.allocation.length}</div>
+                        <div className="text-2xl font-semibold">{overview.assetDetails.length}</div>
                         <p className="text-xs text-muted-foreground">
-                            Active asset classes
+                            Total unique holdings
                         </p>
                     </CardContent>
                 </GlassCard>
             </div>
 
-            {/* Charts */}
-            <div className="grid gap-4 md:grid-cols-2">
-                <GlassCard glowColor="primary" className="p-0">
+            {/* Asset Class Allocation & Portfolio History */}
+            <div className="grid gap-6 md:grid-cols-2">
+                <GlassCard glowColor="primary" className="p-0 overflow-hidden">
                     <CardHeader>
                         <CardTitle>Portfolio History</CardTitle>
                     </CardHeader>
@@ -112,14 +131,60 @@ export function InvestmentOverview() {
                         <PortfolioHistoryChart data={overview.history} />
                     </CardContent>
                 </GlassCard>
-                <GlassCard glowColor="blue" className="p-0">
+                <GlassCard glowColor="blue" className="p-0 overflow-hidden">
                     <CardHeader>
-                        <CardTitle>Allocation</CardTitle>
+                        <CardTitle>Asset Class Allocation</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
                         <AllocationChart data={overview.allocation} />
                     </CardContent>
                 </GlassCard>
+            </div>
+
+            {/* Specific Allocations (Crypto & Stocks) */}
+            <div className="grid gap-6 md:grid-cols-2">
+                {overview.cryptoAllocation.length > 0 && (
+                    <GlassCard glowColor="primary" className="p-0 overflow-hidden">
+                        <CardHeader>
+                            <CardTitle>Crypto Allocation</CardTitle>
+                        </CardHeader>
+                        <CardContent className="h-[300px]">
+                            <CryptoAllocationChart data={overview.cryptoAllocation} />
+                        </CardContent>
+                    </GlassCard>
+                )}
+                {overview.stockAllocation.length > 0 && (
+                    <GlassCard glowColor="blue" className="p-0 overflow-hidden">
+                        <CardHeader>
+                            <CardTitle>Stock/ETF Allocation</CardTitle>
+                        </CardHeader>
+                        <CardContent className="h-[300px]">
+                            <StockAllocationChart data={overview.stockAllocation} />
+                        </CardContent>
+                    </GlassCard>
+                )}
+            </div>
+
+            {/* Daily Asset Change Cards */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold tracking-tight">Market Movers</h3>
+                    <p className="text-xs text-muted-foreground">Daily performance of individual assets</p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+                    {overview.assetDetails
+                        .filter(asset => asset.symbol) // Only show assets with symbols in movers grid
+                        .sort((a, b) => Math.abs(b.dayChangePercent) - Math.abs(a.dayChangePercent)) // Top movers first
+                        .map(asset => (
+                            <AssetDailyChangeCard key={asset.id} asset={asset} />
+                        ))}
+                    {overview.assetDetails.filter(asset => asset.symbol).length === 0 && (
+                        <div className="col-span-full py-12 flex flex-col items-center justify-center text-muted-foreground bg-muted/20 rounded-2xl border border-dashed">
+                            <Clock className="h-8 w-8 mb-2 opacity-20" />
+                            <p className="text-sm">No assets with real-time tracking found</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )

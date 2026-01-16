@@ -83,14 +83,14 @@ export async function POST(req: NextRequest) {
         if (!body.manualPrice && !initialPrice && body.symbol) {
             try {
                 if (body.assetClass === AssetClass.CRYPTO) {
-                    const prices = await getLatestCryptoPrices([body.symbol])
-                    if (prices[body.symbol.toLowerCase()]) {
-                        initialPrice = prices[body.symbol.toLowerCase()]
+                    const cryptoData = await getLatestCryptoPrices([body.symbol])
+                    if (cryptoData[body.symbol.toLowerCase()]) {
+                        initialPrice = cryptoData[body.symbol.toLowerCase()].price
                     }
                 } else if (([AssetClass.STOCK, AssetClass.ETF, AssetClass.MUTUAL_FUND] as AssetClass[]).includes(body.assetClass)) {
-                    const prices = await getLatestStockPrices([body.symbol])
-                    if (prices[body.symbol]) {
-                        initialPrice = prices[body.symbol]
+                    const stockData = await getLatestStockPrices([body.symbol])
+                    if (stockData[body.symbol]) {
+                        initialPrice = stockData[body.symbol].price
                     }
                 }
             } catch (err) {
