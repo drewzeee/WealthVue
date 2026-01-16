@@ -8,6 +8,7 @@ import { AssetList } from "@/components/assets/asset-list"
 import { LiabilityList } from "@/components/liabilities/liability-list"
 import { FamilyManagement } from "@/components/settings/family-management"
 import { PreferencesSettings } from "@/components/settings/preferences-settings"
+import { SyncAccountsButton } from "@/components/settings/sync-accounts-button"
 import { Separator } from "@/components/ui/separator"
 import {
     Tabs,
@@ -85,7 +86,10 @@ export default async function SettingsPage() {
                                 Connect banks or add manual bank accounts.
                             </p>
                         </div>
-                        <AccountDialog />
+                        <div className="flex items-center gap-2">
+                            <SyncAccountsButton />
+                            <AccountDialog />
+                        </div>
                     </div>
 
                     <AccountList

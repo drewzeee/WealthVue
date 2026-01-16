@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Trash, Pencil } from "lucide-react"
+import { MoreHorizontal, Trash, Pencil, Clock } from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -86,6 +87,7 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
                             type={account.type}
                             subtype={account.subtype}
                             isPlaid={!!account.plaidItem}
+                            lastSyncedAt={account.lastSyncedAt}
                             onDelete={() => handleDelete("account", account.id)}
                             onEdit={() => handleEdit({ ...account, balance: account.currentBalance })}
                             deletingId={deletingId}
@@ -169,13 +171,14 @@ function Section({ title, description, children }: { title: string, description:
     )
 }
 
-function AccountItem({ id, name, balance, type, subtype, isPlaid, onDelete, onEdit, deletingId }: {
+function AccountItem({ id, name, balance, type, subtype, isPlaid, lastSyncedAt, onDelete, onEdit, deletingId }: {
     id: string,
     name: string,
     balance: number,
     type: string,
     subtype?: string | null,
     isPlaid?: boolean,
+    lastSyncedAt?: Date | null,
     onDelete: () => void,
     onEdit: () => void,
     deletingId: string | null
@@ -190,7 +193,17 @@ function AccountItem({ id, name, balance, type, subtype, isPlaid, onDelete, onEd
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                     <span className="font-medium">{name}</span>
-                    {isPlaid && <Badge variant="secondary" className="text-[10px] h-5">Synced</Badge>}
+                    {isPlaid && (
+                        <div className="flex items-center gap-1.5">
+                            <Badge variant="secondary" className="text-[10px] h-5">Synced</Badge>
+                            {lastSyncedAt && (
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                                    <Clock className="h-3 w-3" />
+                                    {formatDistanceToNow(new Date(lastSyncedAt), { addSuffix: true })}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="capitalize">{type.replace(/_/g, " ").toLowerCase()}</span>

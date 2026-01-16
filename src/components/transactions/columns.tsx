@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Transaction } from "@prisma/client"
 import { format } from "date-fns"
+import { formatTransactionDate } from "@/lib/utils"
 import { ArrowUpDown, MoreHorizontal, Repeat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -65,21 +66,41 @@ export const getColumns = (categories: Category[]): ColumnDef<TransactionWithRel
         </Button>
       )
     },
-    cell: ({ row }) => format(new Date(row.getValue("date")), "MMM d, yyyy"),
+    cell: ({ row }) => {
+      const transaction = row.original
+      const dateToDisplay = transaction.authorizedDate || transaction.date
+      return format(formatTransactionDate(new Date(dateToDisplay)), "MMM d, yyyy")
+    },
   },
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
       const transaction = row.original
+      const displayDescription = transaction.rawDescription || transaction.description
+
       return (
-        <div className="flex items-center gap-2">
-          <span>{transaction.description}</span>
-          {transaction.isTransfer && (
-            <Badge variant="outline" className="flex items-center gap-1 font-normal text-muted-foreground">
-              <Repeat className="h-3 w-3" />
-              Transfer
-            </Badge>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className={transaction.pending ? "text-muted-foreground italic" : ""}>
+              {displayDescription}
+            </span>
+            {transaction.isTransfer && (
+              <Badge variant="outline" className="flex items-center gap-1 font-normal text-muted-foreground">
+                <Repeat className="h-3 w-3" />
+                Transfer
+              </Badge>
+            )}
+            {transaction.pending && (
+              <Badge variant="secondary" className="font-normal text-[10px] px-1.5 py-0 h-4">
+                Pending
+              </Badge>
+            )}
+          </div>
+          {transaction.rawDescription && transaction.rawDescription !== transaction.description && (
+            <span className="text-[10px] text-muted-foreground leading-none">
+              {transaction.description}
+            </span>
           )}
         </div>
       )

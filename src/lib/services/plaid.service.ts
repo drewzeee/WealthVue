@@ -137,7 +137,9 @@ export class PlaidService {
             accountId: account.id,
             plaidTransactionId: txn.transaction_id,
             date: new Date(txn.date),
+            authorizedDate: txn.authorized_date ? new Date(txn.authorized_date) : null,
             description: txn.name,
+            rawDescription: txn.original_description,
             merchant: txn.merchant_name,
             amount: -txn.amount, // Standardized: Negative = spent. Plaid: Positive = spent.
             pending: txn.pending,
@@ -153,7 +155,9 @@ export class PlaidService {
           update: {
             // Update mutable fields if it already exists
             date: new Date(txn.date),
+            authorizedDate: txn.authorized_date ? new Date(txn.authorized_date) : null,
             description: txn.name,
+            rawDescription: txn.original_description,
             merchant: txn.merchant_name,
             amount: new Prisma.Decimal(-txn.amount),
             pending: txn.pending,
@@ -176,7 +180,9 @@ export class PlaidService {
         where: { plaidTransactionId: txn.transaction_id },
         data: {
           date: new Date(txn.date),
+          authorizedDate: txn.authorized_date ? new Date(txn.authorized_date) : null,
           description: txn.name,
+          rawDescription: txn.original_description,
           merchant: txn.merchant_name,
           amount: -txn.amount,
           pending: txn.pending,
@@ -195,6 +201,12 @@ export class PlaidService {
     await prisma.plaidItem.update({
       where: { id: plaidItemId },
       data: { cursor },
+    });
+
+    // Update lastSyncedAt for all accounts in this item
+    await prisma.account.updateMany({
+      where: { plaidItemId },
+      data: { lastSyncedAt: new Date() },
     });
 
     // Run transfer detection

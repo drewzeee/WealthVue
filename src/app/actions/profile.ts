@@ -1,4 +1,4 @@
-"use client"
+"use server"
 
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/db/client"

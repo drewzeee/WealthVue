@@ -159,8 +159,9 @@ model Transaction {
   account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   // Transaction details
-  date        DateTime
-  description String
+  date           DateTime
+  authorizedDate DateTime?
+  description    String
   merchant    String?
   amount      Decimal  @db.Decimal(15, 2)
 
@@ -174,6 +175,7 @@ model Transaction {
 
   // Plaid integration
   plaidTransactionId String? @unique
+  rawDescription     String?
 
   // User notes
   notes String?
