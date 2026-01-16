@@ -68,7 +68,7 @@ The MVP will deliver a fully-featured financial management platform with multi-u
 **Dashboard & Overview:**
 - ✅ Total net worth calculation (assets - liabilities)
 - ✅ Net worth change over time (24h, 1w, 1mo, 3mo, 6mo, 1y, all)
-- ✅ Allocation donut chart (cash, stocks, crypto, real estate, other)
+- ✅ Interactive asset allocation and budget spending donut charts with "glow" effects and inactive fading
 - ✅ Key metric cards (Total Cash, Credit Balance, Investment Balance, Outstanding Loans, Real Estate Value)
 - ✅ Timezone-aware local midnight snapshots
 - ✅ Historical net worth tracking and visualization

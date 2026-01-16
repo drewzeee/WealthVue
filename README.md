@@ -178,7 +178,7 @@ Private project - All rights reserved
 ---
 
 **Current Phase**: Polish, Testing & Deployment (Phase 5)
-**Last Major Update**: Investment Overview Enhancements
+**Last Major Update**: Interactive Donut Charts & Polish
 **Next Phase**: Production Release
 
 See [TASKS.md](./TASKS.md) for detailed progress tracking.

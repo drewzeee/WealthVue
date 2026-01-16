@@ -239,6 +239,7 @@
 - ✅ Implement custom account naming and "Reset Sync" for Plaid accounts
 - ✅ Fix non-functional account edit button and improve Plaid account edit UX
 - ✅ Move "Process History" button from Transactions to Rules page and clean up unused imports
+- ✅ Enhance asset allocation and budget spending donut charts with interactive "glow" effects, segment scaling, and inactive fading
 
 ## Bugs
 
@@ -253,6 +254,7 @@
 - ✅ Improve mobile responsiveness: reclaim container space and optimize chart headers
 - ✅ Optimize chart Y-axis scaling for high-precision ranges (e.g. $66.2k)
 - ✅ Fix account edit state synchronization and Plaid account naming/sync issues
+- ✅ Fix legend synchronization bug in donut charts where wrong categories were highlighted on hover
 
 ## Quick Commands
 
@@ -284,4 +286,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-16 (Account Custom Naming & Transactions/Rules UX Improvements)
+**Last Updated:** 2026-01-16 (Interactive Donut Charts & Legend Sync Fix)

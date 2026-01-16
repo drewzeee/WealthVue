@@ -103,6 +103,14 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
     if (searchParams.get("uncategorized") === "true") {
       active.push({ key: "uncategorized", label: "Uncategorized", value: "Only" })
     }
+    if (searchParams.get("isTransfer")) {
+      const val = searchParams.get("isTransfer")
+      active.push({
+        key: "isTransfer",
+        label: "Transfers",
+        value: val === "true" ? "Only" : "Exclude"
+      })
+    }
 
     return active
   }

@@ -60,7 +60,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
       amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
       amountMax: searchParams.amountMax ? parseFloat(searchParams.amountMax) : undefined,
       merchant: searchParams.merchant,
-      isTransfer: searchParams.isTransfer === "true",
+      isTransfer: searchParams.isTransfer === "true" ? true : searchParams.isTransfer === "false" ? false : undefined,
       uncategorized: searchParams.uncategorized === "true",
       limit,
       offset,
@@ -76,7 +76,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
       amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
       amountMax: searchParams.amountMax ? parseFloat(searchParams.amountMax) : undefined,
       merchant: searchParams.merchant,
-      isTransfer: searchParams.isTransfer === "true",
+      isTransfer: searchParams.isTransfer === "true" ? true : searchParams.isTransfer === "false" ? false : undefined,
       uncategorized: searchParams.uncategorized === "true",
     }),
     prisma.account.findMany({

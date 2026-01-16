@@ -136,7 +136,7 @@ export class PlaidService {
           create: {
             accountId: account.id,
             plaidTransactionId: txn.transaction_id,
-            date: new Date(txn.date),
+            date: txn.authorized_date ? new Date(txn.authorized_date) : new Date(txn.date),
             authorizedDate: txn.authorized_date ? new Date(txn.authorized_date) : null,
             description: txn.name,
             rawDescription: txn.original_description,
@@ -154,7 +154,7 @@ export class PlaidService {
           },
           update: {
             // Update mutable fields if it already exists
-            date: new Date(txn.date),
+            date: txn.authorized_date ? new Date(txn.authorized_date) : new Date(txn.date),
             authorizedDate: txn.authorized_date ? new Date(txn.authorized_date) : null,
             description: txn.name,
             rawDescription: txn.original_description,
@@ -179,7 +179,7 @@ export class PlaidService {
       await prisma.transaction.updateMany({
         where: { plaidTransactionId: txn.transaction_id },
         data: {
-          date: new Date(txn.date),
+          date: txn.authorized_date ? new Date(txn.authorized_date) : new Date(txn.date),
           authorizedDate: txn.authorized_date ? new Date(txn.authorized_date) : null,
           description: txn.name,
           rawDescription: txn.original_description,

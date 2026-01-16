@@ -32,7 +32,7 @@ interface FilterPopoverProps {
     categories: { id: string; name: string }[]
 }
 
-type FilterTab = "account" | "date" | "type" | "amount" | "category" | "merchant"
+type FilterTab = "account" | "date" | "type" | "amount" | "category" | "merchant" | "transfer"
 
 export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
     const router = useRouter()
@@ -62,6 +62,9 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
     const [amountMax, setAmountMax] = React.useState(searchParams.get("amountMax") || "")
     const [merchant, setMerchant] = React.useState(searchParams.get("merchant") || "")
     const [uncategorized, setUncategorized] = React.useState(searchParams.get("uncategorized") === "true")
+    const [isTransferFilter, setIsTransferFilter] = React.useState<'all' | 'true' | 'false'>(
+        (searchParams.get("isTransfer") as any) || "all"
+    )
 
     const [accountSearch, setAccountSearch] = React.useState("")
     const [categorySearch, setCategorySearch] = React.useState("")
@@ -78,6 +81,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
             setAmountMax(searchParams.get("amountMax") || "")
             setMerchant(searchParams.get("merchant") || "")
             setUncategorized(searchParams.get("uncategorized") === "true")
+            setIsTransferFilter((searchParams.get("isTransfer") as any) || "all")
         }
     }, [isOpen, searchParams])
 
@@ -111,6 +115,9 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         if (uncategorized) params.set("uncategorized", "true")
         else params.delete("uncategorized")
 
+        if (isTransferFilter !== "all") params.set("isTransfer", isTransferFilter)
+        else params.delete("isTransfer")
+
         params.set("page", "1")
         router.push(pathname + "?" + params.toString())
         setIsOpen(false)
@@ -126,6 +133,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         setAmountMax("")
         setMerchant("")
         setUncategorized(false)
+        setIsTransferFilter("all")
 
         const params = new URLSearchParams(searchParams.toString())
         params.delete("accountId")
@@ -137,6 +145,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         params.delete("amountMax")
         params.delete("merchant")
         params.delete("uncategorized")
+        params.delete("isTransfer")
         params.set("page", "1")
 
         router.push(pathname + "?" + params.toString())
@@ -158,6 +167,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
         { id: "amount", label: "Amount", icon: <Hash className="h-4 w-4" /> },
         { id: "category", label: "Category", icon: <Tag className="h-4 w-4" /> },
         { id: "merchant", label: "Merchant", icon: <Building2 className="h-4 w-4" /> },
+        { id: "transfer", label: "Transfers", icon: <Hash className="h-4 w-4" /> },
     ]
 
     return (
@@ -376,6 +386,37 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
                                             value={merchant}
                                             onChange={(e) => setMerchant(e.target.value)}
                                         />
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === "transfer" && (
+                                <div className="space-y-4">
+                                    <div className="grid gap-2">
+                                        <Button
+                                            variant={isTransferFilter === "all" ? "secondary" : "ghost"}
+                                            className="justify-between"
+                                            onClick={() => setIsTransferFilter("all")}
+                                        >
+                                            Show All
+                                            {isTransferFilter === "all" && <Check className="h-4 w-4" />}
+                                        </Button>
+                                        <Button
+                                            variant={isTransferFilter === "true" ? "secondary" : "ghost"}
+                                            className="justify-between"
+                                            onClick={() => setIsTransferFilter("true")}
+                                        >
+                                            Only Transfers
+                                            {isTransferFilter === "true" && <Check className="h-4 w-4" />}
+                                        </Button>
+                                        <Button
+                                            variant={isTransferFilter === "false" ? "secondary" : "ghost"}
+                                            className="justify-between"
+                                            onClick={() => setIsTransferFilter("false")}
+                                        >
+                                            Exclude Transfers
+                                            {isTransferFilter === "false" && <Check className="h-4 w-4" />}
+                                        </Button>
                                     </div>
                                 </div>
                             )}

@@ -78,7 +78,7 @@ export class TransactionRepository {
         where,
         take: limit,
         skip: offset,
-        orderBy: { date: "desc" },
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
         include: {
           category: { select: { id: true, name: true, color: true, icon: true } },
           account: { select: { id: true, name: true, customName: true } },

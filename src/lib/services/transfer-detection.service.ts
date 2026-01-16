@@ -86,9 +86,21 @@ export class TransferDetectionService {
      * Atomic operation to link two transactions as a transfer.
      */
     private async linkPair(id1: string, id2: string, transferId: string, userId: string) {
-        // Find the Transfer category for this user
-        const transferCategory = await prisma.category.findFirst({
-            where: { userId, name: 'Transfer' }
+        // Find or create the Transfers category for this user
+        const transferCategory = await prisma.category.upsert({
+            where: {
+                userId_name: {
+                    userId,
+                    name: 'Transfers'
+                }
+            },
+            update: {},
+            create: {
+                userId,
+                name: 'Transfers',
+                color: '#94a3b8',
+                icon: '🔁'
+            }
         })
 
         return prisma.$transaction([
@@ -97,7 +109,7 @@ export class TransferDetectionService {
                 data: {
                     isTransfer: true,
                     transferId,
-                    ...(transferCategory ? { categoryId: transferCategory.id } : {})
+                    categoryId: transferCategory.id
                 }
             }),
             prisma.transaction.update({
@@ -105,7 +117,7 @@ export class TransferDetectionService {
                 data: {
                     isTransfer: true,
                     transferId,
-                    ...(transferCategory ? { categoryId: transferCategory.id } : {})
+                    categoryId: transferCategory.id
                 }
             })
         ])
