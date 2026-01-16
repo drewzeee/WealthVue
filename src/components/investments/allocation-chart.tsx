@@ -1,6 +1,9 @@
 "use client"
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
+import { useState } from 'react'
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from 'recharts'
+
+const PieAny = Pie as any
 import { formatCurrency } from "@/lib/utils"
 import { ASSET_CLASS_CONFIG, AssetClass } from "@/types/investment"
 
@@ -25,7 +28,29 @@ const COLOR_PALETTE = [
     "hsl(210, 100%, 50%)", // Blue
 ]
 
+const renderActiveShape = (props: any) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+
+    return (
+        <g>
+            <Sector
+                cx={cx}
+                cy={cy}
+                innerRadius={innerRadius - 2}
+                outerRadius={outerRadius + 6}
+                startAngle={startAngle}
+                endAngle={endAngle}
+                fill={fill}
+                style={{ filter: `drop-shadow(0 0 8px ${fill})` }}
+                className="transition-all duration-300 ease-in-out"
+            />
+        </g>
+    );
+};
+
 export function AllocationChart({ data }: AllocationChartProps) {
+    const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
     const chartData = data
         .filter(d => d.value > 0)
         .map((d, index) => {
@@ -46,10 +71,20 @@ export function AllocationChart({ data }: AllocationChartProps) {
         )
     }
 
+    const onPieEnter = (_: any, index: number) => {
+        setActiveIndex(index)
+    }
+
+    const onPieLeave = () => {
+        setActiveIndex(null)
+    }
+
     return (
         <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-                <Pie
+                <PieAny
+                    activeIndex={activeIndex !== null ? activeIndex : undefined}
+                    activeShape={renderActiveShape}
                     data={chartData}
                     cx="50%"
                     cy="50%"
@@ -59,11 +94,24 @@ export function AllocationChart({ data }: AllocationChartProps) {
                     dataKey="value"
                     stroke="none"
                     strokeWidth={0}
+                    onMouseEnter={onPieEnter}
+                    onMouseLeave={onPieLeave}
+                    animationBegin={0}
+                    animationDuration={800}
                 >
                     {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                        <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color}
+                            stroke="none"
+                            style={{
+                                opacity: activeIndex === null || activeIndex === index ? 1 : 0.4,
+                                transition: 'all 0.3s ease-in-out',
+                                outline: 'none'
+                            }}
+                        />
                     ))}
-                </Pie>
+                </PieAny>
                 <Tooltip
                     formatter={(value: any) => formatCurrency(Number(value))}
                     contentStyle={{
@@ -80,11 +128,22 @@ export function AllocationChart({ data }: AllocationChartProps) {
                     verticalAlign="bottom"
                     height={36}
                     iconType="circle"
-                    formatter={(value, entry: any) => (
-                        <span className="text-xs font-medium ml-1 text-muted-foreground uppercase">
-                            {value} ({entry.payload.percentage.toFixed(1)}%)
-                        </span>
-                    )}
+                    formatter={(value, entry: any) => {
+                        const index = chartData.findIndex(d => d.name === value);
+                        return (
+                            <span
+                                className="text-xs font-medium ml-1 text-muted-foreground uppercase transition-opacity duration-300"
+                                onMouseEnter={() => setActiveIndex(index)}
+                                onMouseLeave={() => setActiveIndex(null)}
+                                style={{
+                                    opacity: activeIndex === null || activeIndex === index ? 1 : 0.4,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {value} ({entry.payload.percentage.toFixed(1)}%)
+                            </span>
+                        )
+                    }}
                 />
             </PieChart>
         </ResponsiveContainer>
