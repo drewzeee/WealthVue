@@ -7,7 +7,7 @@ A comprehensive personal financial dashboard that unifies budget management, inv
 - **Budget Management**: Create custom categories, set monthly budgets, and track spending
 - **Transaction Sync**: Automatic bank account syncing via Plaid + manual entry + CSV import
 - **Investment Tracking**: Multi-asset class support (stocks, crypto, real estate, metals, commodities) with real-time pricing
-- **Net Worth Dashboard**: Complete financial overview with allocation charts and key metrics
+- **Net Worth Dashboard**: Complete financial overview with allocation charts, key metrics, and timezone-aware historical snapshots
 - **Family Accounts**: Link accounts with family members for household finance management
 - **Self-Hosted**: Run on your own infrastructure via Docker Compose
 
@@ -151,7 +151,7 @@ sudo ./scripts/setup-services.sh
 
 ```bash
 # Update the application
-sudo ./scripts/update-app.sh
+sudo ./update.sh
 
 # Check status
 systemctl status wealthvue

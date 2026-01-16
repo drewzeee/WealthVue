@@ -162,7 +162,8 @@
 
 ### Sprint 1: Dashboard Implementation ✅
 - ✅ Net worth calculation engine (backend service complete)
-- ✅ Net worth snapshot job (daily BullMQ job)
+- ✅ Net worth snapshot job (timezone-aware hourly trigger)
+- ✅ User timezone preference in Settings
 - ✅ API endpoints for net worth data (/api/net-worth, /api/net-worth/history)
 - ✅ Dashboard page with real data (replaced placeholders)
 - ✅ Time selector component (24h, 1w, 1m, 3m, 6m, 1y, all)
@@ -273,4 +274,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-15 (Enhanced Transaction Filtering & Mobile Optimization)
+**Last Updated:** 2026-01-16 (Timezone-Aware Net Worth Snapshots)

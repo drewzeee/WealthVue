@@ -57,12 +57,12 @@ async function startWorkers() {
     'daily-snapshot-trigger',
     {},
     {
-      repeat: { pattern: '0 0 * * *' },
+      repeat: { pattern: '0 * * * *' },
       jobId: 'daily-snapshot-config',
       removeOnComplete: true
     }
   );
-  console.log('Scheduled daily net worth snapshot trigger (midnight UTC).');
+  console.log('Scheduled hourly net worth snapshot trigger (checked per-user timezone).');
 
   // Schedule monthly budget carry-over (1st of every month at 00:05 UTC)
   await budgetCarryOverQueue.add(

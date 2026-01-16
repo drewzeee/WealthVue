@@ -12,15 +12,33 @@ export const netWorthSnapshotWorker = createWorker(NET_WORTH_SNAPSHOT_QUEUE_NAME
 
   try {
     if (jobName === 'daily-snapshot-trigger') {
-      // 1. Fetch all users
       const users = await prisma.user.findMany({
-        select: { id: true }
+        select: { id: true, timezone: true }
       });
 
-      console.log(`[NetWorthSnapshot] Triggering snapshots for ${users.length} users...`);
+      const now = new Date();
+      const usersToSnapshot = users.filter(user => {
+        const userTimezone = user.timezone || "UTC";
+        try {
+          const hour = new Intl.DateTimeFormat('en-US', {
+            timeZone: userTimezone,
+            hour: 'numeric',
+            hour12: false,
+          }).format(now);
+
+          // We trigger if it's the 0th hour (midnight)
+          // Note: hour might be "24" in some locales/settings, but "00" or "0" is standard for hour12: false
+          return hour === "0" || hour === "00" || hour === "24";
+        } catch (e) {
+          console.error(`Invalid timezone for user ${user.id}: ${userTimezone}`);
+          return false;
+        }
+      });
+
+      console.log(`[NetWorthSnapshot] Triggering snapshots for ${usersToSnapshot.length} users (out of ${users.length})...`);
 
       // 2. Add a job for each user
-      const jobs = users.map(user => ({
+      const jobs = usersToSnapshot.map(user => ({
         name: 'snapshot-user',
         data: { userId: user.id },
         opts: {
@@ -32,19 +50,19 @@ export const netWorthSnapshotWorker = createWorker(NET_WORTH_SNAPSHOT_QUEUE_NAME
       await netWorthSnapshotQueue.addBulk(jobs);
 
       return { triggered: users.length };
-    } 
-    
+    }
+
     else if (jobName === 'snapshot-user') {
       const { userId } = job.data;
       if (!userId) throw new Error('userId is required for snapshot-user job');
 
       const snapshot = await NetWorthService.generateSnapshot(userId);
       console.log(`[NetWorthSnapshot] Snapshot created for user ${userId}: $${snapshot.netWorth}`);
-      
-      return { 
-        userId, 
+
+      return {
+        userId,
         netWorth: snapshot.netWorth,
-        snapshotId: snapshot.id 
+        snapshotId: snapshot.id
       };
     }
 

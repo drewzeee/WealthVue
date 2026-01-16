@@ -185,10 +185,24 @@ export class NetWorthService {
   }
 
   static async generateSnapshot(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { timezone: true }
+    });
+    const userTimezone = user?.timezone || "UTC";
+
     const data = await this.calculateCurrentNetWorth(userId);
 
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0); // Normalized to UTC midnight
+    // Calculate "today" in the user's timezone
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', { // en-CA gives YYYY-MM-DD
+      timeZone: userTimezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const datePart = formatter.format(now); // "YYYY-MM-DD"
+    const today = new Date(`${datePart}T00:00:00Z`); // UTC midnight of that local date
 
     // Check if snapshot exists for today to update or create
     return await prisma.netWorthSnapshot.upsert({

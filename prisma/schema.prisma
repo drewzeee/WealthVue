@@ -40,6 +40,7 @@ model User {
   sentInvitations     LinkInvitation[]      @relation("InvitationSender")
   receivedInvitations LinkInvitation[]      @relation("InvitationReceiver")
 
+  timezone      String    @default("UTC")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

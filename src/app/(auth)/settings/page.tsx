@@ -7,6 +7,7 @@ import { AccountList } from "@/components/settings/account-list"
 import { AssetList } from "@/components/assets/asset-list"
 import { LiabilityList } from "@/components/liabilities/liability-list"
 import { FamilyManagement } from "@/components/settings/family-management"
+import { PreferencesSettings } from "@/components/settings/preferences-settings"
 import { Separator } from "@/components/ui/separator"
 import {
     Tabs,
@@ -28,6 +29,12 @@ export default async function SettingsPage() {
     }
 
     const userId = session.user.id
+
+    // Fetch user details for preferences
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { timezone: true }
+    })
 
     // Fetch data for all sections
     const accounts = await prisma.account.findMany({
@@ -67,6 +74,7 @@ export default async function SettingsPage() {
                     <TabsTrigger value="assets">Manual Assets</TabsTrigger>
                     <TabsTrigger value="liabilities">Manual Liabilities</TabsTrigger>
                     <TabsTrigger value="family">Family</TabsTrigger>
+                    <TabsTrigger value="preferences">Preferences</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="accounts" className="space-y-6">
@@ -103,6 +111,10 @@ export default async function SettingsPage() {
 
                 <TabsContent value="family">
                     <FamilyManagement />
+                </TabsContent>
+
+                <TabsContent value="preferences">
+                    <PreferencesSettings initialTimezone={user?.timezone || "UTC"} />
                 </TabsContent>
             </Tabs>
         </div>
