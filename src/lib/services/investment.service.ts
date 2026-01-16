@@ -46,18 +46,21 @@ export class InvestmentService {
             percentage: totalValue > 0 ? (value / totalValue) * 100 : 0
         })).sort((a, b) => b.value - a.value);
 
+        const totalCryptoValue = Array.from(cryptoAllocationMap.values()).reduce((sum, d) => sum + d.value, 0);
+        const totalStockValue = Array.from(stockAllocationMap.values()).reduce((sum, d) => sum + d.value, 0);
+
         const cryptoAllocation = Array.from(cryptoAllocationMap.entries()).map(([symbol, data]) => ({
             symbol,
             name: data.name,
             value: data.value,
-            percentage: totalValue > 0 ? (data.value / totalValue) * 100 : 0
+            percentage: totalCryptoValue > 0 ? (data.value / totalCryptoValue) * 100 : 0
         })).sort((a, b) => b.value - a.value);
 
         const stockAllocation = Array.from(stockAllocationMap.entries()).map(([symbol, data]) => ({
             symbol,
             name: data.name,
             value: data.value,
-            percentage: totalValue > 0 ? (data.value / totalValue) * 100 : 0
+            percentage: totalStockValue > 0 ? (data.value / totalStockValue) * 100 : 0
         })).sort((a, b) => b.value - a.value);
 
         // 3. Get History (from NetWorthSnapshot)
