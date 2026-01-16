@@ -44,6 +44,18 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
   const limit = 50
   const offset = (page - 1) * limit
 
+  const accountId = searchParams.accountId
+    ? searchParams.accountId.includes(",")
+      ? searchParams.accountId.split(",")
+      : searchParams.accountId
+    : undefined
+
+  const categoryId = searchParams.categoryId
+    ? searchParams.categoryId.includes(",")
+      ? searchParams.categoryId.split(",")
+      : searchParams.categoryId
+    : undefined
+
   // Fetch data in parallel
   const [
     { transactions, total },
@@ -55,8 +67,8 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
       userId: session.user.id,
       startDate: searchParams.from ? new Date(searchParams.from) : undefined,
       endDate: searchParams.to ? new Date(searchParams.to) : undefined,
-      accountId: searchParams.accountId,
-      categoryId: searchParams.categoryId,
+      accountId,
+      categoryId,
       search: searchParams.search,
       type: searchParams.type,
       amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
@@ -71,8 +83,8 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
       userId: session.user.id,
       startDate: searchParams.from ? new Date(searchParams.from) : undefined,
       endDate: searchParams.to ? new Date(searchParams.to) : undefined,
-      accountId: searchParams.accountId,
-      categoryId: searchParams.categoryId,
+      accountId,
+      categoryId,
       search: searchParams.search,
       type: searchParams.type,
       amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
