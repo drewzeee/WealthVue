@@ -260,6 +260,7 @@
 - ✅ Fix account edit state synchronization and Plaid account naming/sync issues
 - ✅ Fix legend synchronization bug in donut charts where wrong categories were highlighted on hover
 - ✅ Fix transaction sorting inconsistency: use effective date (authorized date) for both sorting and display
+- ✅ Fix transaction multi-select filtering logic (backend array handling)
 
 ## Quick Commands
 
@@ -291,4 +292,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-16 (Investment Overview Cards)
+**Last Updated:** 2026-01-16 (Transaction Filtering Fix)

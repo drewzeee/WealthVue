@@ -19,8 +19,19 @@ export async function GET(req: NextRequest) {
 
   const from = searchParams.get("from")
   const to = searchParams.get("to")
-  const accountId = searchParams.get("accountId") || undefined
-  const categoryId = searchParams.get("categoryId") || undefined
+  const accountIdParam = searchParams.get("accountId")
+  const accountId = accountIdParam
+    ? accountIdParam.includes(",")
+      ? accountIdParam.split(",")
+      : accountIdParam
+    : undefined
+
+  const categoryIdParam = searchParams.get("categoryId")
+  const categoryId = categoryIdParam
+    ? categoryIdParam.includes(",")
+      ? categoryIdParam.split(",")
+      : categoryIdParam
+    : undefined
   const search = searchParams.get("search") || undefined
 
   try {

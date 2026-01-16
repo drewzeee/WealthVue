@@ -5,8 +5,8 @@ export type TransactionFilter = {
   userId: string
   startDate?: Date
   endDate?: Date
-  accountId?: string
-  categoryId?: string
+  accountId?: string | string[]
+  categoryId?: string | string[]
   search?: string
   type?: 'income' | 'expense' | 'all'
   amountMin?: number
@@ -53,8 +53,12 @@ export class TransactionRepository {
           },
         }
         : {}),
-      ...(accountId ? { accountId } : {}),
-      ...(categoryId ? { categoryId } : {}),
+      ...(accountId
+        ? (Array.isArray(accountId) ? { accountId: { in: accountId } } : { accountId })
+        : {}),
+      ...(categoryId
+        ? (Array.isArray(categoryId) ? { categoryId: { in: categoryId } } : { categoryId })
+        : {}),
       ...(uncategorized ? { categoryId: null } : {}),
       ...(type === 'income' ? { amount: { gt: 0 } } : {}),
       ...(type === 'expense' ? { amount: { lt: 0 } } : {}),
@@ -122,8 +126,12 @@ export class TransactionRepository {
           },
         }
         : {}),
-      ...(accountId ? { accountId } : {}),
-      ...(categoryId ? { categoryId } : {}),
+      ...(accountId
+        ? (Array.isArray(accountId) ? { accountId: { in: accountId } } : { accountId })
+        : {}),
+      ...(categoryId
+        ? (Array.isArray(categoryId) ? { categoryId: { in: categoryId } } : { categoryId })
+        : {}),
       ...(uncategorized ? { categoryId: null } : {}),
       ...(type === 'income' ? { amount: { gt: 0 } } : {}),
       ...(type === 'expense' ? { amount: { lt: 0 } } : {}),
