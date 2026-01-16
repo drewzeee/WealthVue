@@ -11,7 +11,7 @@ import { format } from "date-fns"
 import { useDebounce } from "@/hooks/use-debounce"
 
 interface TransactionFiltersProps {
-  accounts: { id: string; name: string }[]
+  accounts: { id: string; name: string; customName: string | null }[]
   categories: { id: string; name: string }[]
 }
 

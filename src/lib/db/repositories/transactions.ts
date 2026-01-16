@@ -81,7 +81,7 @@ export class TransactionRepository {
         orderBy: { date: "desc" },
         include: {
           category: { select: { id: true, name: true, color: true, icon: true } },
-          account: { select: { id: true, name: true } },
+          account: { select: { id: true, name: true, customName: true } },
         },
       }),
     ])

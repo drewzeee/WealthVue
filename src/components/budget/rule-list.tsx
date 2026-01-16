@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { RuleDialog } from "./add-rule-dialog"
+import { ProcessTransactionsButton } from "@/components/transactions/process-transactions-button"
 
 type RuleWithCategory = CategorizationRule & {
   category: { name: string; color: string }
@@ -68,7 +69,10 @@ export function RuleList() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Categorization Rules</h3>
-        <RuleDialog />
+        <div className="flex items-center gap-2">
+          <ProcessTransactionsButton />
+          <RuleDialog />
+        </div>
       </div>
 
       <div className="rounded-md border">

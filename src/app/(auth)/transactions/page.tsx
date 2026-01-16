@@ -8,7 +8,6 @@ import { TransactionsTableShell } from "@/components/transactions/transactions-t
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { ImportCSVDialog } from "@/components/transactions/import-csv-dialog"
 import { AddTransactionDialog } from "@/components/transactions/add-transaction-dialog"
-import { ProcessTransactionsButton } from "@/components/transactions/process-transactions-button"
 import { TransactionSummaryCards } from "@/components/transactions/transaction-summary-cards"
 
 export const metadata: Metadata = {
@@ -82,7 +81,7 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
     }),
     prisma.account.findMany({
       where: { userId: session.user.id },
-      select: { id: true, name: true },
+      select: { id: true, name: true, customName: true },
       orderBy: { name: "asc" },
     }),
     prisma.category.findMany({
@@ -104,7 +103,6 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ProcessTransactionsButton />
           <ImportCSVDialog accounts={accounts} />
           <AddTransactionDialog accounts={accounts} categories={categories} />
         </div>

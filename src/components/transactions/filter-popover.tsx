@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 interface FilterPopoverProps {
-    accounts: { id: string; name: string }[]
+    accounts: { id: string; name: string; customName: string | null }[]
     categories: { id: string; name: string }[]
 }
 
@@ -144,7 +144,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
     }
 
     const filteredAccounts = accounts.filter(acc =>
-        acc.name.toLowerCase().includes(accountSearch.toLowerCase())
+        (acc.customName || acc.name).toLowerCase().includes(accountSearch.toLowerCase())
     )
 
     const filteredCategories = categories.filter(cat =>
@@ -211,7 +211,7 @@ export function FilterPopover({ accounts, categories }: FilterPopoverProps) {
                                                     }}
                                                 />
                                                 <Label htmlFor={`acc-${acc.id}`} className="text-sm font-normal cursor-pointer flex-1 py-1">
-                                                    {acc.name}
+                                                    {acc.customName || acc.name}
                                                 </Label>
                                             </div>
                                         ))}

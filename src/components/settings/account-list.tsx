@@ -15,12 +15,16 @@ import { Account, Asset, Liability, InvestmentAccount, PlaidItem } from "@prisma
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { deleteAccount } from "@/app/actions/accounts"
+import { resetPlaidSync } from "@/app/actions/plaid"
 import { AccountDialog } from "@/components/accounts/add-account-dialog"
+import { RefreshCcw } from "lucide-react"
 
 type SimpleAccount = Omit<Account, "currentBalance" | "availableBalance" | "creditLimit"> & {
     currentBalance: number;
     availableBalance: number | null;
     creditLimit: number | null;
+    customName: string | null;
+    plaidItemId: string | null;
     plaidItem?: PlaidItem | null
 }
 type SimpleAsset = Omit<Asset, "currentValue"> & { currentValue: number }
@@ -82,14 +86,15 @@ export function AccountList({ accounts, assets, liabilities, investmentAccounts 
                         <AccountItem
                             id={account.id}
                             key={account.id}
-                            name={account.name}
+                            name={account.customName || account.name}
                             balance={account.currentBalance}
                             type={account.type}
                             subtype={account.subtype}
                             isPlaid={!!account.plaidItem}
                             lastSyncedAt={account.lastSyncedAt}
+                            plaidItemId={account.plaidItemId}
                             onDelete={() => handleDelete("account", account.id)}
-                            onEdit={() => handleEdit({ ...account, balance: account.currentBalance })}
+                            onEdit={() => handleEdit({ ...account, balance: account.currentBalance, plaidItemId: account.plaidItemId })}
                             deletingId={deletingId}
                         />
                     ))}
@@ -171,7 +176,7 @@ function Section({ title, description, children }: { title: string, description:
     )
 }
 
-function AccountItem({ id, name, balance, type, subtype, isPlaid, lastSyncedAt, onDelete, onEdit, deletingId }: {
+function AccountItem({ id, name, balance, type, subtype, isPlaid, lastSyncedAt, plaidItemId, onDelete, onEdit, deletingId }: {
     id: string,
     name: string,
     balance: number,
@@ -179,14 +184,34 @@ function AccountItem({ id, name, balance, type, subtype, isPlaid, lastSyncedAt, 
     subtype?: string | null,
     isPlaid?: boolean,
     lastSyncedAt?: Date | null,
+    plaidItemId?: string | null,
     onDelete: () => void,
     onEdit: () => void,
     deletingId: string | null
 }) {
+    const router = useRouter()
+    const [isResetting, setIsResetting] = useState(false)
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
     })
+
+    const handleResetSync = async () => {
+        if (!plaidItemId) return
+        if (!confirm("This will clear the sync 'bookmark' for this account, forcing it to re-download all transactions on the next sync. Are you sure?")) return
+
+        setIsResetting(true)
+        try {
+            await resetPlaidSync(plaidItemId)
+            alert("Sync reset successfully. Please trigger a manual sync or wait for the next automatic sync to see deleted transactions return.")
+            router.refresh()
+        } catch (error) {
+            console.error(error)
+            alert("Failed to reset sync")
+        } finally {
+            setIsResetting(false)
+        }
+    }
 
     return (
         <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors">
@@ -224,6 +249,12 @@ function AccountItem({ id, name, balance, type, subtype, isPlaid, lastSyncedAt, 
                         <DropdownMenuItem onClick={onEdit}>
                             <Pencil className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
+                        {isPlaid && (
+                            <DropdownMenuItem onClick={handleResetSync} disabled={isResetting}>
+                                <RefreshCcw className={`mr-2 h-4 w-4 ${isResetting ? 'animate-spin' : ''}`} />
+                                {isResetting ? 'Resetting...' : 'Reset Sync'}
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem disabled={deletingId === id} className="text-destructive focus:text-destructive" onClick={onDelete}>
                             {deletingId === id ? <span className="animate-spin mr-2">⟳</span> : <Trash className="mr-2 h-4 w-4" />} Delete
                         </DropdownMenuItem>

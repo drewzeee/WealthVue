@@ -21,7 +21,7 @@ import { CategorySelect } from "./category-select"
 // We need to extend the Transaction type to include relations
 export type TransactionWithRelations = Transaction & {
   category: { id: string; name: string; color: string } | null
-  account: { id: string; name: string }
+  account: { id: string; name: string; customName: string | null }
 }
 
 interface Category {
@@ -123,7 +123,7 @@ export const getColumns = (categories: Category[]): ColumnDef<TransactionWithRel
   {
     accessorKey: "account",
     header: "Account",
-    cell: ({ row }) => row.original.account.name,
+    cell: ({ row }) => row.original.account.customName || row.original.account.name,
   },
   {
     accessorKey: "amount",

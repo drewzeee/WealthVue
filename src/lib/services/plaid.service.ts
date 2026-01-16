@@ -219,13 +219,23 @@ export class PlaidService {
     for (const acc of accounts) {
       const type = this.mapAccountType(acc.type, acc.subtype);
 
+      // Naming strategy: Use official_name if available, and append mask if it's generic or available
+      let displayName = acc.official_name || acc.name;
+      if (acc.mask) {
+        // If it's a generic name like "CREDIT CARD" or just "Checking", 
+        // the mask is very helpful for differentiation.
+        displayName = `${displayName} (*${acc.mask})`;
+      }
+
       await prisma.account.upsert({
         where: { plaidAccountId: acc.account_id },
         update: {
           currentBalance: acc.balances.current || 0,
           availableBalance: acc.balances.available,
           creditLimit: acc.balances.limit,
-          name: acc.name,
+          name: displayName,
+          officialName: acc.official_name,
+          mask: acc.mask,
           // Ensure these are set in case it was an orphaned account or re-link
           userId,
           plaidItemId,
@@ -234,7 +244,9 @@ export class PlaidService {
           userId,
           plaidItemId,
           plaidAccountId: acc.account_id,
-          name: acc.name,
+          name: displayName,
+          officialName: acc.official_name,
+          mask: acc.mask,
           type,
           subtype: acc.subtype || null,
           currentBalance: acc.balances.current || 0,

@@ -116,8 +116,11 @@ model Account {
 
   // Account details
   name            String
+  officialName    String?
+  customName      String?
   type            AccountType
   subtype         String?
+  mask            String?
 
   // Plaid integration
   plaidAccountId   String?  @unique

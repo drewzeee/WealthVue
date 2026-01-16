@@ -21,10 +21,12 @@ interface AccountDialogProps {
     initialData?: {
         id: string
         name: string
+        customName?: string | null
         balance: number
         type: string
         subtype?: string | null
         interestRate?: number | null
+        plaidItemId?: string | null
     }
     open?: boolean
     onOpenChange?: (open: boolean) => void
@@ -99,40 +101,46 @@ export function AccountDialog({ children, mode = "create", initialData, open: co
         mode === "edit" ? "manual-form" : "method"
     )
 
-    // Initialize manualType correctly based on initialData
-    const [manualType, setManualType] = useState<string | null>(
-        initialData ? mapTypeToManualType(initialData.type) : null
-    )
-
     // Form State
+    const [manualType, setManualType] = useState<string | null>(null)
     const [formData, setFormData] = useState({
-        name: initialData?.name || "",
-        balance: initialData?.balance.toString() || "",
-        type: initialData?.subtype || "", // Specific subtype (e.g., CHECKING, VISA)
-        interestRate: initialData?.interestRate?.toString() || "",
+        name: "",
+        customName: "",
+        balance: "",
+        type: "",
+        interestRate: "",
     })
 
-    const reset = () => {
-        if (mode === "create") {
-            setStep("method")
-            setManualType(null)
-            setFormData({ name: "", balance: "", type: "", interestRate: "" })
-        } else {
-            // Reset to initial data for edit mode
-            setFormData({
-                name: initialData?.name || "",
-                balance: initialData?.balance.toString() || "",
-                type: initialData?.subtype || "",
-                interestRate: initialData?.interestRate?.toString() || "",
-            })
+    // Re-initialize state when initialData or mode changes or dialog opens
+    useEffect(() => {
+        if (open) {
+            if (mode === "edit" && initialData) {
+                setStep("manual-form")
+                setManualType(mapTypeToManualType(initialData.type))
+                setFormData({
+                    name: initialData.name || "",
+                    customName: initialData.customName || "",
+                    balance: initialData.balance.toString() || "0",
+                    type: initialData.subtype || "",
+                    interestRate: initialData.interestRate?.toString() || "",
+                })
+            } else {
+                setStep("method")
+                setManualType(null)
+                setFormData({
+                    name: "",
+                    customName: "",
+                    balance: "",
+                    type: "",
+                    interestRate: "",
+                })
+            }
         }
-    }
+    }, [open, mode, initialData])
 
     const handleOpenChange = (open: boolean) => {
         setOpen(open)
-        if (!open) reset()
     }
-
 
     const handleManualSubmit = async () => {
         if (!manualType || !formData.name || !formData.balance) {
@@ -155,13 +163,13 @@ export function AccountDialog({ children, mode = "create", initialData, open: co
                     id: initialData.id,
                     type: manualType as any,
                     name: formData.name,
+                    customName: formData.customName,
                     balance: parseFloat(formData.balance),
                     subtype: formData.type,
                     interestRate: formData.interestRate ? parseFloat(formData.interestRate) : undefined
                 })
             }
             setOpen(false)
-            reset()
         } catch (error) {
             console.error(error)
             alert(`Failed to ${mode} account`)
@@ -263,28 +271,47 @@ export function AccountDialog({ children, mode = "create", initialData, open: co
                     <div className="space-y-4">
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="name" className="text-right">Name</Label>
+                                <Label htmlFor="name" className="text-right">Bank Name</Label>
                                 <Input
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="col-span-3"
                                     placeholder="e.g. Chase Checking"
+                                    disabled={mode === "edit" && !!initialData?.plaidItemId}
                                 />
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="balance" className="text-right">
+                                <Label htmlFor="customName" className="text-right">Display Name</Label>
+                                <Input
+                                    id="customName"
+                                    value={formData.customName}
+                                    onChange={(e) => setFormData({ ...formData, customName: e.target.value })}
+                                    className="col-span-3"
+                                    placeholder="e.g. My Personal Savings"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-start gap-4">
+                                <Label htmlFor="balance" className="text-right mt-3">
                                     {manualType === "LIABILITY" || manualType === "CREDIT" ? "Current Balance (Owed)" : "Current Value"}
                                 </Label>
-                                <Input
-                                    id="balance"
-                                    type="number"
-                                    value={formData.balance}
-                                    onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-                                    className="col-span-3"
-                                    placeholder="0.00"
-                                />
+                                <div className="col-span-3 space-y-2">
+                                    <Input
+                                        id="balance"
+                                        type="number"
+                                        value={formData.balance}
+                                        onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
+                                        placeholder="0.00"
+                                        disabled={mode === "edit" && !!initialData?.plaidItemId}
+                                    />
+                                    {mode === "edit" && !!initialData?.plaidItemId && (
+                                        <p className="text-[10px] text-muted-foreground bg-muted/30 p-2 rounded">
+                                            This value is managed automatically by Plaid and cannot be edited manually.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Dynamic Fields based on Type */}

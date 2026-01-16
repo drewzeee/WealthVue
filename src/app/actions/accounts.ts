@@ -138,6 +138,7 @@ export async function updateAccount(data: {
     id: string
     type: "BANK" | "CREDIT" | "INVESTMENT" | "ASSET" | "LIABILITY"
     name: string
+    customName?: string
     balance: number
     subtype?: string
     interestRate?: number
@@ -147,15 +148,23 @@ export async function updateAccount(data: {
     const userId = session.user.id
 
     try {
+        const isPlaid = data.id ? await (async () => {
+            const acc = await prisma.account.findUnique({ where: { id: data.id }, select: { plaidItemId: true } })
+            return !!acc?.plaidItemId
+        })() : false
+
         switch (data.type) {
             case "BANK":
                 await prisma.account.update({
                     where: { id: data.id, userId },
                     data: {
-                        name: data.name,
-                        type: data.subtype as any || "CHECKING",
-                        currentBalance: data.balance,
-                        availableBalance: data.balance,
+                        customName: data.customName,
+                        ...(isPlaid ? {} : {
+                            name: data.name,
+                            type: data.subtype as any || "CHECKING",
+                            currentBalance: data.balance,
+                            availableBalance: data.balance,
+                        })
                     }
                 })
                 break
@@ -164,9 +173,12 @@ export async function updateAccount(data: {
                 await prisma.account.update({
                     where: { id: data.id, userId },
                     data: {
-                        name: data.name,
-                        type: "CREDIT_CARD",
-                        currentBalance: data.balance,
+                        customName: data.customName,
+                        ...(isPlaid ? {} : {
+                            name: data.name,
+                            type: "CREDIT_CARD",
+                            currentBalance: data.balance,
+                        })
                     }
                 })
                 break
