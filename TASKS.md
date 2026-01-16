@@ -242,6 +242,7 @@
 - ✅ Enhance asset allocation and budget spending donut charts with interactive "glow" effects, segment scaling, and inactive fading
 - ✅ Fix hidden transfer transactions and implement robust UI filtering toggle
 - ✅ Refine transfer category logic to use plural 'Transfers' and ensure automatic category provisioning
+- ✅ Implement transaction notes and enhanced editing (desktop/mobile) with search support
 
 ## Bugs
 
