@@ -33,25 +33,27 @@ export function PortfolioHistoryChart({ data }: PortfolioHistoryChartProps) {
                         <stop offset="95%" stopColor="oklch(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(var(--muted-foreground)/0.2)" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" vertical={false} />
                 <XAxis
                     dataKey="date"
-                    tickFormatter={(value) => {
-                        const date = new Date(value);
-                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    }}
+                    className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-tighter"
                     stroke="none"
-                    tick={{ fill: 'oklch(var(--muted-foreground)/0.5)', fontSize: 10, fontWeight: 700 }}
-                    tickLine={false}
-                    axisLine={false}
+                    tick={{ fill: 'oklch(var(--muted-foreground)/0.5)' }}
+                    minTickGap={30}
+                    hide
                 />
                 <YAxis
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    className="text-[10px] font-bold text-muted-foreground/50"
                     stroke="none"
-                    tick={{ fill: 'oklch(var(--muted-foreground)/0.5)', fontSize: 10, fontWeight: 700 }}
-                    tickLine={false}
-                    axisLine={false}
-                    domain={['dataMin', 'dataMax']}
+                    tick={{ fill: 'oklch(var(--muted-foreground)/0.5)' }}
+                    tickFormatter={(value) => {
+                        if (value >= 1000) return `$${(value / 1000).toFixed(1)}k`
+                        return `$${value}`
+                    }}
+                    domain={['auto', 'auto']}
+                    width={45}
+                    tickCount={5}
+                    hide
                 />
                 <Tooltip
                     formatter={(value: any) => [formatCurrency(Number(value)), "Portfolio Value"]}
@@ -72,8 +74,8 @@ export function PortfolioHistoryChart({ data }: PortfolioHistoryChartProps) {
                     dataKey="value"
                     stroke="oklch(var(--primary))"
                     strokeWidth={2}
-                    fillOpacity={1}
                     fill="url(#colorValue)"
+                    animationDuration={1000}
                 />
             </AreaChart>
         </ResponsiveContainer>
