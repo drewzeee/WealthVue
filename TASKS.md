@@ -115,6 +115,7 @@
 - ✅ Implement initial transaction fetch from Plaid
 - ✅ Create transaction storage logic
 - ✅ Build Plaid webhook endpoint (POST /api/webhooks/plaid)
+- 🔲 Implement scheduled BullMQ job for periodic Plaid sync fallback
 - ✅ Create transaction list page (/transactions)
 - ✅ Build transaction table component with sorting
 - ✅ Add transaction filters (date range, category, account)

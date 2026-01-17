@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db/client"
 import { investmentRepository } from "@/lib/db/repositories/investments"
 
 export class InvestmentService {
-    async getOverview(userId: string) {
+    async getOverview(userId: string, range: string = 'ALL') {
         // 1. Get current holdings (fetch enough to cover most portfolios)
         const { investments } = await investmentRepository.findMany({ userId, limit: 1000 });
 
@@ -64,10 +64,39 @@ export class InvestmentService {
         })).sort((a, b) => b.value - a.value);
 
         // 3. Get History (from NetWorthSnapshot)
+        let dateFilter: Date | undefined;
+        const now = new Date();
+
+        switch (range) {
+            case '24H':
+                dateFilter = new Date(now.setDate(now.getDate() - 2));
+                break;
+            case '1W':
+                dateFilter = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case '1M':
+                dateFilter = new Date(now.setMonth(now.getMonth() - 1));
+                break;
+            case '3M':
+                dateFilter = new Date(now.setMonth(now.getMonth() - 3));
+                break;
+            case '6M':
+                dateFilter = new Date(now.setMonth(now.getMonth() - 6));
+                break;
+            case '1Y':
+                dateFilter = new Date(now.setFullYear(now.getFullYear() - 1));
+                break;
+            case 'ALL':
+            default:
+                dateFilter = undefined;
+        }
+
         const history = await prisma.netWorthSnapshot.findMany({
-            where: { userId },
+            where: {
+                userId,
+                date: dateFilter ? { gte: dateFilter } : undefined
+            },
             orderBy: { date: 'asc' },
-            take: 365,
             select: { date: true, allocation: true }
         });
 

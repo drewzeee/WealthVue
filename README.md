@@ -158,6 +158,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Integration & Webhooks
+
+### Plaid Webhooks
+Plaid uses webhooks to notify WealthVue of new transactions and account updates.
+
+- **Endpoint**: `POST https://your-domain.com/api/webhooks/plaid`
+- **Testing**: Using curl (replace with your domain):
+```bash
+curl -X POST https://your-domain.com/api/webhooks/plaid \
+  -H "Content-Type: application/json" \
+  -d '{"webhook_type": "TRANSACTIONS", "webhook_code": "SYNC_UPDATES_AVAILABLE", "item_id": "test_item"}'
+```
+
 ## Project Structure
 
 ```

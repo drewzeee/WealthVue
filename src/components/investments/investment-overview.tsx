@@ -13,6 +13,8 @@ import { formatCurrency } from "@/lib/utils"
 import { CryptoAllocationChart } from "./crypto-allocation-chart"
 import { StockAllocationChart } from "./stock-allocation-chart"
 import { AssetDailyChangeCard } from "./asset-daily-change-card"
+import { useState } from "react"
+import { TimeRange, TimeSelector } from "@/components/dashboard/time-selector"
 
 export interface InvestmentOverviewData {
     totalValue: number
@@ -46,10 +48,12 @@ export interface InvestmentOverviewData {
 }
 
 export function InvestmentOverview() {
+    const [range, setRange] = useState<TimeRange>("ALL")
+
     const { data, isLoading } = useQuery<{ success: boolean; data: InvestmentOverviewData }>({
-        queryKey: ["investment-overview"],
+        queryKey: ["investment-overview", range],
         queryFn: async () => {
-            const res = await fetch("/api/investments/overview")
+            const res = await fetch(`/api/investments/overview?range=${range}`)
             return res.json()
         }
     })
@@ -152,8 +156,9 @@ export function InvestmentOverview() {
             {/* Asset Class Allocation & Portfolio History */}
             <div className="grid gap-6 md:grid-cols-2">
                 <GlassCard glowColor="primary" className="p-0 overflow-hidden">
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Portfolio History</CardTitle>
+                        <TimeSelector selected={range} onChange={setRange} />
                     </CardHeader>
                     <CardContent className="h-[300px]">
                         <PortfolioHistoryChart data={overview.history} />
