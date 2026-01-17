@@ -7,6 +7,7 @@ import { AccountList } from "@/components/settings/account-list"
 import { AssetList } from "@/components/assets/asset-list"
 import { LiabilityList } from "@/components/liabilities/liability-list"
 import { FamilyManagement } from "@/components/settings/family-management"
+import { AISettings } from "@/components/ai/ai-settings"
 import { PreferencesSettings } from "@/components/settings/preferences-settings"
 import { SyncAccountsButton } from "@/components/settings/sync-accounts-button"
 import { Separator } from "@/components/ui/separator"
@@ -84,6 +85,7 @@ export default async function SettingsPage() {
                     <TabsTrigger value="liabilities">Manual Liabilities</TabsTrigger>
                     <TabsTrigger value="family">Family</TabsTrigger>
                     <TabsTrigger value="preferences">Preferences</TabsTrigger>
+                    <TabsTrigger value="ai">AI Assistant</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="accounts" className="space-y-6">
@@ -141,6 +143,10 @@ export default async function SettingsPage() {
 
                 <TabsContent value="preferences">
                     <PreferencesSettings initialTimezone={user?.timezone || "UTC"} />
+                </TabsContent>
+
+                <TabsContent value="ai">
+                    <AISettings />
                 </TabsContent>
             </Tabs>
         </div>

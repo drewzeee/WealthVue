@@ -1,4 +1,5 @@
 import { Header } from '@/components/shared'
+import { AIChatButton } from '@/components/ai/ai-chat-button'
 
 export default function AuthenticatedLayout({
   children,
@@ -9,6 +10,7 @@ export default function AuthenticatedLayout({
     <div className="min-h-screen bg-muted/30">
       <Header />
       <main className="container py-6">{children}</main>
+      <AIChatButton />
     </div>
   )
 }

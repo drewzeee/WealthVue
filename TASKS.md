@@ -219,6 +219,84 @@
 
 ---
 
+## Phase 6: AI Integration
+
+**Goal:** Enable intelligent financial insights via multi-provider LLM support (OpenAI, Anthropic, Gemini, Ollama).
+**Duration:** 2-3 weeks
+**Status:** � In Progress
+
+### 6.1 Foundation
+- ✅ Add AI-related models to Prisma schema (AIConfiguration, AIConversation, AIMessage)
+- ✅ Add AIProvider, AIPermissions, MessageRole enums
+- ✅ Run database migration
+- ✅ Update User model with AI relations
+- ✅ Create base provider interface (`src/lib/services/ai/providers/types.ts`)
+- ✅ Create abstract base provider class (`base-provider.ts`)
+
+### 6.2 Context Builder Service
+- ✅ Create `context-builder.service.ts` with financial data aggregation
+- ✅ Implement `buildSummaryContext()` (~500 tokens)
+- ✅ Implement `buildStandardContext()` (~2,000 tokens)
+- ✅ Implement `buildDetailedContext()` (~5,000 tokens)
+- ✅ Implement selective context builders (transactions, investments, budgets)
+- ✅ Add token estimation utilities
+- ✅ Write unit tests for context builder
+
+### 6.3 AI Providers
+- ✅ Install AI SDKs (openai, @anthropic-ai/sdk, @google/genai, ai)
+- ✅ Implement OpenAI provider (`openai.provider.ts`)
+- ✅ Implement Ollama provider (`ollama.provider.ts`) - HTTP-based, no SDK
+- ✅ Implement Anthropic provider (`anthropic.provider.ts`)
+- ✅ Implement Gemini provider (`gemini.provider.ts`)
+- ✅ Create AI router service (`ai-router.service.ts`)
+- ✅ Add provider fallback and retry logic
+- ✅ Write unit tests for providers (mocked responses)
+
+### 6.4 API Endpoints
+- ✅ Create `/api/ai/config` GET endpoint (retrieve configuration)
+- ✅ Create `/api/ai/config` PATCH endpoint (update configuration)
+- ✅ Create `/api/ai/chat` POST endpoint (chat with streaming)
+- ✅ Create `/api/ai/conversations` GET endpoint (list conversations)
+- ✅ Create `/api/ai/conversations/[id]` GET endpoint (get conversation)
+- ✅ Create `/api/ai/conversations/[id]` DELETE endpoint (delete conversation)
+- ✅ Add API key encryption/decryption for storage
+- ✅ Add input validation with Zod schemas
+
+### 6.5 Frontend - Settings
+- 🔲 Create `AISettings` component (`src/components/ai/ai-settings.tsx`)
+- 🔲 Add provider selection dropdown with status indicators
+- 🔲 Add API key input fields (masked, secure)
+- 🔲 Add Ollama endpoint/model configuration
+- 🔲 Add permission level toggle (Read-Only / Suggest / Write)
+- 🔲 Add enable/disable toggle
+- 🔲 Integrate into Settings page
+
+### 6.6 Frontend - Chat UI
+- 🔲 Create `AIChat` floating panel component (`src/components/ai/ai-chat.tsx`)
+- 🔲 Create `AIChatMessage` component for message display
+- 🔲 Create `AIProviderStatus` indicator component
+- 🔲 Implement streaming response display
+- 🔲 Add conversation history sidebar
+- 🔲 Add context level toggle (Summary/Standard/Detailed)
+- 🔲 Add chat input with send button
+- 🔲 Add responsive mobile layout
+- 🔲 Add chat button to main layout (floating action button)
+
+### 6.7 Polish & Testing
+- 🔲 Add conversation persistence (title auto-generation)
+- 🔲 Add token usage tracking and display
+- 🔲 Implement rate limiting for AI endpoints
+- 🔲 Add error handling and user-friendly error messages
+- 🔲 Write integration tests for chat flow
+- 🔲 Test all four providers end-to-end
+- 🔲 Test permission levels (Read-Only, Suggest, Write)
+- 🔲 Mobile responsiveness testing
+- 🔲 Documentation (usage guide in README)
+
+**Phase 6 Progress: 27/48 tasks completed (56%)**
+
+---
+
 ## Odds and Ends
 - ✅ Plaid link modal non-responsive
 - ✅ Improve CSV transaction import
@@ -292,4 +370,4 @@ npm run format          # Format code with Prettier
 
 ---
 
-**Last Updated:** 2026-01-16 (Transaction Filtering Fix)
+**Last Updated:** 2026-01-17 (AI Integration Foundation Complete)

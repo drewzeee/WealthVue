@@ -44,6 +44,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // AI Configuration & History
+  aiConfiguration AiConfiguration?
+  aiConversations AiConversation[]
+
   @@map("users")
 }
 
@@ -471,4 +475,81 @@ model NetWorthSnapshot {
 
   @@unique([userId, date], name: "userId_date")
   @@map("net_worth_snapshots")
+}
+
+// ============================================================================
+// AI INTEGRATION
+// ============================================================================
+
+model AiConfiguration {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Provider settings
+  activeProvider  AiProvider @default(OPENAI)
+  openaiApiKey    String?    // Encrypted
+  anthropicApiKey String?    // Encrypted
+  geminiApiKey    String?    // Encrypted
+  ollamaEndpoint  String?    @default("http://localhost:11434")
+  ollamaModel     String?    @default("llama3.2")
+  
+  // Feature flags
+  enabled         Boolean    @default(true)
+  permissions     AiPermissions @default(READ_ONLY)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ai_configurations")
+}
+
+model AiConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String?
+  messages  AiMessage[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id             String         @id @default(cuid())
+  conversationId String
+  conversation   AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           MessageRole
+  content        String
+  provider       AiProvider?
+  tokensUsed     Int?
+  
+  createdAt DateTime @default(now())
+
+  @@index([conversationId])
+  @@map("ai_messages")
+}
+
+enum AiProvider {
+  OPENAI
+  ANTHROPIC
+  GEMINI
+  OLLAMA
+}
+
+enum AiPermissions {
+  READ_ONLY      // Can only query data
+  SUGGEST        // Can suggest changes
+  WRITE          // Can make changes (with confirmation)
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
 }
