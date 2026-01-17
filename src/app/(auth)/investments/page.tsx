@@ -65,6 +65,8 @@ export default function InvestmentsPage() {
     const [accountFilter, setAccountFilter] = useState<string>("all")
     const [assetClassFilter, setAssetClassFilter] = useState<string>("all")
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+    const [sortBy, setSortBy] = useState<string>("symbol")
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
     // Edit/Delete state
     const [editInvestment, setEditInvestment] = useState<InvestmentRow | null>(null)
@@ -84,13 +86,15 @@ export default function InvestmentsPage() {
 
     // Fetch investments
     const { data: investmentsData, isLoading } = useQuery<InvestmentListResponse>({
-        queryKey: ["investments", page, search, accountFilter, assetClassFilter],
+        queryKey: ["investments", page, search, accountFilter, assetClassFilter, sortBy, sortOrder],
         queryFn: async () => {
             const params = new URLSearchParams()
             params.set("page", String(page))
             if (search) params.set("search", search)
             if (accountFilter && accountFilter !== "all") params.set("accountId", accountFilter)
             if (assetClassFilter && assetClassFilter !== "all") params.set("assetClass", assetClassFilter)
+            if (sortBy) params.set("sortBy", sortBy)
+            if (sortOrder) params.set("sortOrder", sortOrder)
 
             const res = await fetch(`/api/investments?${params}`)
             return res.json()
@@ -250,6 +254,11 @@ export default function InvestmentsPage() {
                             isLoading={isLoading}
                             onEdit={setEditInvestment}
                             onDelete={setDeleteInvestment}
+                            onSortingChange={(sortBy, sortOrder) => {
+                                setSortBy(sortBy)
+                                setSortOrder(sortOrder)
+                                setPage(1) // Reset to first page when sorting changes
+                            }}
                         />
                     </Suspense>
                 </TabsContent>

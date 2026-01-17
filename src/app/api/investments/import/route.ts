@@ -40,13 +40,43 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        // Fetch existing investments to prevent duplicates
+        const { investments: existingInvestments } = await investmentRepository.findMany({
+            userId: session.user.id,
+            accountId: accountId,
+            limit: 1000 // Assume no more than 1000 positions per account for simplicity
+        })
+
+        // Filter out duplicates
+        const newInvestments = investments.filter(inv => {
+            const isDuplicate = existingInvestments.some(existing => {
+                const sameSymbol = existing.symbol?.toLowerCase() === inv.symbol.toLowerCase()
+                const sameQuantity = Number(existing.quantity) === inv.quantity
+                const sameCostBasis = Number(existing.costBasis) === inv.costBasis
+
+                // Compare dates by day
+                const existingDate = existing.purchaseDate.toISOString().split('T')[0]
+                const incomingDate = inv.purchaseDate
+                    ? new Date(inv.purchaseDate).toISOString().split('T')[0]
+                    : new Date().toISOString().split('T')[0]
+                const sameDate = existingDate === incomingDate
+
+                return sameSymbol && sameQuantity && sameCostBasis && sameDate
+            })
+            return !isDuplicate
+        })
+
+        if (newInvestments.length === 0) {
+            return NextResponse.json({ success: true, count: 0, message: "No new investments to import (all appear to be duplicates)" }, { status: 200 })
+        }
+
         // Fetch prices
         // We'll separate by likely asset class or just try both if generic.
         // For simplicity in import, we assume most are STOCKS/ETFs unless specified otherwise,
         // but if the user mapped 'assetClass', we use it.
 
-        const cryptoSymbols = investments.filter(i => i.assetClass === AssetClass.CRYPTO).map(i => i.symbol)
-        const stockSymbols = investments.filter(i => i.assetClass !== AssetClass.CRYPTO).map(i => i.symbol)
+        const cryptoSymbols = newInvestments.filter(i => i.assetClass === AssetClass.CRYPTO).map(i => i.symbol)
+        const stockSymbols = newInvestments.filter(i => i.assetClass !== AssetClass.CRYPTO).map(i => i.symbol)
 
         let stockData: Record<string, any> = {}
         let cryptoData: Record<string, any> = {}
@@ -72,11 +102,7 @@ export async function POST(req: NextRequest) {
         await Promise.all(fetchPromises)
 
         // Create records
-        // We'll do this in parallel or a loop since we don't have a true 'createMany' with side effects (AssetPrice) in our repo yet
-        // and we want to use the repository logic if possible, or just raw prisma.
-        // Given the volume might be 10-100, a loop with Promise.all is fine.
-
-        const results = await Promise.all(investments.map(async (inv) => {
+        const results = await Promise.all(newInvestments.map(async (inv) => {
             const dataMap = inv.assetClass === AssetClass.CRYPTO ? cryptoData : stockData
             // Try symbol match, then lowercase match
             const priceInfo = dataMap[inv.symbol] || dataMap[inv.symbol.toLowerCase()]

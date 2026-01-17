@@ -72,6 +72,8 @@ export function InvestmentMobileCard({
                                     <Wallet className="h-3 w-3" />
                                     {investment.account.name}
                                 </span>
+                                <span>•</span>
+                                <span>{investment.purchaseDate ? new Date(investment.purchaseDate).toLocaleDateString() : "—"}</span>
                             </div>
                         </div>
                     </div>

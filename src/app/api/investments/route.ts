@@ -23,6 +23,9 @@ export async function GET(req: NextRequest) {
         ? (assetClassParam as AssetClass)
         : undefined
     const search = searchParams.get("search") || undefined
+    const sortBy = searchParams.get("sortBy") || undefined
+    const sortOrderParam = searchParams.get("sortOrder") || undefined
+    const sortOrder = sortOrderParam === "asc" || sortOrderParam === "desc" ? sortOrderParam : undefined
 
     try {
         const { total, investments } = await investmentRepository.findMany({
@@ -32,6 +35,8 @@ export async function GET(req: NextRequest) {
             search,
             limit,
             offset,
+            sortBy,
+            sortOrder,
         })
 
         return NextResponse.json({
