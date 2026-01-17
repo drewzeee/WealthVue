@@ -1,15 +1,98 @@
 # WealthVue
 
-A comprehensive personal financial dashboard that unifies budget management, investment tracking, and asset overview in a single, intuitive application.
+**Your Complete Financial Picture, Finally in One Place.**
 
-## Features
+WealthVue is a comprehensive personal financial dashboard that eliminates the fragmentation of managing your money across multiple apps and spreadsheets. Track budgets, investments, and net worth with a single, unified platform that you control.
 
-- **Budget Management**: Create custom categories, set monthly budgets, and track spending
-- **Transaction Sync**: Automatic bank account syncing via Plaid + manual entry + CSV import
-- **Investment Tracking**: Multi-asset class support (stocks, crypto, real estate, metals, commodities) with real-time pricing, 24h performance tracking, and dedicated crypto/stock allocation views
-- **Net Worth Dashboard**: Complete financial overview with allocation charts, key metrics, and timezone-aware historical snapshots
-- **Family Accounts**: Link accounts with family members for household finance management
-- **Self-Hosted**: Run on your own infrastructure via Docker Compose
+Stop juggling Mint for budgeting, Personal Capital for investments, and Excel for net worth tracking—WealthVue does it all.
+
+---
+
+## Screenshots
+### Dashboard
+![WealthVue Dashboard](./images/dashboard.png)
+### Budget Management
+![Budget View](./images/budget-view.png)
+
+## Why WealthVue?
+
+### 🎯 **Unified Financial Management**
+Unlike traditional finance apps that focus on just budgeting *or* just investments, WealthVue seamlessly integrates both—along with comprehensive asset tracking—so you see your complete financial picture in one dashboard.
+
+### 🔒 **Privacy-First & Self-Hosted**
+Your financial data is sensitive. WealthVue is designed to be self-hosted via Docker, meaning your data stays on your own infrastructure, under your control. No third-party data sharing, no privacy concerns.
+
+### 💎 **Multi-Asset Portfolio Tracking**
+Most finance apps only track stocks and bonds. WealthVue supports **stocks, crypto, real estate, precious metals, commodities, and more**—giving sophisticated investors the flexibility they need for modern, diversified portfolios.
+
+### 👨‍👩‍👧‍👦 **Built for Families**
+Link accounts with family members to manage household finances together while maintaining independent logins. See combined net worth, shared budgets, and individual spending in one place.
+
+### 🤖 **Smart Automation Without Losing Control**
+Automatically sync bank transactions via Plaid, apply intelligent categorization rules, and get real-time portfolio pricing—but retain full manual override for complete flexibility.
+
+---
+
+## What You Can Do with WealthVue
+
+### **📊 Track Your Complete Net Worth**
+- See all your assets and liabilities in one comprehensive dashboard
+- Monitor net worth changes over time with interactive historical charts
+- View asset allocation breakdowns (cash, stocks, crypto, real estate, etc.)
+- Get timezone-aware daily snapshots for accurate tracking
+
+### **💰 Master Your Budget**
+- Create custom budget categories that match how you actually spend
+- Set monthly budgets with flexible carry-over rules (roll unused funds or start fresh)
+- Automatically categorize transactions with intelligent rules
+- Track spending vs. budget with visual progress indicators
+
+### **📈 Monitor Your Investments**
+- Track diverse portfolios: stocks, ETFs, crypto, real estate, precious metals, commodities
+- Real-time pricing updates for stocks (Yahoo Finance) and crypto (CoinGecko)
+- View dedicated allocation charts for crypto and stock holdings
+- Monitor 24h performance and market movers
+- Calculate gains/losses and ROI across all asset classes
+
+### **🏦 Sync All Your Accounts**
+- Automatic bank transaction syncing via Plaid integration
+- Manual transaction entry for cash purchases and non-connected accounts
+- CSV import for bulk transaction uploads
+- Comprehensive transaction filtering and search
+
+### **🏠 Manage Family Finances**
+- Link accounts with family members for household visibility
+- Toggle between personal and household views
+- Share budgets and track combined net worth
+- Maintain separate logins with appropriate privacy controls
+
+---
+
+## Key Benefits
+
+✅ **Stop Context Switching** – One app for budgets, investments, and net worth  
+✅ **Own Your Data** – Self-hosted deployment means complete privacy control  
+✅ **Track Any Asset** – From stocks to crypto to real estate, all in one portfolio  
+✅ **Automate the Boring Stuff** – Smart rules and syncing save hours every month  
+✅ **See the Full Picture** – Understand where you stand financially at a glance  
+✅ **Plan Together** – Family account linking for household financial management  
+
+---
+
+## Features at a Glance
+
+- ✅ **Automated Transaction Syncing** via Plaid
+- ✅ **Manual Transaction Entry** and CSV Import
+- ✅ **Custom Budget Categories** with flexible carry-over rules
+- ✅ **Intelligent Transaction Categorization** with rule engine
+- ✅ **Multi-Asset Investment Tracking** (stocks, crypto, real estate, metals, commodities)
+- ✅ **Real-Time Portfolio Pricing** (Yahoo Finance + CoinGecko)
+- ✅ **24h Performance Tracking** and market movers
+- ✅ **Net Worth Dashboard** with historical snapshots
+- ✅ **Interactive Allocation Charts** with hover effects
+- ✅ **Family Account Linking** for household finances
+- ✅ **Mobile-Optimized** responsive design
+- ✅ **Self-Hosted** via Docker Compose
 
 ## Tech Stack
 

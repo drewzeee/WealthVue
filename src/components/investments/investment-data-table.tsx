@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     ColumnDef,
     flexRender,
     getCoreRowModel,
     useReactTable,
     SortingState,
-    getSortedRowModel,
     OnChangeFn,
     RowSelectionState,
 } from "@tanstack/react-table"
@@ -36,6 +35,7 @@ interface DataTableProps<TData, TValue> {
     isLoading?: boolean
     onEdit?: (investment: TData) => void
     onDelete?: (investment: TData) => void
+    onSortingChange?: (sortBy: string, sortOrder: "asc" | "desc") => void
 }
 
 export function InvestmentDataTable<TData, TValue>({
@@ -49,14 +49,24 @@ export function InvestmentDataTable<TData, TValue>({
     isLoading,
     onEdit,
     onDelete,
+    onSortingChange,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
+
+    // Communicate sorting changes to parent for server-side sorting
+    useEffect(() => {
+        if (sorting.length > 0 && onSortingChange) {
+            const sortColumn = sorting[0]
+            onSortingChange(sortColumn.id, sortColumn.desc ? "desc" : "asc")
+        }
+    }, [sorting, onSortingChange])
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         manualPagination: true,
+        manualSorting: true, // Enable manual sorting for server-side
         pageCount: pageCount,
         state: {
             pagination: {
@@ -69,7 +79,6 @@ export function InvestmentDataTable<TData, TValue>({
         enableRowSelection: true,
         onSortingChange: setSorting,
         onRowSelectionChange: onRowSelectionChange,
-        getSortedRowModel: getSortedRowModel(),
     })
 
     const selectedCount = Object.keys(rowSelection || {}).length

@@ -115,6 +115,22 @@ export function getInvestmentColumns(actions?: ColumnActions): ColumnDef<Investm
             cell: ({ row }) => row.original.account.name,
         },
         {
+            accessorKey: "purchaseDate",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Date
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => {
+                const date = row.getValue("purchaseDate")
+                return date ? new Date(date as string).toLocaleDateString() : "—"
+            },
+        },
+        {
             accessorKey: "quantity",
             header: () => <div className="text-right">Shares</div>,
             cell: ({ row }) => {

@@ -111,6 +111,8 @@ export type InvestmentFilter = {
     search?: string
     limit?: number
     offset?: number
+    sortBy?: string
+    sortOrder?: "asc" | "desc"
 }
 
 export class InvestmentRepository {
@@ -121,6 +123,8 @@ export class InvestmentRepository {
         search,
         limit = 50,
         offset = 0,
+        sortBy = "symbol",
+        sortOrder = "asc",
     }: InvestmentFilter) {
         const where: Prisma.InvestmentWhereInput = {
             account: { userId },
@@ -136,13 +140,25 @@ export class InvestmentRepository {
                 : {}),
         }
 
+        // Build orderBy clause based on sortBy parameter
+        let orderBy: Prisma.InvestmentOrderByWithRelationInput[] = []
+
+        if (sortBy === "symbol" || sortBy === "name" || sortBy === "assetClass" || sortBy === "purchaseDate") {
+            orderBy = [{ [sortBy]: sortOrder }]
+        } else if (sortBy === "account") {
+            orderBy = [{ account: { name: sortOrder } }]
+        } else {
+            // Default to symbol ascending
+            orderBy = [{ symbol: "asc" }]
+        }
+
         const [total, investments] = await Promise.all([
             prisma.investment.count({ where }),
             prisma.investment.findMany({
                 where,
                 take: limit,
                 skip: offset,
-                orderBy: [{ symbol: "asc" }],
+                orderBy,
                 include: {
                     account: { select: { id: true, name: true, type: true } },
                 },

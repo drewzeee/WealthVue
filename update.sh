@@ -6,8 +6,8 @@
 
 set -e
 
-PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
-USER_NAME="${USER_NAME:-$(whoami)}"
+PROJECT_ROOT="/home/andrew/wealthvue"
+USER_NAME="andrew"
 
 echo "🔄 Starting WealthVue update..."
 
