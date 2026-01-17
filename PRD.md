@@ -134,12 +134,14 @@ The MVP will deliver a fully-featured financial management platform with multi-u
 ### ❌ Out of Scope - Future Phases
 
 **Phase 2+ Features:**
-**AI Integration (Phase 6 Foundation Complete):**
+**AI Integration:**
 - ✅ Context-aware financial chat
 - ✅ Multi-provider support (OpenAI, Anthropic, Gemini, Ollama)
 - ✅ Secure API key storage (AES-256-GCM)
 - ✅ Streaming chat responses
 - ✅ Historical conversation persistence
+- ✅ Tunable context levels (Summary, Standard, Detailed)
+- ✅ Permission-based controls (Read-Only, Suggest, Write)
 - ❌ OAuth authentication (Google, GitHub, etc.)
 - ❌ Two-factor authentication (2FA)
 - ❌ Bill payment reminders and alerts

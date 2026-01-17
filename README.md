@@ -62,11 +62,17 @@ Automatically sync bank transactions via Plaid, apply intelligent categorization
 - CSV import for bulk transaction uploads
 - Comprehensive transaction filtering and search
 
-### **🏠 Manage Family Finances**
+### 🏠 Manage Family Finances
 - Link accounts with family members for household visibility
 - Toggle between personal and household views
 - Share budgets and track combined net worth
 - Maintain separate logins with appropriate privacy controls
+
+### 🤖 Smart AI Assistant
+- Chat with an intelligent financial assistant powered by OpenAI, Anthropic, Gemini, or local Ollama models
+- Get instant summaries of your net worth, spending habits, and investment performance
+- Ask complex questions about your financial history with context-aware insights
+- Control data privacy with tunable context levels and permission settings
 
 ---
 
@@ -93,6 +99,9 @@ Automatically sync bank transactions via Plaid, apply intelligent categorization
 - ✅ **Net Worth Dashboard** with historical snapshots
 - ✅ **Interactive Allocation Charts** with hover effects
 - ✅ **Family Account Linking** for household finances
+- ✅ **Interactive AI Assistant** with multi-provider support (OpenAI, Anthropic, Gemini, Ollama)
+- ✅ **Secure API Key Management** with encryption-at-rest
+- ✅ **Real-Time AI Streaming** and full markdown support
 - ✅ **Mobile-Optimized** responsive design
 - ✅ **Self-Hosted** via Docker Compose
 
@@ -106,7 +115,7 @@ Automatically sync bank transactions via Plaid, apply intelligent categorization
 
 ## Project Status
 
-✅ **Phase 4: Dashboard, Net Worth & Family Accounts** - Complete
+✅ **Phase 6: AI Integration** - Complete
 
 See [TASKS.md](./TASKS.md) for detailed task breakdown and progress.
 
@@ -284,7 +293,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 **Current Phase**: MVP Release (v1.0.0)
-**Last Major Update**: Pre-release Housekeeping & Cleanup
+**Last Major Update**: Interactive AI Assistant & Multi-Provider Support
 **Next Phase**: Community Feedback & Feature Expansion
 
 See [TASKS.md](./TASKS.md) for detailed progress tracking.

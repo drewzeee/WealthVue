@@ -11,9 +11,9 @@ WealthVue AI is a multi-provider AI integration that provides context-aware fina
 
 ## Data Model Changes
 The following models were added to `prisma/schema.prisma`:
-- **AIConfiguration:** Stores user settings, active provider, and encrypted API keys.
-- **AIConversation:** Groups messages into distinct chat sessions.
-- **AIMessage:** Stores individual chat messages with roles (USER, ASSISTANT, SYSTEM).
+- **AiConfiguration:** Stores user settings, active provider, and encrypted API keys.
+- **AiConversation:** Groups messages into distinct chat sessions.
+- **AiMessage:** Stores individual chat messages with roles (USER, ASSISTANT, SYSTEM).
 
 ## API Endpoints
 - `GET /api/ai/config`: Retrieve user AI configuration (keys masked).
@@ -38,17 +38,9 @@ Routes chat requests to the active provider and handles secure decryption of API
 - `GeminiProvider`: Implements Gemini 1.5 Pro support.
 - `OllamaProvider`: Implements local LLM support via HTTP.
 
-## Implementation Status
-- ✅ Database Schema & Migrations
-- ✅ AI Provider Abstractions
-- ✅ Context Builder Service
-- ✅ API Key Encryption
-- ✅ Multi-Provider Implementations
-- ✅ AI Router Service
-- ✅ AI API Endpoints
-- ✅ Unit Tests for services and providers
-
-## Future Work
-- AI Chat Sidebar UI component.
-- AI Settings UI for user configuration.
+- ✅ AI Settings UI for user configuration
+- ✅ AI Chat Sidebar UI component
+- ✅ Streaming Chat UI with Markdown
+- ✅ Multiple context levels supported
+- ✅ Secure API Key Storage
 - Proactive AI financial insights on the Dashboard.
