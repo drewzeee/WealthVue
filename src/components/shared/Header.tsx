@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Wallet,
-  CreditCard,
   TrendingUp,
   Menu,
   X,
@@ -20,7 +19,6 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/budget', label: 'Budget', icon: Wallet },
-  { href: '/transactions', label: 'Transactions', icon: CreditCard },
   { href: '/investments', label: 'Investments', icon: TrendingUp },
 ]
 

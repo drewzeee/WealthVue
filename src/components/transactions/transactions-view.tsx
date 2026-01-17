@@ -1,0 +1,133 @@
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
+import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/db/client"
+import { transactionRepository } from "@/lib/db/repositories/transactions"
+import { TransactionsTableShell } from "@/components/transactions/transactions-table-shell"
+import { TransactionFilters } from "@/components/transactions/transaction-filters"
+import { ImportCSVDialog } from "@/components/transactions/import-csv-dialog"
+import { AddTransactionDialog } from "@/components/transactions/add-transaction-dialog"
+import { TransactionSummaryCards } from "@/components/transactions/transaction-summary-cards"
+
+interface TransactionsViewProps {
+    searchParams: {
+        page?: string
+        from?: string
+        to?: string
+        accountId?: string
+        categoryId?: string
+        search?: string
+        type?: 'income' | 'expense' | 'all'
+        amountMin?: string
+        amountMax?: string
+        merchant?: string
+        isTransfer?: string
+        uncategorized?: string
+    }
+}
+
+export async function TransactionsView({ searchParams }: TransactionsViewProps) {
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+        redirect("/login")
+    }
+
+    const page = Number(searchParams.page) || 1
+    const limit = 50
+    const offset = (page - 1) * limit
+
+    const accountId = searchParams.accountId
+        ? searchParams.accountId.includes(",")
+            ? searchParams.accountId.split(",")
+            : searchParams.accountId
+        : undefined
+
+    const categoryId = searchParams.categoryId
+        ? searchParams.categoryId.includes(",")
+            ? searchParams.categoryId.split(",")
+            : searchParams.categoryId
+        : undefined
+
+    // Fetch data in parallel
+    const [
+        { transactions, total },
+        summary,
+        accounts,
+        categories
+    ] = await Promise.all([
+        transactionRepository.findMany({
+            userId: session.user.id,
+            startDate: searchParams.from ? new Date(searchParams.from) : undefined,
+            endDate: searchParams.to ? new Date(searchParams.to) : undefined,
+            accountId,
+            categoryId,
+            search: searchParams.search,
+            type: searchParams.type,
+            amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
+            amountMax: searchParams.amountMax ? parseFloat(searchParams.amountMax) : undefined,
+            merchant: searchParams.merchant,
+            isTransfer: searchParams.isTransfer === "true" ? true : searchParams.isTransfer === "false" ? false : undefined,
+            uncategorized: searchParams.uncategorized === "true",
+            limit,
+            offset,
+        }),
+        transactionRepository.getSummary({
+            userId: session.user.id,
+            startDate: searchParams.from ? new Date(searchParams.from) : undefined,
+            endDate: searchParams.to ? new Date(searchParams.to) : undefined,
+            accountId,
+            categoryId,
+            search: searchParams.search,
+            type: searchParams.type,
+            amountMin: searchParams.amountMin ? parseFloat(searchParams.amountMin) : undefined,
+            amountMax: searchParams.amountMax ? parseFloat(searchParams.amountMax) : undefined,
+            merchant: searchParams.merchant,
+            isTransfer: searchParams.isTransfer === "true" ? true : searchParams.isTransfer === "false" ? false : undefined,
+            uncategorized: searchParams.uncategorized === "true",
+        }),
+        prisma.account.findMany({
+            where: { userId: session.user.id },
+            orderBy: { name: "asc" },
+        }),
+        prisma.category.findMany({
+            where: { userId: session.user.id },
+            select: { id: true, name: true, color: true, icon: true },
+            orderBy: { name: "asc" },
+        }),
+    ])
+
+    const pageCount = Math.ceil(total / limit)
+
+    return (
+        <div className="flex flex-col space-y-4 md:space-y-8">
+            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Transactions</h2>
+                    <p className="text-muted-foreground">
+                        View and manage your financial transactions.
+                    </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                    <ImportCSVDialog accounts={accounts} />
+                    <AddTransactionDialog accounts={accounts} categories={categories} />
+                </div>
+            </div>
+
+            <TransactionSummaryCards
+                totalCount={summary.count}
+                totalIncome={Number(summary.totalIncome)}
+                totalExpenses={Number(summary.totalExpenses)}
+            />
+
+            <div className="space-y-4">
+                <TransactionFilters accounts={accounts} categories={categories} />
+                <TransactionsTableShell
+                    data={transactions}
+                    pageCount={pageCount}
+                    categories={categories}
+                    accounts={accounts}
+                />
+            </div>
+        </div>
+    )
+}

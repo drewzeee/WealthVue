@@ -38,13 +38,11 @@ export function TransactionFilters({ accounts, categories }: TransactionFiltersP
     [searchParams]
   )
 
-  // Sync search input with URL if changed externally
+  // Sync search input with URL if changed externally (e.g. back button)
   useEffect(() => {
     const urlSearch = searchParams.get("search") || ""
-    if (urlSearch !== search) {
-      setSearch(urlSearch)
-    }
-  }, [searchParams, search])
+    setSearch(urlSearch)
+  }, [searchParams.get("search")]) // Only run when the specific param changes in URL
 
   // Update URL when debounced search changes
   useEffect(() => {
