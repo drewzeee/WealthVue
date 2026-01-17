@@ -13,6 +13,8 @@ Stop juggling Mint for budgeting, Personal Capital for investments, and Excel fo
 ![WealthVue Dashboard](./images/dashboard.png)
 ### Budget Management
 ![Budget View](./images/budget-view.png)
+### Investment Management
+![Investment View](./images/investments.png)
 
 ## Why WealthVue?
 
