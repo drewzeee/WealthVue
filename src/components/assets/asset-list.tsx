@@ -27,7 +27,11 @@ interface Asset {
     notes: string | null
 }
 
-export function AssetList() {
+interface AssetListProps {
+    onSuccess?: () => void
+}
+
+export function AssetList({ onSuccess }: AssetListProps) {
     const [assets, setAssets] = useState<Asset[]>([])
     const [loading, setLoading] = useState(true)
     const router = useRouter()
@@ -60,6 +64,7 @@ export function AssetList() {
             if (response.ok) {
                 toast.success('Asset deleted')
                 fetchAssets()
+                onSuccess?.()
                 router.refresh()
             } else {
                 toast.error('Failed to delete asset')
@@ -105,7 +110,10 @@ export function AssetList() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Manual Assets</h3>
-                <AddAssetDialog />
+                <AddAssetDialog onSuccess={() => {
+                    fetchAssets()
+                    onSuccess?.()
+                }} />
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -150,6 +158,10 @@ export function AssetList() {
                                     <div className="flex items-center justify-end gap-2">
                                         <AddAssetDialog
                                             asset={asset}
+                                            onSuccess={() => {
+                                                fetchAssets()
+                                                onSuccess?.()
+                                            }}
                                             trigger={
                                                 <Button variant="ghost" size="icon">
                                                     <Pencil className="h-4 w-4" />

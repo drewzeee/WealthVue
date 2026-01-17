@@ -39,9 +39,10 @@ import { assetFormSchema, type AssetFormInput } from '@/lib/validations/asset'
 interface AddAssetDialogProps {
     asset?: any // For editing
     trigger?: React.ReactNode
+    onSuccess?: () => void
 }
 
-export function AddAssetDialog({ asset, trigger }: AddAssetDialogProps) {
+export function AddAssetDialog({ asset, trigger, onSuccess }: AddAssetDialogProps) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const router = useRouter()
@@ -80,6 +81,7 @@ export function AddAssetDialog({ asset, trigger }: AddAssetDialogProps) {
                 toast.success(isEditing ? 'Asset updated' : 'Asset added')
                 setOpen(false)
                 if (!isEditing) form.reset()
+                onSuccess?.()
                 router.refresh()
             } else {
                 toast.error('Failed to save asset')

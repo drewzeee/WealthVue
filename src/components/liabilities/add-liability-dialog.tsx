@@ -39,9 +39,10 @@ import { liabilityFormSchema, type LiabilityFormInput } from '@/lib/validations/
 interface AddLiabilityDialogProps {
     liability?: any // For editing
     trigger?: React.ReactNode
+    onSuccess?: () => void
 }
 
-export function AddLiabilityDialog({ liability, trigger }: AddLiabilityDialogProps) {
+export function AddLiabilityDialog({ liability, trigger, onSuccess }: AddLiabilityDialogProps) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const router = useRouter()
@@ -95,6 +96,7 @@ export function AddLiabilityDialog({ liability, trigger }: AddLiabilityDialogPro
                 toast.success(isEditing ? 'Liability updated' : 'Liability added')
                 setOpen(false)
                 if (!isEditing) form.reset()
+                onSuccess?.()
                 router.refresh()
             } else {
                 toast.error('Failed to save liability')

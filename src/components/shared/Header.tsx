@@ -7,7 +7,6 @@ import {
   Wallet,
   CreditCard,
   TrendingUp,
-  Building2,
   Menu,
   X,
 } from 'lucide-react'
@@ -23,7 +22,6 @@ const navItems = [
   { href: '/budget', label: 'Budget', icon: Wallet },
   { href: '/transactions', label: 'Transactions', icon: CreditCard },
   { href: '/investments', label: 'Investments', icon: TrendingUp },
-  { href: '/assets', label: 'Assets', icon: Building2 },
 ]
 
 export function Header() {
